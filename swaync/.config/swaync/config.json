@@ -1,0 +1,23 @@
+{
+  "positionX": "right",
+  "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "notification-window-width": 420,
+  "control-center-width": 420,
+  "control-center-height": 700,
+  "notification-icon-size": 48,
+  "notification-body-image-height": 100,
+  "notification-body-image-width": 200,
+  "timeout": 6,
+  "timeout-low": 3,
+  "timeout-critical": 0,
+  "fit-to-screen": true,
+  "keyboard-shortcuts": true,
+  "image-visibility": "when-available",
+  "widgets": [
+    "title",
+    "dnd",
+    "notifications"
+  ]
+}

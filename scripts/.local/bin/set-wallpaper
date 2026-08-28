@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+CURRENT_WALLPAPER="$WALLPAPER_DIR/main.png"
+MONITOR="DP-2"
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: set-wallpaper <image>"
+    exit 1
+fi
+
+INPUT="$1"
+
+if [[ ! -f "$INPUT" ]]; then
+    echo "Wallpaper not found: $INPUT"
+    exit 1
+fi
+
+mkdir -p "$WALLPAPER_DIR"
+
+# Resolve the original path before replacing main.png.
+INPUT="$(realpath "$INPUT")"
+CURRENT_REAL="$(realpath -m "$CURRENT_WALLPAPER")"
+
+# Keep a stable wallpaper path for hyprpaper/hyprlock/etc.
+if [[ "$INPUT" != "$CURRENT_REAL" ]]; then
+    cp "$INPUT" "$CURRENT_WALLPAPER"
+fi
+
+echo "Generating theme..."
+matugen image "$CURRENT_WALLPAPER"
+
+echo "Setting wallpaper..."
+hyprctl hyprpaper wallpaper "$MONITOR,$CURRENT_WALLPAPER,cover"
+
+echo "Reloading Hyprland..."
+hyprctl reload
+
+if pgrep -x waybar >/dev/null; then
+    echo "Reloading Waybar..."
+    pkill -SIGUSR2 waybar
+fi
+
+if pgrep -x swaync >/dev/null; then
+    echo "Reloading SwayNC..."
+    swaync-client -rs
+fi
+
+echo "Wallpaper and theme updated."

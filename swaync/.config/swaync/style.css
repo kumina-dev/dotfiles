@@ -1,0 +1,47 @@
+@import "../theme/colors.css";
+
+* {
+    font-family: "Noto Sans", sans-serif",
+}
+
+.control-center {
+    background: alpha(@surface, 0.94);
+    border: 1px solid @outline;
+    border-radius: 16px;
+    margin: 10px;
+    padding: 10px;
+}
+
+.notification-row {
+    outline: none;
+}
+
+.notification {
+    background: @surface_container;
+    border: 1px solid @outline;
+    border-radius: 12px;
+    margin: 6px;
+    padding: 4px;
+}
+
+.notification-content {
+    padding: 8px;
+}
+
+.summary {
+    font-weight: 600;
+}
+
+.body {
+    color: @text_muted;
+}
+
+.widget-title {
+    margin: 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.widget-dnd {
+    margin: 8px;
+}

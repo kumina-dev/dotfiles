@@ -1,0 +1,72 @@
+{
+  "layer": "top",
+  "position": "top",
+  "spacing": 6,
+
+  "modules-left": [
+    "hyprland/workspaces",
+    "hyprland/window"
+  ],
+
+  "modules-center": [
+    "clock"
+  ],
+
+  "modules-right": [
+    "tray",
+    "hyprland/language",
+    "network",
+    "bluetooth",
+    "pulseaudio"
+  ],
+
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "on-click": "activate",
+    "sort-by-number": true
+  },
+
+  "hyprland/window": {
+    "format": "{}",
+    "max-length": 60
+  },
+
+  "hyprland/language": {
+    "format": "{}",
+    "format-fi": "FI",
+    "format-en": "EN"
+  },
+
+  "clock": {
+    "format": "{:%H:%M}",
+    "format-alt": "{:%A %d.%m.%Y}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "on-click": "swaync-client -t -sw"
+  },
+
+  "network": {
+    "format-wifi": "{essid} {signalStrength}%",
+    "format-ethernet": "Ethernet",
+    "format-disconnected": "Offline",
+    "tooltip-format-wifi": "{ipaddr}\n{frequency} MHz",
+    "on-click": "nm-connection-editor"
+  },
+
+  "bluetooth": {
+    "format": "BT",
+    "format-connected": "BT {num_connections}",
+    "tooltip-format": "{controller_alias}\n{device_enumerate}",
+    "on-click": "blueman-manager"
+  },
+
+  "pulseaudio": {
+    "format": "{volume}%",
+    "format-muted": "Muted",
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "tray": {
+    "spacing": 8
+  }
+}

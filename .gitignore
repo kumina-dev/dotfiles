@@ -1,0 +1,11 @@
+# Matugen-generated files
+hypr/.config/hypr/generated/
+kitty/.config/kitty/colors.conf
+fuzzel/.config/fuzzel/colors.ini
+gtk/.config/gtk-3.0/matugen.css
+gtk/.config/gtk-4.0/matugen.css
+theme/.config/theme/colors.css
+
+# Runtime / cache
+*.log
+.DS_Store

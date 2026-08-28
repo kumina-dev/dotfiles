@@ -1,0 +1,54 @@
+@import "../theme/colors.css";
+
+* {
+    border: none;
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: @text;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: alpha(@surface, 0.90);
+    border: 1px solid @outline;
+    border-radius: 12px;
+    margin: 7px 8px 0 8px;
+    padding: 3px 7px;
+}
+
+#workspaces button {
+    color: @text_muted;
+    background: transparent;
+    border-radius: 8px;
+    padding: 2px 8px;
+    margin: 2px;
+}
+
+#workspaces button.active {
+    color: @background;
+    background: @primary;
+}
+
+#workspaces button.urgent {
+    color: @background;
+    background: @error;
+}
+
+#clock,
+#network,
+#bluetooth,
+#pulseaudio,
+#tray {
+    padding: 0 7px;
+}
+
+#language {
+    padding: 0 7px;
+    color: #9999a3;
+}

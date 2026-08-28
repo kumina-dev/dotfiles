@@ -5,7 +5,7 @@ local browser = "microsoft-edge-stable"
 -- Applications
 
 hl.bind(
-    "ALT + SHIFT",
+    "SUPER + SPACE",
     hl.dsp.exec_cmd("hyprlauncher"),
     { description = "Open launcher" }
 )

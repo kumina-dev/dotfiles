@@ -2,37 +2,46 @@
 
 * {
     border: none;
+    border-radius: 0;
     font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
     font-size: 13px;
     min-height: 0;
 }
 
 window#waybar {
-    background: transparent;
+    background: alpha(@surface, 0.88);
     color: @text;
+
+    border-bottom: 1px solid alpha(@outline, 0.65);
 }
 
-.modules-left,
-.modules-center,
-.modules-right {
-    background: alpha(@surface, 0.90);
-    border: 1px solid @outline;
-    border-radius: 12px;
-    margin: 7px 8px 0 8px;
-    padding: 3px 7px;
+/* Workspaces */
+
+#workspaces {
+    margin-left: 8px;
 }
 
 #workspaces button {
     color: @text_muted;
     background: transparent;
-    border-radius: 8px;
-    padding: 2px 8px;
-    margin: 2px;
+
+    border-radius: 7px;
+
+    min-width: 28px;
+    padding: 0 5px;
+    margin: 5px 1px;
+
+    transition: all 150ms ease;
+}
+
+#workspaces button:hover {
+    color: @text;
+    background: alpha(@primary, 0.12);
 }
 
 #workspaces button.active {
     color: @background;
-    background: @primary;
+    background: alpha(@primary, 0.20);
 }
 
 #workspaces button.urgent {
@@ -40,15 +49,89 @@ window#waybar {
     background: @error;
 }
 
-#clock,
-#network,
+/* Active application */
+
+#window {
+    color: @text_muted;
+
+    margin-left: 10px;
+    padding: 0 10px;
+}
+
+/* Updates */
+#custom-updates {
+    color: @text_muted;
+    padding: 0 8px;
+    margin: 4px 1px;
+    border-radius: 7px;
+}
+
+#custom-updates.pending {
+    color: @primary;
+}
+
+#custom-updates:hover {
+    background: alpha(@primary, 0.12);
+}
+
+#custom-updates.updated {
+    padding: 0;
+    margin: 0;
+}
+
+/* Clock */
+
+#clock {
+    color: @text;
+
+    font-weight: 600;
+
+    padding: 0 12px;
+    margin: 4px 0;
+
+    border-radius: 7px;
+}
+
+#clock:hover {
+    background: alpha(@primary, 0.12);
+}
+
+/* Right-side system area */
+
+#tray,
+#language,
 #bluetooth,
-#pulseaudio,
-#tray {
-    padding: 0 7px;
+#pulseaudio {
+    color: @text_muted;
+
+    padding: 0 8px;
+    margin: 4px 1px;
+
+    border-radius: 7px;
 }
 
 #language {
-    padding: 0 7px;
-    color: #9999a3;
+    font-weight: 600;
+}
+
+#bluetooth.connected,
+#pulseaudio {
+    color: @text;
+}
+
+#bluetooth:hover,
+#pulseaudio:hover,
+#language:hover {
+    color: @text;
+    background: alpha(@primary, 0.12);
+}
+
+#pulseaudio.muted {
+    color: @text_muted;
+}
+
+#tray {
+    margin-left: 6px;
+    padding-left: 6px;
+    padding-right: 6px;
 }

@@ -1,7 +1,8 @@
 {
   "layer": "top",
   "position": "top",
-  "spacing": 6,
+  "height": 38,
+  "spacing": 0,
 
   "modules-left": [
     "hyprland/workspaces",
@@ -9,16 +10,24 @@
   ],
 
   "modules-center": [
+    "custom/updates",
     "clock"
   ],
 
   "modules-right": [
-    "tray",
     "hyprland/language",
-    "network",
     "bluetooth",
-    "pulseaudio"
+    "pulseaudio",
+    "tray"
   ],
+
+  "custom/updates": {
+    "exec": "~/.config/hypr/scripts/update-check.sh",
+    "return-type": "json",
+    "interval": 900,
+    "tooltip": true,
+    "on-click": "kitty --class kumina-updater -e ~/.config/hypr/scripts/system-update.sh"
+  },
 
   "hyprland/workspaces": {
     "format": "{name}",
@@ -28,7 +37,8 @@
 
   "hyprland/window": {
     "format": "{}",
-    "max-length": 60
+    "max-length": 55,
+    "separate-outputs": true
   },
 
   "hyprland/language": {
@@ -39,34 +49,40 @@
 
   "clock": {
     "format": "{:%H:%M}",
-    "format-alt": "{:%A %d.%m.%Y}",
     "tooltip-format": "<tt>{calendar}</tt>",
-    "on-click": "swaync-client -t -sw"
-  },
-
-  "network": {
-    "format-wifi": "{essid} {signalStrength}%",
-    "format-ethernet": "Ethernet",
-    "format-disconnected": "Offline",
-    "tooltip-format-wifi": "{ipaddr}\n{frequency} MHz",
-    "on-click": "nm-connection-editor"
+    "on-click": "~/.config/hypr/scripts/calendar-toggle.sh"
   },
 
   "bluetooth": {
-    "format": "BT",
-    "format-connected": "BT {num_connections}",
+    "format": "",
+    "format-disabled": "󰂲",
+    "format-off": "󰂲",
+    "format-connected": "",
     "tooltip-format": "{controller_alias}\n{device_enumerate}",
     "on-click": "blueman-manager"
   },
 
   "pulseaudio": {
-    "format": "{volume}%",
-    "format-muted": "Muted",
+    "format": "{icon}",
+    "format-muted": "󰝟",
+    "format-icons": {
+      "headphone": "",
+      "headset": "",
+      "speaker": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "tooltip-format": "{desc}\nVolume: {volume}%",
     "on-click": "pavucontrol",
-    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "scroll-step": 2
   },
 
   "tray": {
-    "spacing": 8
+    "icon-size": 16,
+    "spacing": 7
   }
 }

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: set-wallpaper <image>"
+    exit 1
+fi
+
+SOURCE="$(realpath "$1")"
+TARGET="$HOME/Pictures/Wallpapers/main.png"
+MONITOR="HDMI-A-1"
+
+if [[ ! -f "$SOURCE" ]]; then
+    echo "File not found: $SOURCE"
+    exit 1
+fi
+
+mkdir -p "$(dirname "$TARGET")"
+
+if [[ "$SOURCE" != "$TARGET" ]]; then
+    cp -- "$SOURCE" "$TARGET"
+fi
+
+hyprctl hyprpaper wallpaper "$MONITOR, $TARGET, cover"
+
+echo "Wallpaper updated: $TARGET"

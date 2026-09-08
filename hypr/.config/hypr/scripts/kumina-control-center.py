@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import gi
+import subprocess
+from pathlib import Path
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
@@ -51,6 +53,7 @@ class ControlCenter(Gtk.Window):
             on_wifi_details=(
                 self.show_wifi_view
             ),
+            on_sound_settings=self.open_sound_settings,
         )
 
         self.wifi_view = WifiView(
@@ -61,10 +64,10 @@ class ControlCenter(Gtk.Window):
             on_open_settings=self.close,
         )
 
-        self.stack.add_named(
-            self.main_view,
-            "main",
-        )
+        main_scroller = Gtk.ScrolledWindow()
+        main_scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        main_scroller.add(self.main_view)
+        self.stack.add_named(main_scroller, "main")
 
         self.stack.add_named(
             self.wifi_view,
@@ -90,6 +93,24 @@ class ControlCenter(Gtk.Window):
         self.stack.set_visible_child_name(
             "main"
         )
+
+    def open_sound_settings(self):
+        script = Path(__file__).resolve().parent / "open-settings.sh"
+        try:
+            subprocess.Popen([str(script), "sound"], start_new_session=True)
+        except OSError as error:
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                modal=True,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.CLOSE,
+                text="Could not open Sound settings",
+            )
+            dialog.format_secondary_text(str(error))
+            dialog.run()
+            dialog.destroy()
+            return
+        self.close()
 
 
     def show_wifi_view(self):

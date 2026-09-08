@@ -17,6 +17,7 @@ class MainView(Gtk.Box):
     def __init__(
         self,
         on_wifi_details,
+        on_sound_settings,
     ):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
@@ -50,6 +51,10 @@ class MainView(Gtk.Box):
             0,
         )
 
+        sound_settings = Gtk.Button(label="Sound Settings  ›")
+        sound_settings.connect("clicked", lambda _button: on_sound_settings())
+        self.pack_start(sound_settings, False, False, 0)
+
         self.pack_start(
             self.media,
             False,
@@ -79,5 +84,4 @@ class MainView(Gtk.Box):
 
     def refresh(self):
         self.connectivity.refresh()
-        self.sound.refresh()
         self.media.refresh()

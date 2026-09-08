@@ -135,3 +135,9 @@ entry {
 .settings-link:hover {
     background-color: alpha(@accent_color, 0.10);
 }
+
+.settings-card button.active {
+    background-image: none;
+    background-color: @accent_color;
+    color: @accent_fg_color;
+}

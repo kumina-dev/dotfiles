@@ -20,6 +20,10 @@ from settings_app.views.wifi import (
     WifiView,
 )
 
+from settings_app.views.sound import (
+    SoundView,
+)
+
 
 class SettingsWindow(Gtk.Window):
     def __init__(
@@ -67,6 +71,7 @@ class SettingsWindow(Gtk.Window):
 
         self.overview_view = OverviewView()
         self.wifi_view = WifiView()
+        self.sound_view = SoundView()
 
         self.stack.add_named(
             self.overview_view,
@@ -76,6 +81,11 @@ class SettingsWindow(Gtk.Window):
         self.stack.add_named(
             self.wifi_view,
             "wifi",
+        )
+
+        self.stack.add_named(
+            self.sound_view,
+            "sound",
         )
 
         root.pack_start(
@@ -97,6 +107,7 @@ class SettingsWindow(Gtk.Window):
         if initial_page not in (
             "overview",
             "wifi",
+            "sound",
         ):
             initial_page = "overview"
 
@@ -150,6 +161,12 @@ class SettingsWindow(Gtk.Window):
             "wifi",
         )
 
+        self.add_sidebar_button(
+            sidebar,
+            "Sound",
+            "sound",
+        )
+
         separator = Gtk.Separator(
             orientation=Gtk.Orientation.HORIZONTAL
         )
@@ -163,7 +180,6 @@ class SettingsWindow(Gtk.Window):
 
         for label in (
             "Bluetooth",
-            "Sound",
             "Display",
             "Appearance",
             "Keyboard",
@@ -240,6 +256,9 @@ class SettingsWindow(Gtk.Window):
 
         elif page == "wifi":
             child = self.wifi_view
+
+        elif page == "sound":
+            child = self.sound_view
 
         else:
             print(

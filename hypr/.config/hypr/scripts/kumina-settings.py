@@ -311,6 +311,9 @@ class SettingsWindow(Gtk.Window):
         if page == "wifi":
             self.wifi_view.refresh()
 
+        if page == "display":
+            self.display_view.refresh()
+
 
 initial_page = (
     sys.argv[1]

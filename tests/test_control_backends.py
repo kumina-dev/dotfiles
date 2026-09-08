@@ -49,13 +49,19 @@ class ControlBackendTests(
             ssid
         )
 
-        mocked_run.assert_called_once_with([
-            "nmcli",
-            "connection",
-            "up",
-            "id",
-            ssid,
-        ])
+        mocked_run.assert_called_once_with(
+            [
+                "nmcli",
+                "connection",
+                "up",
+                "id",
+                ssid,
+            ],
+            check=True,
+            fallback=(
+                "Could not connect to the Wi-Fi network."
+            ),
+        )
 
     @patch(
         "control_center.media.run"
@@ -80,11 +86,17 @@ class ControlBackendTests(
             "play-pause"
         )
 
-        mocked_run.assert_called_once_with([
-            "playerctl",
-            f"--player={player}",
-            "play-pause",
-        ])
+        mocked_run.assert_called_once_with(
+            [
+                "playerctl",
+                f"--player={player}",
+                "play-pause",
+            ],
+            check=True,
+            fallback=(
+                "Could not control media playback."
+            ),
+        )
 
     def test_invalid_media_action_is_rejected(
         self,
@@ -95,6 +107,30 @@ class ControlBackendTests(
             media.command(
                 "definitely-not-an-action"
             )
+
+    @patch(
+        "control_center.network.run"
+    )
+    def test_wifi_state_write_is_checked(
+        self,
+        mocked_run,
+    ):
+        network.set_wifi_enabled(
+            True
+        )
+
+        mocked_run.assert_called_once_with(
+            [
+                "nmcli",
+                "radio",
+                "wifi",
+                "on",
+            ],
+            check=True,
+            fallback=(
+                "Could not change Wi-Fi state."
+            ),
+        )
 
     @patch(
         "settings_app.network.run"

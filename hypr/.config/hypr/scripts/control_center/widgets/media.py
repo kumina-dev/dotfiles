@@ -12,6 +12,9 @@ class MediaCard(Gtk.Box):
         )
 
         self._refreshing = False
+        self._commanding = False
+        self._has_player = False
+        self._action_error = None
 
         self.get_style_context().add_class(
             "card"
@@ -67,7 +70,7 @@ class MediaCard(Gtk.Box):
             spacing=8,
         )
 
-        previous = Gtk.Button(
+        self.previous_button = Gtk.Button(
             label="󰒮"
         )
 
@@ -77,15 +80,15 @@ class MediaCard(Gtk.Box):
             )
         )
 
-        next_button = Gtk.Button(
+        self.next_button = Gtk.Button(
             label="󰒭"
         )
 
-        previous.set_can_focus(False)
+        self.previous_button.set_can_focus(False)
         self.play_pause_button.set_can_focus(False)
-        next_button.set_can_focus(False)
+        self.next_button.set_can_focus(False)
 
-        previous.connect(
+        self.previous_button.connect(
             "clicked",
             lambda _: self.command(
                 "previous"
@@ -99,7 +102,7 @@ class MediaCard(Gtk.Box):
             ),
         )
 
-        next_button.connect(
+        self.next_button.connect(
             "clicked",
             lambda _: self.command(
                 "next"
@@ -107,7 +110,7 @@ class MediaCard(Gtk.Box):
         )
 
         controls.pack_start(
-            previous,
+            self.previous_button,
             True,
             True,
             0,
@@ -121,7 +124,7 @@ class MediaCard(Gtk.Box):
         )
 
         controls.pack_start(
-            next_button,
+            self.next_button,
             True,
             True,
             0,
@@ -132,6 +135,58 @@ class MediaCard(Gtk.Box):
             False,
             False,
             0,
+        )
+
+        self.error_label = Gtk.Label(
+            xalign=0,
+        )
+
+        self.error_label.set_line_wrap(
+            True
+        )
+
+        self.error_label.get_style_context().add_class(
+            "secondary"
+        )
+
+        self.pack_start(
+            self.error_label,
+            False,
+            False,
+            0,
+        )
+
+        self.set_controls_sensitive(
+            False
+        )
+
+    def set_controls_sensitive(
+        self,
+        sensitive,
+    ):
+        sensitive = (
+            bool(sensitive)
+            and not self._commanding
+        )
+
+        self.previous_button.set_sensitive(
+            sensitive
+        )
+
+        self.play_pause_button.set_sensitive(
+            sensitive
+        )
+
+        self.next_button.set_sensitive(
+            sensitive
+        )
+
+    def show_error(
+        self,
+        message,
+    ):
+        self.error_label.set_text(
+            message or ""
         )
 
     def refresh(self):
@@ -158,6 +213,10 @@ class MediaCard(Gtk.Box):
         metadata = state["metadata"]
         status = state["status"]
 
+        self._has_player = bool(
+            state["player"]
+        )
+
         self.media_label.set_text(
             metadata
             or "Nothing playing"
@@ -169,29 +228,94 @@ class MediaCard(Gtk.Box):
             else "󰐊"
         )
 
+        self.set_controls_sensitive(
+            self._has_player
+        )
+
+        self.show_error(
+            self._action_error
+        )
+
         return False
 
     def refresh_failed(
         self,
-        _error,
+        error,
     ):
         self._refreshing = False
+        self._has_player = False
+
+        self.media_label.set_text(
+            "Media unavailable"
+        )
+
+        self.set_controls_sensitive(
+            False
+        )
+
+        if not self._action_error:
+            self.show_error(
+                str(error)
+            )
+
         return False
 
     def command(
         self,
         action,
     ):
+        if (
+            self._commanding
+            or not self._has_player
+        ):
+            return
+
+        self._commanding = True
+        self._action_error = None
+
+        self.show_error("")
+
+        self.set_controls_sensitive(
+            False
+        )
+
         run_async(
             lambda: media.command(
                 action
             ),
             self.command_finished,
+            self.command_failed,
         )
 
     def command_finished(
         self,
         _result,
     ):
+        self._commanding = False
+        self._action_error = None
+
+        self.show_error("")
+
         self.refresh()
+
+        return False
+
+    def command_failed(
+        self,
+        error,
+    ):
+        self._commanding = False
+
+        self._action_error = str(
+            error
+        )
+
+        self.set_controls_sensitive(
+            self._has_player
+        )
+
+        self.show_error(
+            self._action_error
+        )
+
         return False

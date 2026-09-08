@@ -495,7 +495,10 @@ class BluetoothView(Gtk.Box):
                 enabled
             ),
             self.toggle_finished,
-            self.toggle_failed,
+            lambda error: self.toggle_failed(
+                enabled,
+                error,
+            ),
         )
 
     def toggle_finished(
@@ -512,10 +515,16 @@ class BluetoothView(Gtk.Box):
 
     def toggle_failed(
         self,
+        requested_state,
         error,
     ):
         self.toggle.set_sensitive(
             True
+        )
+
+        self.toggle.set_active(
+            not requested_state,
+            emit=False,
         )
 
         self.status.set_text(
@@ -536,15 +545,25 @@ class BluetoothView(Gtk.Box):
             / "open-settings.sh"
         )
 
-        subprocess.Popen(
-            [
-                str(script),
-                "bluetooth",
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
+        try:
+            subprocess.Popen(
+                [
+                    str(script),
+                    "bluetooth",
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+        except OSError as error:
+            self.status.set_text(
+                (
+                    "Could not open Bluetooth Settings: "
+                    f"{error}"
+                )
+            )
+
+            return
 
         if self.on_open_settings:
             self.on_open_settings()

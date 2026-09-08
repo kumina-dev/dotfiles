@@ -19,6 +19,7 @@ class ConnectivityCard(Gtk.Box):
         self.on_wifi_details = on_wifi_details
         self.on_bluetooth_details = on_bluetooth_details
         self._refreshing = False
+        self._action_error = None
 
         self.get_style_context().add_class(
             "card"
@@ -162,6 +163,25 @@ class ConnectivityCard(Gtk.Box):
             0,
         )
 
+        self.status = Gtk.Label(
+            xalign=0,
+        )
+
+        self.status.set_line_wrap(
+            True
+        )
+
+        self.status.get_style_context().add_class(
+            "secondary"
+        )
+
+        self.pack_start(
+            self.status,
+            False,
+            False,
+            0,
+        )
+
     def refresh(self):
         if self._refreshing:
             return
@@ -251,19 +271,33 @@ class ConnectivityCard(Gtk.Box):
             bluetooth_active,
         )
 
+        self.show_error(
+            self._action_error
+        )
+
         return False
 
     def refresh_failed(
         self,
-        _error,
+        error,
     ):
         self._refreshing = False
+
+        if not self._action_error:
+            self.show_error(
+                str(error)
+            )
+
         return False
 
     def toggle_wifi(
         self,
         _button,
     ):
+        self._action_error = None
+
+        self.show_error("")
+
         self.wifi_button.set_sensitive(
             False
         )
@@ -271,17 +305,40 @@ class ConnectivityCard(Gtk.Box):
         run_async(
             network.toggle_wifi,
             self.wifi_toggle_finished,
+            self.wifi_toggle_failed,
         )
 
     def wifi_toggle_finished(
         self,
         _result,
     ):
+        self._action_error = None
+
         self.wifi_button.set_sensitive(
             True
         )
 
+        self.show_error("")
+
         self.refresh()
+
+        return False
+
+    def wifi_toggle_failed(
+        self,
+        error,
+    ):
+        self._action_error = str(
+            error
+        )
+
+        self.wifi_button.set_sensitive(
+            True
+        )
+
+        self.show_error(
+            self._action_error
+        )
 
         return False
 
@@ -289,6 +346,10 @@ class ConnectivityCard(Gtk.Box):
         self,
         _button,
     ):
+        self._action_error = None
+
+        self.show_error("")
+
         self.bluetooth_button.set_sensitive(
             False
         )
@@ -296,17 +357,40 @@ class ConnectivityCard(Gtk.Box):
         run_async(
             bluetooth.toggle,
             self.bluetooth_toggle_finished,
+            self.bluetooth_toggle_failed,
         )
 
     def bluetooth_toggle_finished(
         self,
         _result,
     ):
+        self._action_error = None
+
         self.bluetooth_button.set_sensitive(
             True
         )
 
+        self.show_error("")
+
         self.refresh()
+
+        return False
+
+    def bluetooth_toggle_failed(
+        self,
+        error,
+    ):
+        self._action_error = str(
+            error
+        )
+
+        self.bluetooth_button.set_sensitive(
+            True
+        )
+
+        self.show_error(
+            self._action_error
+        )
 
         return False
 
@@ -327,3 +411,11 @@ class ConnectivityCard(Gtk.Box):
             context.remove_class(
                 "active"
             )
+
+    def show_error(
+        self,
+        message,
+    ):
+        self.status.set_text(
+            message or ""
+        )

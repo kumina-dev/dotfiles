@@ -6,11 +6,17 @@ from .command import (
 
 def is_wifi_enabled():
     return (
-        output([
-            "nmcli",
-            "radio",
-            "wifi",
-        ])
+        output(
+            [
+                "nmcli",
+                "radio",
+                "wifi",
+            ],
+            check=True,
+            fallback=(
+                "Could not read Wi-Fi state."
+            ),
+        )
         == "enabled"
     )
 
@@ -18,12 +24,18 @@ def is_wifi_enabled():
 def set_wifi_enabled(
     enabled,
 ):
-    return run([
-        "nmcli",
-        "radio",
-        "wifi",
-        "on" if enabled else "off",
-    ])
+    return run(
+        [
+            "nmcli",
+            "radio",
+            "wifi",
+            "on" if enabled else "off",
+        ],
+        check=True,
+        fallback=(
+            "Could not change Wi-Fi state."
+        ),
+    )
 
 
 def toggle_wifi():
@@ -33,14 +45,20 @@ def toggle_wifi():
 
 
 def get_current_ssid():
-    raw = output([
-        "nmcli",
-        "-t",
-        "-f",
-        "ACTIVE,SSID",
-        "device",
-        "wifi",
-    ])
+    raw = output(
+        [
+            "nmcli",
+            "-t",
+            "-f",
+            "ACTIVE,SSID",
+            "device",
+            "wifi",
+        ],
+        check=True,
+        fallback=(
+            "Could not read the current Wi-Fi network."
+        ),
+    )
 
     for line in raw.splitlines():
         active, separator, ssid = (
@@ -73,21 +91,27 @@ def get_state():
 def get_networks(
     rescan=True,
 ):
-    raw = output([
-        "nmcli",
-        "-t",
-        "-f",
-        "IN-USE,SSID,SIGNAL,SECURITY",
-        "device",
-        "wifi",
-        "list",
-        "--rescan",
-        (
-            "yes"
-            if rescan
-            else "no"
+    raw = output(
+        [
+            "nmcli",
+            "-t",
+            "-f",
+            "IN-USE,SSID,SIGNAL,SECURITY",
+            "device",
+            "wifi",
+            "list",
+            "--rescan",
+            (
+                "yes"
+                if rescan
+                else "no"
+            ),
+        ],
+        check=True,
+        fallback=(
+            "Could not load Wi-Fi networks."
         ),
-    ])
+    )
 
     networks = []
     seen = set()
@@ -140,10 +164,16 @@ def get_networks(
 def connect_saved_network(
     ssid,
 ):
-    return run([
-        "nmcli",
-        "connection",
-        "up",
-        "id",
-        ssid,
-    ])
+    return run(
+        [
+            "nmcli",
+            "connection",
+            "up",
+            "id",
+            ssid,
+        ],
+        check=True,
+        fallback=(
+            "Could not connect to the Wi-Fi network."
+        ),
+    )

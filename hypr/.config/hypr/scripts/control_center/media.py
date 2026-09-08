@@ -114,11 +114,17 @@ def command(
     if not player:
         return None
 
-    return run([
-        "playerctl",
-        f"--player={player}",
-        action,
-    ])
+    return run(
+        [
+            "playerctl",
+            f"--player={player}",
+            action,
+        ],
+        check=True,
+        fallback=(
+            "Could not control media playback."
+        ),
+    )
 
 
 def previous():

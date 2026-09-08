@@ -28,6 +28,9 @@ class WifiView(Gtk.Box):
             on_open_settings
         )
 
+        self._refreshing = False
+        self._action_error = None
+
         self.build()
 
     def build(self):
@@ -55,6 +58,25 @@ class WifiView(Gtk.Box):
             scroller,
             True,
             True,
+            0,
+        )
+
+        self.status = Gtk.Label(
+            xalign=0,
+        )
+
+        self.status.set_line_wrap(
+            True
+        )
+
+        self.status.get_style_context().add_class(
+            "secondary"
+        )
+
+        self.pack_start(
+            self.status,
+            False,
+            False,
             0,
         )
 
@@ -142,24 +164,32 @@ class WifiView(Gtk.Box):
             0,
         )
 
-    def refresh(self):
+    def clear_networks(self):
         for child in (
-            self.wifi_networks.get_children()
+            self.wifi_networks
+            .get_children()
         ):
             self.wifi_networks.remove(
                 child
             )
 
-        loading = Gtk.Label(
-            label="Loading networks..."
+    def show_message(
+        self,
+        message,
+    ):
+        self.clear_networks()
+
+        label = Gtk.Label(
+            label=message,
+            xalign=0,
         )
 
-        loading.get_style_context().add_class(
+        label.get_style_context().add_class(
             "secondary"
         )
 
         self.wifi_networks.pack_start(
-            loading,
+            label,
             False,
             False,
             20,
@@ -167,10 +197,46 @@ class WifiView(Gtk.Box):
 
         self.wifi_networks.show_all()
 
+    def refresh(self):
+        if self._refreshing:
+            return
+
+        self._refreshing = True
+
+        self.toggle.set_sensitive(
+            False
+        )
+
+        self.show_message(
+            "Loading networks..."
+        )
+
         run_async(
             self.load_wifi_state,
             self.apply_wifi_state,
+            self.refresh_failed,
         )
+
+    def refresh_failed(
+        self,
+        error,
+    ):
+        self._refreshing = False
+
+        self.toggle.set_sensitive(
+            True
+        )
+
+        self.show_message(
+            "Could not load Wi-Fi networks"
+        )
+
+        if not self._action_error:
+            self.status.set_text(
+                str(error)
+            )
+
+        return False
 
     def load_wifi_state(self):
         enabled = (
@@ -194,18 +260,23 @@ class WifiView(Gtk.Box):
         self,
         state,
     ):
-        for child in (
-            self.wifi_networks.get_children()
-        ):
-            self.wifi_networks.remove(
-                child
-            )
+        self._refreshing = False
+
+        self.toggle.set_sensitive(
+            True
+        )
+
+        self.clear_networks()
 
         enabled = state["enabled"]
 
         self.toggle.set_active(
             enabled,
             emit=False,
+        )
+
+        self.status.set_text(
+            self._action_error or ""
         )
 
         if not enabled:
@@ -385,7 +456,15 @@ class WifiView(Gtk.Box):
         if connected:
             return
 
-        button.set_sensitive(False)
+        self._action_error = None
+
+        self.status.set_text(
+            f"Connecting to {ssid}…"
+        )
+
+        button.set_sensitive(
+            False
+        )
 
         run_async(
             lambda: (
@@ -399,17 +478,26 @@ class WifiView(Gtk.Box):
                     result,
                 )
             ),
+            lambda error: (
+                self.network_connection_failed(
+                    button,
+                    error,
+                )
+            ),
         )
 
     def network_connection_finished(
         self,
         button,
-        result,
+        _result,
     ):
-        button.set_sensitive(True)
+        self._action_error = None
 
-        if result.returncode != 0:
-            return False
+        button.set_sensitive(
+            True
+        )
+
+        self.status.set_text("")
 
         self.refresh()
 
@@ -417,11 +505,42 @@ class WifiView(Gtk.Box):
 
         return False
 
+    def network_connection_failed(
+        self,
+        button,
+        error,
+    ):
+        button.set_sensitive(
+            True
+        )
+
+        self._action_error = str(
+            error
+        )
+
+        self.status.set_text(
+            self._action_error
+        )
+
+        return False
+
     def toggle_changed(
         self,
         switch,
     ):
-        enabled = switch.get_active()
+        enabled = (
+            switch.get_active()
+        )
+
+        self._action_error = None
+
+        self.status.set_text(
+            (
+                "Turning Wi-Fi on…"
+                if enabled
+                else "Turning Wi-Fi off…"
+            )
+        )
 
         self.toggle.set_sensitive(
             False
@@ -434,19 +553,51 @@ class WifiView(Gtk.Box):
                 )
             ),
             self.toggle_finished,
+            lambda error: self.toggle_failed(
+                enabled,
+                error,
+            ),
         )
 
     def toggle_finished(
         self,
         _result,
     ):
+        self._action_error = None
+
         self.toggle.set_sensitive(
             True
         )
 
+        self.status.set_text("")
+
         self.refresh()
 
         self.on_connectivity_changed()
+
+        return False
+
+    def toggle_failed(
+        self,
+        requested_state,
+        error,
+    ):
+        self.toggle.set_sensitive(
+            True
+        )
+
+        self.toggle.set_active(
+            not requested_state,
+            emit=False,
+        )
+
+        self._action_error = str(
+            error
+        )
+
+        self.status.set_text(
+            self._action_error
+        )
 
         return False
 
@@ -462,15 +613,25 @@ class WifiView(Gtk.Box):
             / "open-settings.sh"
         )
 
-        subprocess.Popen(
-            [
-                str(script),
-                "wifi",
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
+        try:
+            subprocess.Popen(
+                [
+                    str(script),
+                    "wifi",
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+        except OSError as error:
+            self.status.set_text(
+                (
+                    "Could not open Wi-Fi Settings: "
+                    f"{error}"
+                )
+            )
+
+            return
 
         if self.on_open_settings:
             self.on_open_settings()

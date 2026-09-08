@@ -1,19 +1,10 @@
-import subprocess
+from kumina_common.process import (
+    output,
+    run,
+)
 
 
-def run(command):
-    return subprocess.run(
-        command,
-        shell=True,
-        text=True,
-        capture_output=True,
-    )
-
-
-def output(command):
-    result = run(command)
-
-    if result.returncode != 0:
-        return ""
-
-    return result.stdout.strip()
+__all__ = (
+    "output",
+    "run",
+)

@@ -1,18 +1,29 @@
-import shlex
-
-from .command import output, run
+from .command import (
+    output,
+    run,
+)
 
 
 def is_wifi_enabled():
-    return output("nmcli radio wifi") == "enabled"
-
-
-def set_wifi_enabled(enabled):
-    return run(
-        "nmcli radio wifi on"
-        if enabled
-        else "nmcli radio wifi off"
+    return (
+        output([
+            "nmcli",
+            "radio",
+            "wifi",
+        ])
+        == "enabled"
     )
+
+
+def set_wifi_enabled(
+    enabled,
+):
+    return run([
+        "nmcli",
+        "radio",
+        "wifi",
+        "on" if enabled else "off",
+    ])
 
 
 def toggle_wifi():
@@ -22,12 +33,19 @@ def toggle_wifi():
 
 
 def get_current_ssid():
-    raw = output(
-        "nmcli -t -f ACTIVE,SSID device wifi"
-    )
+    raw = output([
+        "nmcli",
+        "-t",
+        "-f",
+        "ACTIVE,SSID",
+        "device",
+        "wifi",
+    ])
 
     for line in raw.splitlines():
-        active, separator, ssid = line.partition(":")
+        active, separator, ssid = (
+            line.partition(":")
+        )
 
         if (
             separator
@@ -52,51 +70,80 @@ def get_state():
     }
 
 
-def get_networks(rescan=True):
-    rescan_value = "yes" if rescan else "no"
-
-    raw = output(
-        "nmcli -t "
-        "-f IN-USE,SSID,SIGNAL,SECURITY "
-        f"device wifi list --rescan {rescan_value}"
-    )
+def get_networks(
+    rescan=True,
+):
+    raw = output([
+        "nmcli",
+        "-t",
+        "-f",
+        "IN-USE,SSID,SIGNAL,SECURITY",
+        "device",
+        "wifi",
+        "list",
+        "--rescan",
+        (
+            "yes"
+            if rescan
+            else "no"
+        ),
+    ])
 
     networks = []
     seen = set()
 
     for line in raw.splitlines():
-        parts = line.split(":", 3)
+        parts = line.split(
+            ":",
+            3,
+        )
 
         if len(parts) != 4:
             continue
 
-        active, ssid, signal, security = parts
+        (
+            active,
+            ssid,
+            signal,
+            security,
+        ) = parts
 
-        if not ssid or ssid in seen:
+        if (
+            not ssid
+            or ssid in seen
+        ):
             continue
 
-        seen.add(ssid)
+        seen.add(
+            ssid
+        )
 
         try:
-            signal_value = int(signal)
+            signal_value = int(
+                signal
+            )
         except ValueError:
             signal_value = 0
 
-        networks.append(
-            {
-                "ssid": ssid,
-                "signal": signal_value,
-                "security": security,
-                "connected": active == "*",
-            }
-        )
+        networks.append({
+            "ssid": ssid,
+            "signal": signal_value,
+            "security": security,
+            "connected": (
+                active == "*"
+            ),
+        })
 
     return networks
 
 
-def connect_saved_network(ssid):
-    quoted_ssid = shlex.quote(ssid)
-
-    return run(
-        f"nmcli connection up id {quoted_ssid}"
-    )
+def connect_saved_network(
+    ssid,
+):
+    return run([
+        "nmcli",
+        "connection",
+        "up",
+        "id",
+        ssid,
+    ])

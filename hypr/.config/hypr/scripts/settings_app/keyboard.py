@@ -1,6 +1,9 @@
 import json
-import subprocess
 from pathlib import Path
+
+from kumina_common.process import (
+    output,
+)
 
 
 HYPR_DIR = Path(__file__).resolve().parents[2]
@@ -16,23 +19,17 @@ class KeyboardError(RuntimeError):
     pass
 
 
-def _command(*args):
-    result = subprocess.run(
+def _command(
+    *args,
+):
+    return output(
         args,
-        text=True,
-        capture_output=True,
+        check=True,
+        error_type=KeyboardError,
+        fallback=(
+            "Keyboard command failed."
+        ),
     )
-
-    if result.returncode != 0:
-        message = (
-            result.stderr.strip()
-            or result.stdout.strip()
-            or "Keyboard command failed."
-        )
-
-        raise KeyboardError(message)
-
-    return result.stdout.strip()
 
 
 def _get_option(name):

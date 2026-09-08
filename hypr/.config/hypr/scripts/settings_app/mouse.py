@@ -1,6 +1,9 @@
 import json
-import subprocess
 from pathlib import Path
+
+from kumina_common.process import (
+    output,
+)
 
 
 HYPR_DIR = Path(__file__).resolve().parents[2]
@@ -11,23 +14,17 @@ class MouseError(RuntimeError):
     pass
 
 
-def _command(*args):
-    result = subprocess.run(
+def _command(
+    *args,
+):
+    return output(
         args,
-        text=True,
-        capture_output=True,
+        check=True,
+        error_type=MouseError,
+        fallback=(
+            "Mouse command failed."
+        ),
     )
-
-    if result.returncode != 0:
-        message = (
-            result.stderr.strip()
-            or result.stdout.strip()
-            or "Mouse command failed."
-        )
-
-        raise MouseError(message)
-
-    return result.stdout.strip()
 
 
 def _get_option(name):

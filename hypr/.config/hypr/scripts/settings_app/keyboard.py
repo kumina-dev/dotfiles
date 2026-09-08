@@ -259,13 +259,21 @@ def apply_settings(
     if primary == secondary:
         secondary = None
 
-    repeat_rate = int(
-        repeat_rate
-    )
+    try:
+        repeat_rate = int(
+            repeat_rate
+        )
 
-    repeat_delay = int(
-        repeat_delay
-    )
+        repeat_delay = int(
+            repeat_delay
+        )
+    except (
+        TypeError,
+        ValueError,
+    ) as error:
+        raise KeyboardError(
+            "Invalid keyboard repeat setting."
+        ) from error
 
     if not 1 <= repeat_rate <= 100:
         raise KeyboardError(

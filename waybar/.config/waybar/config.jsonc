@@ -16,8 +16,7 @@
 
   "modules-right": [
     "hyprland/language",
-    "bluetooth",
-    "pulseaudio",
+    "custom/control-center",
     "tray"
   ],
 
@@ -27,6 +26,13 @@
     "interval": 900,
     "tooltip": true,
     "on-click": "kitty --class kumina-updater -e ~/.config/hypr/scripts/system-update.sh"
+  },
+
+  "custom/control-center": {
+    "format": "󰒓",
+    "tooltip": true,
+    "tooltip-format": "Control Center",
+    "on-click": "~/.config/hypr/scripts/control-center-toggle.sh"
   },
 
   "hyprland/workspaces": {

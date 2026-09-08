@@ -98,6 +98,16 @@ window#waybar {
 
 /* Right-side system area */
 
+#custom-control-center {
+    padding: 0 9px;
+    margin: 4px 1px;
+    border-radius: 7px;
+}
+
+#custom-control-center:hover {
+    background: alpha(@primary, 0.12);
+}
+
 #tray,
 #language,
 #bluetooth,

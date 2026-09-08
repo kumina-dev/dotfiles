@@ -83,3 +83,14 @@ hl.window_rule({
     center = true,
     size = { 720, 480 },
 })
+
+hl.window_rule({
+    name = "kumina-control-center",
+    match = {
+        title = "Kumina Control Center",
+    },
+
+    float = true,
+    center = true,
+    size = { 420, 520 },
+})

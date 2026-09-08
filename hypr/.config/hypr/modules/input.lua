@@ -3,18 +3,30 @@ local input = {
     kb_options = "grp:alt_shift_toggle",
 }
 
-package.loaded["generated.keyboard"] = nil
+local function merge_generated(module_name)
+    package.loaded[module_name] = nil
 
-local loaded, keyboard = pcall(
-    require,
-    "generated.keyboard"
-)
+    local loaded, values = pcall(
+        require,
+        module_name
+    )
 
-if loaded and type(keyboard) == "table" then
-    for key, value in pairs(keyboard) do
+    if not loaded or type(values) ~= "table" then
+        return
+    end
+
+    for key, value in pairs(values) do
         input[key] = value
     end
 end
+
+merge_generated(
+    "generated.keyboard"
+)
+
+merge_generated(
+    "generated.mouse"
+)
 
 hl.config({
     input = input,

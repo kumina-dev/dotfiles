@@ -11,7 +11,7 @@ The priority is a simple, reliable daily-driver desktop first. Initial versions 
 * [x] Display settings
 * [ ] Appearance settings
 * [x] Keyboard settings
-* [ ] Mouse settings
+* [x] Mouse settings
 * [x] Sound settings
 * [ ] Complete the basic Control Center
 

@@ -149,7 +149,7 @@ hl.bind(
     hl.dsp.window.drag(),
     {
         mouse = true,
-	description = "Move window",
+	    description = "Move window",
     }
 )
 
@@ -158,7 +158,7 @@ hl.bind(
     hl.dsp.window.resize(),
     {
         mouse = true,
-	description = "Resize window",
+	    description = "Resize window",
     }
 )
 
@@ -211,7 +211,9 @@ hl.bind(
 
 hl.bind(
     "SUPER + SHIFT + L",
-    hl.dsp.exec_cmd("hyprshutdown"),
+    hl.dsp.exec_cmd(
+        [[bash "$HOME/.config/hypr/scripts/power-menu-toggle.sh"]]
+    ),
     { description = "Power menu" }
 )
 

@@ -106,3 +106,15 @@ hl.window_rule({
     center = true,
     size = { 820, 560 },
 })
+
+hl.window_rule({
+    name = "kumina-power-menu",
+
+    match = {
+        title = "Kumina Power Menu",
+    },
+
+    float = true,
+    center = true,
+    size = { 320, 330 },
+})

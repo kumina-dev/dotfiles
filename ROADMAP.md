@@ -17,7 +17,7 @@ The priority is a simple, reliable daily-driver desktop first. Initial versions 
 
 ### Power
 
-* [ ] macOS-inspired dropdown power menu
+* [x] macOS-inspired dropdown power menu
 
 ## After first iterations
 

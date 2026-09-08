@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 
-import gi
 import subprocess
 from pathlib import Path
+
+from single_instance import acquire
+
+
+if not acquire(
+    "control-center"
+):
+    raise SystemExit(0)
+
+
+import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib

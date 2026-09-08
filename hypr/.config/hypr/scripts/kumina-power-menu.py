@@ -2,6 +2,15 @@
 
 import subprocess
 
+from single_instance import acquire
+
+
+if not acquire(
+    "power-menu"
+):
+    raise SystemExit(0)
+
+
 import gi
 
 gi.require_version(

@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 
 import sys
+
+from single_instance import acquire
+
+
+if not acquire(
+    "settings"
+):
+    raise SystemExit(0)
+
+
 import gi
 
 gi.require_version(

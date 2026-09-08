@@ -3,6 +3,15 @@
 import calendar
 from datetime import date, timedelta
 
+from single_instance import acquire
+
+
+if not acquire(
+    "calendar"
+):
+    raise SystemExit(0)
+
+
 import gi
 
 gi.require_version("Gtk", "3.0")

@@ -66,8 +66,12 @@ The control center's Sound Settings button opens the Sound page. Its main
 view scrolls when the controls do not fit the window. Wi-Fi stays available
 in both windows.
 
-Next iterations: basic display settings, then keyboard settings, then
-Bluetooth management. Appearance and additional features come later.
+Display settings provide active-display selection, supported resolution and
+refresh-rate modes, and display scaling. Applied settings are persisted in the
+ignored `generated/monitors.lua` runtime configuration.
+
+Development intentionally prioritizes basic daily-driver functionality before
+advanced features and polish. See [ROADMAP.md](ROADMAP.md).
 
 ### Verification
 

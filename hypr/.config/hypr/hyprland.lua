@@ -2,12 +2,7 @@
 ---- MONITORS ----
 ------------------
 
-hl.monitor({
-    output   = "",
-    mode     = "preferred",
-    position = "auto",
-    scale    = "auto",
-})
+require("modules.display")
 
 -------------------
 ---- AUTOSTART ----

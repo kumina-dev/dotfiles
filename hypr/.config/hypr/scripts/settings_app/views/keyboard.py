@@ -16,6 +16,8 @@ class KeyboardView(Gtk.Box):
             spacing=18,
         )
 
+        self._loaded = False
+
         self.get_style_context().add_class(
             "content"
         )
@@ -398,6 +400,8 @@ class KeyboardView(Gtk.Box):
             state["numlock"]
         )
 
+        self._loaded = True
+
         self.set_controls_sensitive(
             True
         )
@@ -472,7 +476,7 @@ class KeyboardView(Gtk.Box):
         )
 
         self.set_controls_sensitive(
-            True
+            self._loaded
         )
 
         return False

@@ -13,6 +13,8 @@ class MouseView(Gtk.Box):
             spacing=18,
         )
 
+        self._loaded = False
+
         self.get_style_context().add_class(
             "content"
         )
@@ -287,6 +289,8 @@ class MouseView(Gtk.Box):
         self,
         state,
     ):
+        self._loaded = True
+
         self.sensitivity.set_value(
             state["sensitivity"]
         )
@@ -357,7 +361,7 @@ class MouseView(Gtk.Box):
         )
 
         self.set_controls_sensitive(
-            True
+            self._loaded
         )
 
         return False

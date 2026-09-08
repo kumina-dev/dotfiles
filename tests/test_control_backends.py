@@ -147,15 +147,73 @@ class ControlBackendTests(
             password,
         )
 
-        mocked_run.assert_called_once_with([
-            "nmcli",
-            "device",
-            "wifi",
-            "connect",
-            ssid,
-            "password",
-            password,
-        ])
+        mocked_run.assert_called_once_with(
+            [
+                "nmcli",
+                "device",
+                "wifi",
+                "connect",
+                ssid,
+                "password",
+                password,
+            ],
+            check=True,
+            fallback=(
+                "Could not connect to the Wi-Fi network."
+            ),
+        )
+
+    @patch(
+        "settings_app.network.output"
+    )
+    def test_settings_wifi_read_is_checked(
+        self,
+        mocked_output,
+    ):
+        mocked_output.return_value = (
+            "enabled"
+        )
+
+        self.assertTrue(
+            settings_network
+            .is_wifi_enabled()
+        )
+
+        mocked_output.assert_called_once_with(
+            [
+                "nmcli",
+                "radio",
+                "wifi",
+            ],
+            check=True,
+            fallback=(
+                "Could not read Wi-Fi state."
+            ),
+        )
+
+    @patch(
+        "settings_app.network.run"
+    )
+    def test_settings_wifi_toggle_is_checked(
+        self,
+        mocked_run,
+    ):
+        settings_network.set_wifi_enabled(
+            True
+        )
+
+        mocked_run.assert_called_once_with(
+            [
+                "nmcli",
+                "radio",
+                "wifi",
+                "on",
+            ],
+            check=True,
+            fallback=(
+                "Could not change Wi-Fi state."
+            ),
+        )
 
 
 if __name__ == "__main__":

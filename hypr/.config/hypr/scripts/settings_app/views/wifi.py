@@ -285,6 +285,10 @@ class WifiView(Gtk.Box):
             False
         )
 
+        self.toggle.set_sensitive(
+            False
+        )
+
         self.clear_networks()
 
         self.saved_title.hide()
@@ -324,6 +328,10 @@ class WifiView(Gtk.Box):
         self._refreshing = False
 
         self.refresh_button.set_sensitive(
+            True
+        )
+
+        self.toggle.set_sensitive(
             True
         )
 
@@ -751,17 +759,8 @@ class WifiView(Gtk.Box):
 
     def connection_finished(
         self,
-        result,
+        _result,
     ):
-        if result.returncode != 0:
-            self.show_connection_error(
-                result.stderr.strip()
-                or result.stdout.strip()
-                or "Connection failed."
-            )
-
-            return False
-
         self.refresh()
 
         return False
@@ -793,23 +792,68 @@ class WifiView(Gtk.Box):
         if self._ignore_toggle:
             return
 
-        enabled = switch.get_active()
+        enabled = (
+            switch.get_active()
+        )
 
-        switch.set_sensitive(False)
+        switch.set_sensitive(
+            False
+        )
+
+        self.status_label.set_text(
+            (
+                "Turning Wi-Fi on…"
+                if enabled
+                else "Turning Wi-Fi off…"
+            )
+        )
 
         run_async(
-            lambda: network.set_wifi_enabled(
-                enabled
+            lambda: (
+                network.set_wifi_enabled(
+                    enabled
+                )
             ),
             self.toggle_finished,
+            lambda error: (
+                self.toggle_failed(
+                    enabled,
+                    error,
+                )
+            ),
         )
 
     def toggle_finished(
         self,
         _result,
     ):
+        self.refresh()
+
+        return False
+
+    def toggle_failed(
+        self,
+        requested_state,
+        error,
+    ):
+        self._ignore_toggle = True
+
+        self.toggle.set_active(
+            not requested_state
+        )
+
+        self._ignore_toggle = False
+
         self.toggle.set_sensitive(
             True
+        )
+
+        self.status_label.set_text(
+            "Unable to change Wi-Fi state."
+        )
+
+        self.show_connection_error(
+            str(error)
         )
 
         self.refresh()
@@ -901,18 +945,8 @@ class WifiView(Gtk.Box):
 
     def disconnect_finished(
         self,
-        result,
+        _result,
     ):
-        if (
-            result is None
-            or result.returncode != 0
-        ):
-            self.show_connection_error(
-                "Unable to disconnect."
-            )
-
-            return False
-
         self.refresh()
 
         return False
@@ -962,16 +996,8 @@ class WifiView(Gtk.Box):
 
     def forget_finished(
         self,
-        result,
+        _result,
     ):
-        if result.returncode != 0:
-            self.show_connection_error(
-                result.stderr.strip()
-                or "Unable to forget network."
-            )
-
-            return False
-
         self.refresh()
 
         return False

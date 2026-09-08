@@ -1,5 +1,8 @@
-import subprocess
 from pathlib import Path
+
+from kumina_common.process import (
+    output,
+)
 
 
 CURRENT_WALLPAPER = (
@@ -92,31 +95,18 @@ def apply_settings(
             "set-wallpaper is not installed."
         )
 
-    try:
-        result = subprocess.run(
-            [
-                str(SET_WALLPAPER),
-                str(source),
-                mode,
-            ],
-            text=True,
-            capture_output=True,
-            timeout=30,
-        )
-    except subprocess.TimeoutExpired as error:
-        raise AppearanceError(
-            "Applying appearance settings timed out."
-        ) from error
-    except OSError as error:
-        raise AppearanceError(
-            str(error)
-        ) from error
-
-    if result.returncode != 0:
-        raise AppearanceError(
-            result.stderr.strip()
-            or result.stdout.strip()
-            or "Could not apply appearance settings."
-        )
+    output(
+        [
+            str(SET_WALLPAPER),
+            str(source),
+            mode,
+        ],
+        timeout=30,
+        check=True,
+        error_type=AppearanceError,
+        fallback=(
+            "Could not apply appearance settings."
+        ),
+    )
 
     return get_state()

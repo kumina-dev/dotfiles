@@ -1,4 +1,5 @@
 from kumina_common.process import (
+    CommandError,
     output,
     run,
 )
@@ -6,33 +7,53 @@ from kumina_common.process import (
 
 def is_wifi_enabled():
     return (
-        output([
-            "nmcli",
-            "radio",
-            "wifi",
-        ])
+        output(
+            [
+                "nmcli",
+                "radio",
+                "wifi",
+            ],
+            check=True,
+            fallback=(
+                "Could not read Wi-Fi state."
+            ),
+        )
         == "enabled"
     )
 
 
-def set_wifi_enabled(enabled):
-    return run([
-        "nmcli",
-        "radio",
-        "wifi",
-        "on" if enabled else "off",
-    ])
+def set_wifi_enabled(
+    enabled,
+):
+    return run(
+        [
+            "nmcli",
+            "radio",
+            "wifi",
+            "on" if enabled else "off",
+        ],
+        check=True,
+        fallback=(
+            "Could not change Wi-Fi state."
+        ),
+    )
 
 
 def get_current_ssid():
-    raw = output([
-        "nmcli",
-        "-t",
-        "-f",
-        "ACTIVE,SSID",
-        "device",
-        "wifi",
-    ])
+    raw = output(
+        [
+            "nmcli",
+            "-t",
+            "-f",
+            "ACTIVE,SSID",
+            "device",
+            "wifi",
+        ],
+        check=True,
+        fallback=(
+            "Could not read the current Wi-Fi network."
+        ),
+    )
 
     for line in raw.splitlines():
         active, separator, ssid = (
@@ -50,22 +71,35 @@ def get_current_ssid():
 
 
 def get_wifi_device():
-    raw = output([
-        "nmcli",
-        "-t",
-        "-f",
-        "DEVICE,TYPE,STATE",
-        "device",
-        "status",
-    ])
+    raw = output(
+        [
+            "nmcli",
+            "-t",
+            "-f",
+            "DEVICE,TYPE,STATE",
+            "device",
+            "status",
+        ],
+        check=True,
+        fallback=(
+            "Could not read Wi-Fi device state."
+        ),
+    )
 
     for line in raw.splitlines():
-        parts = line.split(":", 2)
+        parts = line.split(
+            ":",
+            2,
+        )
 
         if len(parts) != 3:
             continue
 
-        device, device_type, state = parts
+        (
+            device,
+            device_type,
+            state,
+        ) = parts
 
         if (
             device_type == "wifi"
@@ -77,21 +111,29 @@ def get_wifi_device():
 
 
 def get_saved_profiles():
-    raw = output([
-        "nmcli",
-        "-t",
-        "-f",
-        "UUID,TYPE",
-        "connection",
-        "show",
-    ])
+    raw = output(
+        [
+            "nmcli",
+            "-t",
+            "-f",
+            "UUID,TYPE",
+            "connection",
+            "show",
+        ],
+        check=True,
+        fallback=(
+            "Could not load saved Wi-Fi networks."
+        ),
+    )
 
     profiles = {}
 
     for line in raw.splitlines():
-        uuid, separator, connection_type = (
-            line.partition(":")
-        )
+        (
+            uuid,
+            separator,
+            connection_type,
+        ) = line.partition(":")
 
         if (
             not separator
@@ -103,6 +145,9 @@ def get_saved_profiles():
         ):
             continue
 
+        # These individual profile lookups are allowed
+        # to fail quietly. A profile can disappear while
+        # NetworkManager data is being refreshed.
         ssid = output([
             "nmcli",
             "-g",
@@ -128,26 +173,37 @@ def get_saved_profiles():
 
         profiles[ssid] = {
             "uuid": uuid,
-            "name": name or ssid,
+            "name": (
+                name
+                or ssid
+            ),
         }
 
     return profiles
 
 
 def get_networks():
-    raw = output([
-        "nmcli",
-        "-t",
-        "-f",
-        "IN-USE,SSID,SIGNAL,SECURITY",
-        "device",
-        "wifi",
-        "list",
-        "--rescan",
-        "yes",
-    ])
+    raw = output(
+        [
+            "nmcli",
+            "-t",
+            "-f",
+            "IN-USE,SSID,SIGNAL,SECURITY",
+            "device",
+            "wifi",
+            "list",
+            "--rescan",
+            "yes",
+        ],
+        check=True,
+        fallback=(
+            "Could not load Wi-Fi networks."
+        ),
+    )
 
-    profiles = get_saved_profiles()
+    profiles = (
+        get_saved_profiles()
+    )
 
     networks = []
     seen = set()
@@ -174,14 +230,20 @@ def get_networks():
         ):
             continue
 
-        seen.add(ssid)
+        seen.add(
+            ssid
+        )
 
         try:
-            signal = int(signal)
+            signal = int(
+                signal
+            )
         except ValueError:
             signal = 0
 
-        profile = profiles.get(ssid)
+        profile = profiles.get(
+            ssid
+        )
 
         networks.append({
             "ssid": ssid,
@@ -191,8 +253,12 @@ def get_networks():
                 security
                 and security != "--"
             ),
-            "connected": active == "*",
-            "saved": profile is not None,
+            "connected": (
+                active == "*"
+            ),
+            "saved": (
+                profile is not None
+            ),
             "profile_uuid": (
                 profile["uuid"]
                 if profile
@@ -212,7 +278,9 @@ def get_networks():
 
 
 def get_state():
-    enabled = is_wifi_enabled()
+    enabled = (
+        is_wifi_enabled()
+    )
 
     if not enabled:
         return {
@@ -228,14 +296,22 @@ def get_state():
     }
 
 
-def connect_saved(profile_uuid):
-    return run([
-        "nmcli",
-        "connection",
-        "up",
-        "uuid",
-        profile_uuid,
-    ])
+def connect_saved(
+    profile_uuid,
+):
+    return run(
+        [
+            "nmcli",
+            "connection",
+            "up",
+            "uuid",
+            profile_uuid,
+        ],
+        check=True,
+        fallback=(
+            "Could not connect to the Wi-Fi network."
+        ),
+    )
 
 
 def connect_new(
@@ -256,28 +332,52 @@ def connect_new(
             password,
         ])
 
-    return run(command)
+    return run(
+        command,
+        check=True,
+        fallback=(
+            "Could not connect to the Wi-Fi network."
+        ),
+    )
 
 
 def disconnect():
-    device = get_wifi_device()
+    device = (
+        get_wifi_device()
+    )
 
     if not device:
-        return None
+        raise CommandError(
+            "No Wi-Fi device is available."
+        )
 
-    return run([
-        "nmcli",
-        "device",
-        "disconnect",
-        device,
-    ])
+    return run(
+        [
+            "nmcli",
+            "device",
+            "disconnect",
+            device,
+        ],
+        check=True,
+        fallback=(
+            "Could not disconnect Wi-Fi."
+        ),
+    )
 
 
-def forget(profile_uuid):
-    return run([
-        "nmcli",
-        "connection",
-        "delete",
-        "uuid",
-        profile_uuid,
-    ])
+def forget(
+    profile_uuid,
+):
+    return run(
+        [
+            "nmcli",
+            "connection",
+            "delete",
+            "uuid",
+            profile_uuid,
+        ],
+        check=True,
+        fallback=(
+            "Could not forget the Wi-Fi network."
+        ),
+    )

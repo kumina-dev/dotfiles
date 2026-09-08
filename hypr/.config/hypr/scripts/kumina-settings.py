@@ -40,6 +40,10 @@ from settings_app.views.bluetooth import (
     BluetoothView,
 )
 
+from settings_app.views.appearance import (
+    AppearanceView,
+)
+
 
 class SettingsWindow(Gtk.Window):
     def __init__(
@@ -92,6 +96,7 @@ class SettingsWindow(Gtk.Window):
         self.keyboard_view = KeyboardView()
         self.mouse_view = MouseView()
         self.bluetooth_view = BluetoothView()
+        self.appearance_view = AppearanceView()
 
         self.stack.add_named(
             self.overview_view,
@@ -128,6 +133,11 @@ class SettingsWindow(Gtk.Window):
             "bluetooth",
         )
 
+        self.stack.add_named(
+            self.appearance_view,
+            "appearance",
+        )
+
         root.pack_start(
             self.sidebar,
             False,
@@ -152,6 +162,7 @@ class SettingsWindow(Gtk.Window):
             "keyboard",
             "mouse",
             "bluetooth",
+            "appearance",
         ):
             initial_page = "overview"
 
@@ -235,40 +246,11 @@ class SettingsWindow(Gtk.Window):
             "bluetooth",
         )
 
-        separator = Gtk.Separator(
-            orientation=Gtk.Orientation.HORIZONTAL
-        )
-
-        sidebar.pack_start(
-            separator,
-            False,
-            False,
-            8,
-        )
-
-        for label in (
+        self.add_sidebar_button(
+            sidebar,
             "Appearance",
-        ):
-            button = Gtk.Button(
-                label=label
-            )
-
-            button.set_sensitive(False)
-
-            child = button.get_child()
-
-            if isinstance(child, Gtk.Label):
-                child.set_halign(
-                    Gtk.Align.START
-                )
-                child.set_xalign(0)
-
-            sidebar.pack_start(
-                button,
-                False,
-                False,
-                0,
-            )
+            "appearance",
+        )
 
         return sidebar
 
@@ -337,6 +319,9 @@ class SettingsWindow(Gtk.Window):
         elif page == "bluetooth":
             child = self.bluetooth_view
 
+        elif page == "appearance":
+            child = self.appearance_view
+
         else:
             print(
                 "Unknown page:",
@@ -379,6 +364,9 @@ class SettingsWindow(Gtk.Window):
 
         if page == "bluetooth":
             self.bluetooth_view.refresh()
+
+        if page == "appearance":
+            self.appearance_view.refresh()
 
 
 initial_page = (

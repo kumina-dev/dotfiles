@@ -4,10 +4,12 @@ set -euo pipefail
 
 WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
 CURRENT_WALLPAPER="$WALLPAPER_DIR/main.png"
-MONITOR="DP-2"
 
-if [[ $# -ne 1 ]]; then
-    echo "Usage: set-wallpaper <image>"
+STATE_DIR="$HOME/.config/kumina"
+MODE_FILE="$STATE_DIR/appearance-mode"
+
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+    echo "Usage: set-wallpaper <image> [dark|light]"
     exit 1
 fi
 
@@ -18,22 +20,64 @@ if [[ ! -f "$INPUT" ]]; then
     exit 1
 fi
 
-mkdir -p "$WALLPAPER_DIR"
+MODE="${2:-}"
 
-# Resolve the original path before replacing main.png.
+if [[ -z "$MODE" ]]; then
+    if [[ -f "$MODE_FILE" ]]; then
+        MODE="$(cat "$MODE_FILE")"
+    else
+        MODE="dark"
+    fi
+fi
+
+case "$MODE" in
+    dark|light)
+        ;;
+    *)
+        echo "Invalid appearance mode: $MODE"
+        exit 1
+        ;;
+esac
+
+mkdir -p "$WALLPAPER_DIR"
+mkdir -p "$STATE_DIR"
+
 INPUT="$(realpath "$INPUT")"
 CURRENT_REAL="$(realpath -m "$CURRENT_WALLPAPER")"
 
-# Keep a stable wallpaper path for hyprpaper/hyprlock/etc.
 if [[ "$INPUT" != "$CURRENT_REAL" ]]; then
-    cp "$INPUT" "$CURRENT_WALLPAPER"
+    cp -- "$INPUT" "$CURRENT_WALLPAPER"
 fi
 
+printf '#s\n' "$MODE" > "$MODE_FILE"
+
 echo "Generating theme..."
-matugen image "$CURRENT_WALLPAPER"
+matugen image "$CURRENT_WALLPAPER" \
+    -m "$MODE" \
+    --source-color-index 0
 
 echo "Setting wallpaper..."
-hyprctl hyprpaper wallpaper "$MONITOR,$CURRENT_WALLPAPER,cover"
+
+mapfile -t MONITORS < <(
+    hyprctl -j monitors |
+        python3 -c '
+import json
+import sys
+
+for monitor in json.load(sys.stdin):
+    if not monitor.get("disabled", False):
+        print(monitor["name"])
+'
+)
+
+if (( ${#MONITORS[@]} == 0 )); then
+    hyprctl hyprpaper wallpaper ",$CURRENT_WALLPAPER,cover"
+else
+    for monitor in "${MONITORS[@]}"; do
+        hyprctl hyprpaper wallpaper \
+            "$monitor,$CURRENT_WALLPAPER,cover"
+    done
+fi
 
 echo "Reloading Hyprland..."
 hyprctl reload

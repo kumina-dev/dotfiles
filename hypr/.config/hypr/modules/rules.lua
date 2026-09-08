@@ -94,3 +94,15 @@ hl.window_rule({
     center = true,
     size = { 420, 520 },
 })
+
+hl.window_rule({
+    name = "kumina-settings",
+
+    match = {
+        title = "Kumina Settings",
+    },
+
+    float = true,
+    center = true,
+    size = { 820, 560 },
+})

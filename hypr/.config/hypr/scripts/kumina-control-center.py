@@ -58,6 +58,7 @@ class ControlCenter(Gtk.Window):
             on_connectivity_changed=(
                 self.main_view.connectivity.refresh
             ),
+            on_open_settings=self.close,
         )
 
         self.stack.add_named(

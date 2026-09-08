@@ -1,3 +1,6 @@
+import subprocess
+from pathlib import Path
+
 from gi.repository import Gtk, GLib
 
 from .. import network
@@ -10,6 +13,7 @@ class WifiView(Gtk.Box):
         self,
         on_back,
         on_connectivity_changed,
+        on_open_settings=None,
     ):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
@@ -19,6 +23,9 @@ class WifiView(Gtk.Box):
         self.on_back = on_back
         self.on_connectivity_changed = (
             on_connectivity_changed
+        )
+        self.on_open_settings = (
+            on_open_settings
         )
 
         self.build()
@@ -48,6 +55,30 @@ class WifiView(Gtk.Box):
             scroller,
             True,
             True,
+            0,
+        )
+
+        self.settings_button = Gtk.Button(
+            label="Wi-Fi Settings  ›"
+        )
+
+        self.settings_button.get_style_context().add_class(
+            "settings-link"
+        )
+
+        self.settings_button.set_halign(
+            Gtk.Align.FILL
+        )
+
+        self.settings_button.connect(
+            "clicked",
+            self.open_wifi_settings,
+        )
+
+        self.pack_start(
+            self.settings_button,
+            False,
+            False,
             0,
         )
 
@@ -418,3 +449,28 @@ class WifiView(Gtk.Box):
         self.on_connectivity_changed()
 
         return False
+
+    def open_wifi_settings(
+        self,
+        _button,
+    ):
+        script = (
+            Path.home()
+            / ".config"
+            / "hypr"
+            / "scripts"
+            / "open-settings.sh"
+        )
+
+        subprocess.Popen(
+            [
+                str(script),
+                "wifi",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+
+        if self.on_open_settings:
+            self.on_open_settings()

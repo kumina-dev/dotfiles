@@ -7,7 +7,7 @@ The priority is a simple, reliable daily-driver desktop first. Initial versions 
 ### Settings and Control Center
 
 * [x] Wi-Fi settings
-* [ ] Bluetooth settings
+* [x] Bluetooth settings
 * [x] Display settings
 * [ ] Appearance settings
 * [x] Keyboard settings

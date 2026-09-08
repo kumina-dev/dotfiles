@@ -36,6 +36,10 @@ from settings_app.views.mouse import (
     MouseView,
 )
 
+from settings_app.views.bluetooth import (
+    BluetoothView,
+)
+
 
 class SettingsWindow(Gtk.Window):
     def __init__(
@@ -87,6 +91,7 @@ class SettingsWindow(Gtk.Window):
         self.display_view = DisplayView()
         self.keyboard_view = KeyboardView()
         self.mouse_view = MouseView()
+        self.bluetooth_view = BluetoothView()
 
         self.stack.add_named(
             self.overview_view,
@@ -118,6 +123,11 @@ class SettingsWindow(Gtk.Window):
             "mouse",
         )
 
+        self.stack.add_named(
+            self.bluetooth_view,
+            "bluetooth",
+        )
+
         root.pack_start(
             self.sidebar,
             False,
@@ -141,6 +151,7 @@ class SettingsWindow(Gtk.Window):
             "display",
             "keyboard",
             "mouse",
+            "bluetooth",
         ):
             initial_page = "overview"
 
@@ -218,6 +229,12 @@ class SettingsWindow(Gtk.Window):
             "mouse",
         )
 
+        self.add_sidebar_button(
+            sidebar,
+            "Bluetooth",
+            "bluetooth",
+        )
+
         separator = Gtk.Separator(
             orientation=Gtk.Orientation.HORIZONTAL
         )
@@ -230,7 +247,6 @@ class SettingsWindow(Gtk.Window):
         )
 
         for label in (
-            "Bluetooth",
             "Appearance",
         ):
             button = Gtk.Button(
@@ -318,6 +334,9 @@ class SettingsWindow(Gtk.Window):
         elif page == "mouse":
             child = self.mouse_view
 
+        elif page == "bluetooth":
+            child = self.bluetooth_view
+
         else:
             print(
                 "Unknown page:",
@@ -357,6 +376,9 @@ class SettingsWindow(Gtk.Window):
 
         if page == "mouse":
             self.mouse_view.refresh()
+
+        if page == "bluetooth":
+            self.bluetooth_view.refresh()
 
 
 initial_page = (

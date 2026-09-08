@@ -17,6 +17,7 @@ class MainView(Gtk.Box):
     def __init__(
         self,
         on_wifi_details,
+        on_bluetooth_details,
         on_sound_settings,
     ):
         super().__init__(
@@ -30,6 +31,9 @@ class MainView(Gtk.Box):
             ConnectivityCard(
                 on_wifi_details=(
                     on_wifi_details
+                ),
+                on_bluetooth_details=(
+                    on_bluetooth_details
                 ),
             )
         )

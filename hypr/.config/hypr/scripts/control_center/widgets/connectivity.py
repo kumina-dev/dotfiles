@@ -9,6 +9,7 @@ class ConnectivityCard(Gtk.Box):
     def __init__(
         self,
         on_wifi_details,
+        on_bluetooth_details,
     ):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
@@ -16,6 +17,7 @@ class ConnectivityCard(Gtk.Box):
         )
 
         self.on_wifi_details = on_wifi_details
+        self.on_bluetooth_details = on_bluetooth_details
         self._refreshing = False
 
         self.get_style_context().add_class(
@@ -94,6 +96,11 @@ class ConnectivityCard(Gtk.Box):
             0,
         )
 
+        bluetooth_group = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL,
+            spacing=4,
+        )
+
         self.bluetooth_button = Gtk.Button(
             label="  Bluetooth"
         )
@@ -102,9 +109,36 @@ class ConnectivityCard(Gtk.Box):
             True
         )
 
+        bluetooth_details = Gtk.Button(
+            label="›"
+        )
+
+        bluetooth_details.set_can_focus(
+            False
+        )
+
         self.bluetooth_button.connect(
             "clicked",
             self.toggle_bluetooth,
+        )
+
+        bluetooth_details.connect(
+            "clicked",
+            lambda _: self.on_bluetooth_details(),
+        )
+
+        bluetooth_group.pack_start(
+            self.bluetooth_button,
+            True,
+            True,
+            0,
+        )
+
+        bluetooth_group.pack_end(
+            bluetooth_details,
+            False,
+            False,
+            0,
         )
 
         row.pack_start(
@@ -115,7 +149,7 @@ class ConnectivityCard(Gtk.Box):
         )
 
         row.pack_start(
-            self.bluetooth_button,
+            bluetooth_group,
             True,
             True,
             0,

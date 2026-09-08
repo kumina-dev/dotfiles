@@ -17,6 +17,10 @@ from control_center.views.wifi import (
     WifiView,
 )
 
+from control_center.views.bluetooth import (
+    BluetoothView,
+)
+
 
 class ControlCenter(Gtk.Window):
     def __init__(self):
@@ -53,10 +57,21 @@ class ControlCenter(Gtk.Window):
             on_wifi_details=(
                 self.show_wifi_view
             ),
+            on_bluetooth_details=(
+                self.show_bluetooth_view
+            ),
             on_sound_settings=self.open_sound_settings,
         )
 
         self.wifi_view = WifiView(
+            on_back=self.show_main_view,
+            on_connectivity_changed=(
+                self.main_view.connectivity.refresh
+            ),
+            on_open_settings=self.close,
+        )
+
+        self.bluetooth_view = BluetoothView(
             on_back=self.show_main_view,
             on_connectivity_changed=(
                 self.main_view.connectivity.refresh
@@ -72,6 +87,11 @@ class ControlCenter(Gtk.Window):
         self.stack.add_named(
             self.wifi_view,
             "wifi",
+        )
+
+        self.stack.add_named(
+            self.bluetooth_view,
+            "bluetooth",
         )
 
         self.stack.set_visible_child_name(
@@ -119,6 +139,13 @@ class ControlCenter(Gtk.Window):
         )
 
         self.wifi_view.refresh()
+
+    def show_bluetooth_view(self):
+        self.stack.set_visible_child_name(
+            "bluetooth"
+        )
+
+        self.bluetooth_view.refresh()
 
     def initial_refresh(self):
         self.main_view.refresh()

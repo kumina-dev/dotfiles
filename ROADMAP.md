@@ -51,10 +51,11 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
   - Truncate overflowing titles/messages and constrain images
 - [ ] Enhance the lock screen using the actual PAM authentication state
   - [x] Keep the empty password field visible and display Hyprlock's exposed PAM prompt
-  - Show a Touch ID-style icon and security-key prompt while FIDO is requested
-  - Keep password input visible whenever FIDO interaction is not requested
-  - Handle failure, retry, and password fallback
-  - FIDO-specific visibility needs a reliable state signal beyond the last PAM prompt
+  - [x] Show a fingerprint-style icon while this Hyprlock process holds pam_u2f's pending file open
+  - [x] Hide the icon after the pending descriptor closes, including failure and retry transitions
+  - [ ] Verify the live security-key and password fallback behavior on the desktop
+  - [ ] Hide password input during FIDO and restore it for password authentication
+    - Hyprlock 0.9.6 has no configuration option for conditional input-field visibility
 - [x] Turn About into an About this PC screen
   - KumiOS version, distribution, kernel, hostname, CPU, GPU, RAM, storage
   - Copy system information

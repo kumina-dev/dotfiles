@@ -7,6 +7,7 @@
 - KumiOS project identity and a single installed development-version file.
 - About this PC with live system information, refresh, and plain-text copy.
 - Super + Alt + 1–9 to move a window without following it.
+- Security-key touch indicator using the locking process's pam_u2f pending-file descriptor.
 
 ### Changed
 
@@ -22,6 +23,6 @@
 ### Still pending
 
 - Fixed dimensions for individual notification cards.
-- FIDO-state-driven lock-screen icon and conditional password-input visibility.
+- Conditional password-input visibility during FIDO authentication.
 - Language & Region settings.
 - Desktop verification before the first release tag.

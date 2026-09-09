@@ -97,9 +97,13 @@ Refresh reloads the information. Copy system information copies the displayed va
 
 ### Lock screen
 
-The password input stays visible even when empty. The authentication label displays Hyprlock's `$PAMPROMPT` variable.
+The password input stays visible even when empty and uses Hyprlock's `$PAMPROMPT` variable as its placeholder. It displays the actual input prompt when PAM asks for a password or PIN.
 
-That variable is the last prompt Hyprlock exposes, not a complete authentication-state interface. Security-key touch cues from `pam_u2f` are not reliably exposed by current upstream Hyprlock. A FIDO-specific icon and conditional input visibility remain pending. This configuration does not change the system PAM stack.
+A fingerprint-style icon and "Touch your security key" appear while the locking Hyprlock process holds `pam_u2f`'s default `/var/run/user/$UID/pam-u2f-authpending` file open. The indicator checks every 250 ms and disappears when that descriptor closes. A leftover file alone does not trigger it, and requests from other processes such as sudo are ignored. The icon is a security-key touch indicator, not fingerprint authentication.
+
+The helper reads process metadata and file-descriptor metadata only. It does not read key registrations or credentials, and this configuration does not change the PAM stack. If the pending state cannot be inspected, the icon stays hidden; password input remains available. A custom `authpending_file` path would need a corresponding helper change.
+
+Hyprlock 0.9.6 cannot conditionally hide its input field based on this signal through configuration. That part remains pending; the field is visible during both security-key and password authentication.
 
 ### Power menu
 

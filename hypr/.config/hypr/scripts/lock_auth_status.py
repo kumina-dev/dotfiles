@@ -69,7 +69,7 @@ def render(pending):
         return label
     # Keep a valid, transparent text resource so Hyprlock clears the old icon.
     # Empty command output can leave the previous resource on screen.
-    return f'<span alpha="0">{label}</span>'
+    return f'<span alpha="1">{label}</span>'
 
 
 def main():

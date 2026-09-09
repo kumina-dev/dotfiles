@@ -67,9 +67,9 @@ class TouchIndicatorTests(unittest.TestCase):
         self.assertIsNone(self.state())
 
     def test_hidden_state_uses_transparent_markup_not_empty_output(self):
-        self.assertNotIn('alpha="0"', auth_status.render(True))
+        self.assertNotIn('alpha="1"', auth_status.render(True))
         for state in (False, None):
-            self.assertIn('alpha="0"', auth_status.render(state))
+            self.assertIn('alpha="1"', auth_status.render(state))
 
     @unittest.skipUnless(sys.platform == "linux", "Requires Linux /proc")
     def test_actual_parent_descriptors_are_visible_from_child(self):

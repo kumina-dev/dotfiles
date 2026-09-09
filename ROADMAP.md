@@ -36,7 +36,8 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
 ### KumiOS 1.0
 
 - [ ] Adopt the KumiOS identity and versioned releases
-  - One version source, About display, changelog, and release tags
+  - [x] KumiOS identity, one version source, About display, and changelog
+  - [ ] Tag the first tested release
 - [x] Add Super + Alt + 1–9 to move windows without following them
   - Preserve existing keybindings
 - [x] Make Control Center a single page of quick controls without scrolling
@@ -49,12 +50,15 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
   - The popup-area cap does not enforce per-card height
   - Truncate overflowing titles/messages and constrain images
 - [ ] Enhance the lock screen using the actual PAM authentication state
+  - [x] Keep the empty password field visible and display Hyprlock's exposed PAM prompt
   - Show a Touch ID-style icon and security-key prompt while FIDO is requested
   - Keep password input visible whenever FIDO interaction is not requested
   - Handle failure, retry, and password fallback
-- [ ] Turn About into an About this PC screen
+  - FIDO-specific visibility needs a reliable state signal beyond the last PAM prompt
+- [x] Turn About into an About this PC screen
   - KumiOS version, distribution, kernel, hostname, CPU, GPU, RAM, storage
   - Copy system information
+- [ ] Verify About values and clipboard behavior on the desktop
 - [ ] Add Language & Region settings
   - Display language and translations for the custom interface
   - Regional date, time, number, and currency formats

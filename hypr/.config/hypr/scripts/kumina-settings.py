@@ -17,6 +17,7 @@ gi.require_version(
     "Gtk",
     "3.0",
 )
+gi.require_version("Gdk", "3.0")
 
 from gi.repository import Gtk
 
@@ -495,6 +496,9 @@ class SettingsWindow(Gtk.Window):
 
         if page == "appearance":
             self.appearance_view.refresh()
+
+        if page == "about":
+            self.about_view.refresh()
 
 
 initial_page = (

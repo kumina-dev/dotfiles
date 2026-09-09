@@ -1,8 +1,14 @@
-# Arch Linux Dotfiles
+# KumiOS
 
-Personal Arch Linux + Hyprland desktop configuration.
+Personal Arch Linux + Hyprland desktop environment with familiar Windows-style shortcuts and a macOS-inspired interface.
 
 The desktop is built around a small set of custom GTK utilities alongside standard Linux components. The current focus is a reliable daily-driver environment before deeper integrations and visual polish.
+
+## Versioning
+
+The development version is stored in [hypr/.config/hypr/VERSION](hypr/.config/hypr/VERSION). Settings reads that same installed file for About and copied system information.
+
+Changes are recorded in [CHANGELOG.md](CHANGELOG.md). Release tags will identify tested desktop snapshots; the current version is a development build.
 
 ## Desktop
 
@@ -77,6 +83,23 @@ Open it with:
 ```sh
 ~/.config/hypr/scripts/control-center-toggle.sh
 ```
+
+### About this PC
+
+The About page reads the current computer's:
+
+- KumiOS version, hostname, distribution, and kernel
+- Processor and PCI graphics devices
+- Usable memory reported by Linux
+- Total, used, and free space for the system filesystem and a separate home filesystem when present
+
+Refresh reloads the information. Copy system information copies the displayed values as plain text. Device names are read using `lspci` from the optional `pciutils` package; if unavailable, the other information still loads. Storage values describe mounted filesystems, not the sum of all physical disks.
+
+### Lock screen
+
+The password input stays visible even when empty. The authentication label displays Hyprlock's `$PAMPROMPT` variable.
+
+That variable is the last prompt Hyprlock exposes, not a complete authentication-state interface. Security-key touch cues from `pam_u2f` are not reliably exposed by current upstream Hyprlock. A FIDO-specific icon and conditional input visibility remain pending. This configuration does not change the system PAM stack.
 
 ### Power menu
 

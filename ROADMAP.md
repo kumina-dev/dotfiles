@@ -10,9 +10,11 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
 - [x] Bluetooth settings
 - [x] Display settings
 - [x] Appearance settings
-- [x] Keyboard settings
-- [x] Mouse settings
+- [x] Input settings
+  - Keyboard
+  - Mouse
 - [x] Sound settings
+- [x] Basic About page
 - [x] Complete the basic Control Center
 
 ### Power

@@ -32,13 +32,8 @@ GROUPS = (
             ),
             (
                 "󰌌",
-                "Keyboard",
-                "keyboard",
-            ),
-            (
-                "󰍽",
-                "Mouse",
-                "mouse",
+                "Input",
+                "input",
             ),
         ),
     ),
@@ -49,6 +44,16 @@ GROUPS = (
                 "󰏘",
                 "Appearance",
                 "appearance",
+            ),
+        ),
+    ),
+    (
+        "Information",
+        (
+            (
+                "󰋼",
+                "About",
+                "about",
             ),
         ),
     ),

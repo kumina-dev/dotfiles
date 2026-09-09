@@ -27,8 +27,9 @@ GTK 3 settings application with pages for:
 - Bluetooth
 - Display
 - Appearance
-- Keyboard
-- Mouse
+- Input
+  - Keyboard
+  - Mouse
 - Sound
 
 Open the overview:
@@ -44,12 +45,12 @@ Open a specific page:
 ~/.config/hypr/scripts/open-settings.sh bluetooth
 ~/.config/hypr/scripts/open-settings.sh display
 ~/.config/hypr/scripts/open-settings.sh appearance
-~/.config/hypr/scripts/open-settings.sh keyboard
-~/.config/hypr/scripts/open-settings.sh mouse
+~/.config/hypr/scripts/open-settings.sh input
+~/.config/hypr/scripts/open-settings.sh about
 ~/.config/hypr/scripts/open-settings.sh sound
 ```
 
-Display, Keyboard, and Mouse settings persist their configuration in ignored files under:
+Display and Input settings persist their generated Hyprland configuration in ignored files under:
 
 ```text
 ~/.config/hypr/generated/

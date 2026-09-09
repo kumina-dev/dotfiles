@@ -38,12 +38,8 @@ from settings_app.views.display import (
     DisplayView,
 )
 
-from settings_app.views.keyboard import (
-    KeyboardView,
-)
-
-from settings_app.views.mouse import (
-    MouseView,
+from settings_app.views.input import (
+    InputView,
 )
 
 from settings_app.views.bluetooth import (
@@ -52,6 +48,10 @@ from settings_app.views.bluetooth import (
 
 from settings_app.views.appearance import (
     AppearanceView,
+)
+
+from settings_app.views.about import (
+    AboutView,
 )
 
 
@@ -96,13 +96,8 @@ NAVIGATION = (
             ),
             (
                 "󰌌",
-                "Keyboard",
-                "keyboard",
-            ),
-            (
-                "󰍽",
-                "Mouse",
-                "mouse",
+                "Input",
+                "input",
             ),
         ),
     ),
@@ -113,6 +108,16 @@ NAVIGATION = (
                 "󰏘",
                 "Appearance",
                 "appearance",
+            ),
+        ),
+    ),
+    (
+        "Information",
+        (
+            (
+                "󰋼",
+                "About",
+                "about",
             ),
         ),
     ),
@@ -169,10 +174,10 @@ class SettingsWindow(Gtk.Window):
         self.wifi_view = WifiView()
         self.sound_view = SoundView()
         self.display_view = DisplayView()
-        self.keyboard_view = KeyboardView()
-        self.mouse_view = MouseView()
+        self.input_view = InputView()
         self.bluetooth_view = BluetoothView()
         self.appearance_view = AppearanceView()
+        self.about_view = AboutView()
 
         self.stack.add_named(
             self.overview_view,
@@ -195,13 +200,8 @@ class SettingsWindow(Gtk.Window):
         )
 
         self.stack.add_named(
-            self.keyboard_view,
-            "keyboard",
-        )
-
-        self.stack.add_named(
-            self.mouse_view,
-            "mouse",
+            self.input_view,
+            "input",
         )
 
         self.stack.add_named(
@@ -212,6 +212,11 @@ class SettingsWindow(Gtk.Window):
         self.stack.add_named(
             self.appearance_view,
             "appearance",
+        )
+
+        self.stack.add_named(
+            self.about_view,
+            "about",
         )
 
         root.pack_start(
@@ -230,15 +235,23 @@ class SettingsWindow(Gtk.Window):
 
         self.add(root)
 
+        initial_page = {
+            "keyboard": "input",
+            "mouse": "input",
+        }.get(
+            initial_page,
+            initial_page,
+        )
+
         if initial_page not in (
             "overview",
             "wifi",
             "sound",
             "display",
-            "keyboard",
-            "mouse",
+            "input",
             "bluetooth",
             "appearance",
+            "about",
         ):
             initial_page = "overview"
 
@@ -408,6 +421,14 @@ class SettingsWindow(Gtk.Window):
         self,
         page,
     ):
+        page = {
+            "keyboard": "input",
+            "mouse": "input",
+        }.get(
+            page,
+            page,
+        )
+
         if page == "overview":
             child = self.overview_view
 
@@ -420,17 +441,17 @@ class SettingsWindow(Gtk.Window):
         elif page == "display":
             child = self.display_view
 
-        elif page == "keyboard":
-            child = self.keyboard_view
-
-        elif page == "mouse":
-            child = self.mouse_view
+        elif page == "input":
+            child = self.input_view
 
         elif page == "bluetooth":
             child = self.bluetooth_view
 
         elif page == "appearance":
             child = self.appearance_view
+
+        elif page == "about":
+            child = self.about_view
 
         else:
             print(
@@ -466,11 +487,8 @@ class SettingsWindow(Gtk.Window):
         if page == "display":
             self.display_view.refresh()
 
-        if page == "keyboard":
-            self.keyboard_view.refresh()
-
-        if page == "mouse":
-            self.mouse_view.refresh()
+        if page == "input":
+            self.input_view.refresh()
 
         if page == "bluetooth":
             self.bluetooth_view.refresh()

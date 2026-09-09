@@ -28,6 +28,14 @@ hl.bind(
     { description = "Open browser" }
 )
 
+hl.bind(
+    "SUPER + I",
+    hl.dsp.exec_cmd(
+        [[bash "$HOME/.config/hypr/scripts/settings-toggle.sh"]]
+    ),
+    { description = "Open settings" }
+)
+
 -- Windows
 
 hl.bind(

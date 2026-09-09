@@ -55,6 +55,70 @@ from settings_app.views.appearance import (
 )
 
 
+NAVIGATION = (
+    (
+        None,
+        (
+            (
+                "󰋜",
+                "Overview",
+                "overview",
+            ),
+        ),
+    ),
+    (
+        "Connectivity",
+        (
+            (
+                "󰤨",
+                "Wi-Fi",
+                "wifi",
+            ),
+            (
+                "",
+                "Bluetooth",
+                "bluetooth",
+            ),
+        ),
+    ),
+    (
+        "System",
+        (
+            (
+                "󰕾",
+                "Sound",
+                "sound",
+            ),
+            (
+                "󰍹",
+                "Display",
+                "display",
+            ),
+            (
+                "󰌌",
+                "Keyboard",
+                "keyboard",
+            ),
+            (
+                "󰍽",
+                "Mouse",
+                "mouse",
+            ),
+        ),
+    ),
+    (
+        "Personalization",
+        (
+            (
+                "󰏘",
+                "Appearance",
+                "appearance",
+            ),
+        ),
+    ),
+)
+
+
 class SettingsWindow(Gtk.Window):
     def __init__(
             self,
@@ -65,8 +129,8 @@ class SettingsWindow(Gtk.Window):
         )
 
         self.set_default_size(
-            820,
-            560,
+            900,
+            620,
         )
 
         self.set_resizable(False)
@@ -99,7 +163,9 @@ class SettingsWindow(Gtk.Window):
             140
         )
 
-        self.overview_view = OverviewView()
+        self.overview_view = OverviewView(
+            self.show_page
+        )
         self.wifi_view = WifiView()
         self.sound_view = SoundView()
         self.display_view = DisplayView()
@@ -181,11 +247,11 @@ class SettingsWindow(Gtk.Window):
     def create_sidebar(self):
         sidebar = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL,
-            spacing=6,
+            spacing=4,
         )
 
         sidebar.set_size_request(
-            220,
+            210,
             -1,
         )
 
@@ -194,15 +260,21 @@ class SettingsWindow(Gtk.Window):
         )
 
         title = Gtk.Label(
-            label="Settings"
-        )
-
-        title.set_halign(
-            Gtk.Align.START
+            label="Settings",
+            xalign=0,
         )
 
         title.get_style_context().add_class(
             "sidebar-title"
+        )
+
+        subtitle = Gtk.Label(
+            label="System & desktop",
+            xalign=0,
+        )
+
+        subtitle.get_style_context().add_class(
+            "sidebar-subtitle"
         )
 
         sidebar.pack_start(
@@ -212,79 +284,107 @@ class SettingsWindow(Gtk.Window):
             0,
         )
 
+        sidebar.pack_start(
+            subtitle,
+            False,
+            False,
+            0,
+        )
+
         self.sidebar_buttons = {}
 
-        self.add_sidebar_button(
-            sidebar,
-            "Overview",
-            "overview",
-        )
+        for (
+            section,
+            items,
+        ) in NAVIGATION:
+            if section is not None:
+                section_label = Gtk.Label(
+                    label=section,
+                    xalign=0,
+                )
 
-        self.add_sidebar_button(
-            sidebar,
-            "Wi-Fi",
-            "wifi",
-        )
+                section_label.get_style_context().add_class(
+                    "sidebar-section"
+                )
 
-        self.add_sidebar_button(
-            sidebar,
-            "Sound",
-            "sound",
-        )
+                sidebar.pack_start(
+                    section_label,
+                    False,
+                    False,
+                    0,
+                )
 
-        self.add_sidebar_button(
-            sidebar,
-            "Display",
-            "display",
-        )
-
-        self.add_sidebar_button(
-            sidebar,
-            "Keyboard",
-            "keyboard",
-        )
-
-        self.add_sidebar_button(
-            sidebar,
-            "Mouse",
-            "mouse",
-        )
-
-        self.add_sidebar_button(
-            sidebar,
-            "Bluetooth",
-            "bluetooth",
-        )
-
-        self.add_sidebar_button(
-            sidebar,
-            "Appearance",
-            "appearance",
-        )
+            for (
+                icon,
+                label,
+                page,
+            ) in items:
+                self.add_sidebar_button(
+                    sidebar,
+                    icon,
+                    label,
+                    page,
+                )
 
         return sidebar
 
     def add_sidebar_button(
         self,
         sidebar,
+        icon,
         label,
         page,
     ):
-        button = Gtk.Button(
-            label=label
-        )
+        button = Gtk.Button()
 
         button.set_halign(
             Gtk.Align.FILL
         )
 
-        child = button.get_child()
+        row = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL,
+            spacing=10,
+        )
 
-        if isinstance(child, Gtk.Label):
-            child.set_halign(
-                Gtk.Align.START
-            )
-            child.set_xalign(0)
+        icon_label = Gtk.Label(
+            label=icon
+        )
+
+        icon_label.set_size_request(
+            22,
+            -1,
+        )
+
+        icon_label.get_style_context().add_class(
+            "sidebar-icon"
+        )
+
+        text = Gtk.Label(
+            label=label,
+            xalign=0,
+        )
+
+        text.set_hexpand(
+            True
+        )
+
+        row.pack_start(
+            icon_label,
+            False,
+            False,
+            0,
+        )
+
+        row.pack_start(
+            text,
+            True,
+            True,
+            0,
+        )
+
+        button.add(
+            row
+        )
 
         button.connect(
             "clicked",

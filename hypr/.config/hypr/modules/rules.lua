@@ -104,7 +104,7 @@ hl.window_rule({
 
     float = true,
     center = true,
-    size = { 820, 560 },
+    size = { 900, 620 },
 })
 
 hl.window_rule({

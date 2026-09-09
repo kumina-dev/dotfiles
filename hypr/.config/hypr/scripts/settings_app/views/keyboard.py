@@ -10,7 +10,10 @@ NONE_LAYOUT = "__none__"
 
 
 class KeyboardView(Gtk.Box):
-    def __init__(self):
+    def __init__(
+        self,
+        embedded=False,
+    ):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
             spacing=18,
@@ -18,9 +21,14 @@ class KeyboardView(Gtk.Box):
 
         self._loaded = False
 
-        self.get_style_context().add_class(
-            "content"
-        )
+        if embedded:
+            self.get_style_context().add_class(
+                "input-section"
+            )
+        else:
+            self.get_style_context().add_class(
+                "content"
+            )
 
         title = Gtk.Label(
             label="Keyboard",
@@ -28,7 +36,11 @@ class KeyboardView(Gtk.Box):
         )
 
         title.get_style_context().add_class(
-            "page-title"
+            (
+                "subpage-title"
+                if embedded
+                else "page-title"
+            )
         )
 
         description = Gtk.Label(
@@ -98,9 +110,17 @@ class KeyboardView(Gtk.Box):
             spacing=12,
         )
 
+        numlock_row.get_style_context().add_class(
+            "settings-row"
+        )
+
         numlock_label = Gtk.Label(
             label="Num Lock on startup",
             xalign=0,
+        )
+
+        numlock_label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         numlock_label.set_hexpand(
@@ -108,6 +128,10 @@ class KeyboardView(Gtk.Box):
         )
 
         self.numlock_switch = Gtk.Switch()
+
+        self.numlock_switch.get_style_context().add_class(
+            "settings-switch"
+        )
 
         numlock_row.pack_start(
             numlock_label,
@@ -134,6 +158,14 @@ class KeyboardView(Gtk.Box):
             label="Apply"
         )
 
+        self.apply_button.set_halign(
+            Gtk.Align.END
+        )
+
+        self.apply_button.get_style_context().add_class(
+            "primary-action"
+        )
+
         self.apply_button.connect(
             "clicked",
             self.apply_clicked,
@@ -156,6 +188,10 @@ class KeyboardView(Gtk.Box):
 
         self.status.get_style_context().add_class(
             "page-description"
+        )
+
+        self.status.get_style_context().add_class(
+            "settings-status"
         )
 
         card.pack_start(
@@ -182,9 +218,17 @@ class KeyboardView(Gtk.Box):
             spacing=12,
         )
 
+        row.get_style_context().add_class(
+            "settings-row"
+        )
+
         row_label = Gtk.Label(
             label=label,
             xalign=0,
+        )
+
+        row_label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         row_label.set_hexpand(
@@ -192,6 +236,10 @@ class KeyboardView(Gtk.Box):
         )
 
         combo = Gtk.ComboBoxText()
+
+        combo.get_style_context().add_class(
+            "settings-control"
+        )
 
         combo.set_size_request(
             260,
@@ -234,9 +282,17 @@ class KeyboardView(Gtk.Box):
             spacing=12,
         )
 
+        row.get_style_context().add_class(
+            "settings-row"
+        )
+
         row_label = Gtk.Label(
             label=label,
             xalign=0,
+        )
+
+        row_label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         row_label.set_hexpand(
@@ -253,6 +309,10 @@ class KeyboardView(Gtk.Box):
 
         spin = Gtk.SpinButton(
             adjustment=adjustment,
+        )
+
+        spin.get_style_context().add_class(
+            "settings-control"
         )
 
         spin.set_numeric(

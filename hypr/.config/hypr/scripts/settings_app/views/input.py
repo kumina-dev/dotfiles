@@ -13,35 +13,67 @@ class InputView(Gtk.Box):
     def __init__(self):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
-            spacing=0,
+            spacing=18,
         )
 
         self.get_style_context().add_class(
             "content"
         )
 
+        title = Gtk.Label(
+            label="Input",
+            xalign=0,
+        )
+
+        title.get_style_context().add_class(
+            "page-title"
+        )
+
+        description = Gtk.Label(
+            label=(
+                "Configure keyboard, pointer "
+                "and scrolling behaviour."
+            ),
+            xalign=0,
+        )
+
+        description.set_line_wrap(
+            True
+        )
+
+        description.get_style_context().add_class(
+            "page-description"
+        )
+
+        self.pack_start(
+            title,
+            False,
+            False,
+            0,
+        )
+
+        self.pack_start(
+            description,
+            False,
+            False,
+            0,
+        )
+
         self.keyboard_view = (
-            KeyboardView()
+            KeyboardView(
+                embedded=True
+            )
         )
 
         self.mouse_view = (
-            MouseView()
-        )
-
-        # Input owns the page padding.
-        # The existing views become sections
-        # inside this page.
-        self.keyboard_view.get_style_context().remove_class(
-            "content"
-        )
-
-        self.mouse_view.get_style_context().remove_class(
-            "content"
+            MouseView(
+                embedded=True
+            )
         )
 
         sections = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL,
-            spacing=28,
+            spacing=24,
         )
 
         sections.pack_start(

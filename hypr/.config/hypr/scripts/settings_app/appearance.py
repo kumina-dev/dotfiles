@@ -19,6 +19,13 @@ MODE_FILE = (
     / "appearance-mode"
 )
 
+WALLPAPER_SOURCE_FILE = (
+    Path.home()
+    / ".config"
+    / "kumina"
+    / "wallpaper-source"
+)
+
 SET_WALLPAPER = (
     Path.home()
     / ".local"
@@ -57,14 +64,42 @@ def get_mode():
     return mode
 
 
+def get_wallpaper():
+    if WALLPAPER_SOURCE_FILE.is_file():
+        try:
+            value = (
+                WALLPAPER_SOURCE_FILE
+                .read_text(
+                    encoding="utf-8"
+                )
+                .strip()
+            )
+        except OSError:
+            value = ""
+
+        if value:
+            source = (
+                Path(value)
+                .expanduser()
+            )
+
+            if source.is_file():
+                return str(
+                    source.resolve()
+                )
+
+    if CURRENT_WALLPAPER.is_file():
+        return str(
+            CURRENT_WALLPAPER.resolve()
+        )
+
+    return ""
+
+
 def get_state():
     return {
         "mode": get_mode(),
-        "wallpaper": (
-            str(CURRENT_WALLPAPER)
-            if CURRENT_WALLPAPER.exists()
-            else ""
-        ),
+        "wallpaper": get_wallpaper(),
     }
 
 
@@ -81,6 +116,7 @@ def apply_settings(
         source = (
             Path(wallpaper)
             .expanduser()
+            .resolve()
         )
     else:
         source = CURRENT_WALLPAPER

@@ -76,6 +76,14 @@ class AppearanceView(Gtk.Box):
             label="Apply"
         )
 
+        self.apply_button.set_halign(
+            Gtk.Align.END
+        )
+
+        self.apply_button.get_style_context().add_class(
+            "primary-action"
+        )
+
         self.apply_button.connect(
             "clicked",
             self.apply_clicked,
@@ -100,6 +108,10 @@ class AppearanceView(Gtk.Box):
             "page-description"
         )
 
+        self.status.get_style_context().add_class(
+            "settings-status"
+        )
+
         card.pack_start(
             self.status,
             False,
@@ -118,20 +130,22 @@ class AppearanceView(Gtk.Box):
         self,
         parent,
     ):
+        section = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=8,
+        )
+
+        section.get_style_context().add_class(
+            "settings-row"
+        )
+
         label = Gtk.Label(
             label="Wallpaper",
             xalign=0,
         )
 
         label.get_style_context().add_class(
-            "section-title"
-        )
-
-        parent.pack_start(
-            label,
-            False,
-            False,
-            0,
+            "settings-row-title"
         )
 
         self.wallpaper_chooser = (
@@ -141,6 +155,14 @@ class AppearanceView(Gtk.Box):
                     Gtk.FileChooserAction.OPEN
                 ),
             )
+        )
+
+        self.wallpaper_chooser.set_hexpand(
+            True
+        )
+
+        self.wallpaper_chooser.get_style_context().add_class(
+            "settings-control"
         )
 
         image_filter = Gtk.FileFilter()
@@ -165,13 +187,6 @@ class AppearanceView(Gtk.Box):
             image_filter
         )
 
-        parent.pack_start(
-            self.wallpaper_chooser,
-            False,
-            False,
-            0,
-        )
-
         self.current_wallpaper = Gtk.Label(
             xalign=0,
         )
@@ -185,11 +200,32 @@ class AppearanceView(Gtk.Box):
         )
 
         self.current_wallpaper.get_style_context().add_class(
-            "page-description"
+            "settings-row-description"
+        )
+
+        section.pack_start(
+            label,
+            False,
+            False,
+            0,
+        )
+
+        section.pack_start(
+            self.wallpaper_chooser,
+            False,
+            False,
+            0,
+        )
+
+        section.pack_start(
+            self.current_wallpaper,
+            False,
+            False,
+            0,
         )
 
         parent.pack_start(
-            self.current_wallpaper,
+            section,
             False,
             False,
             0,
@@ -204,9 +240,17 @@ class AppearanceView(Gtk.Box):
             spacing=12,
         )
 
+        row.get_style_context().add_class(
+            "settings-row"
+        )
+
         label = Gtk.Label(
             label="Color mode",
             xalign=0,
+        )
+
+        label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         label.set_hexpand(
@@ -214,6 +258,10 @@ class AppearanceView(Gtk.Box):
         )
 
         self.mode_combo = Gtk.ComboBoxText()
+
+        self.mode_combo.get_style_context().add_class(
+            "settings-control"
+        )
 
         self.mode_combo.append(
             "dark",

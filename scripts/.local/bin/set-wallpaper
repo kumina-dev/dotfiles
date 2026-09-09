@@ -7,6 +7,7 @@ CURRENT_WALLPAPER="$WALLPAPER_DIR/main.png"
 
 STATE_DIR="$HOME/.config/kumina"
 MODE_FILE="$STATE_DIR/appearance-mode"
+SOURCE_FILE="$STATE_DIR/wallpaper-source"
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
     echo "Usage: set-wallpaper <image> [dark|light]"
@@ -49,8 +50,6 @@ if [[ "$INPUT" != "$CURRENT_REAL" ]]; then
     cp -- "$INPUT" "$CURRENT_WALLPAPER"
 fi
 
-printf '#s\n' "$MODE" > "$MODE_FILE"
-
 echo "Generating theme..."
 matugen image "$CURRENT_WALLPAPER" \
     -m "$MODE" \
@@ -91,5 +90,8 @@ if pgrep -x swaync >/dev/null; then
     echo "Reloading SwayNC..."
     swaync-client -rs
 fi
+
+printf '%s\n' "$MODE" > "$MODE_FILE"
+printf '%s\n' "$INPUT" > "$SOURCE_FILE"
 
 echo "Wallpaper and theme updated."

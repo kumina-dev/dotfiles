@@ -7,7 +7,10 @@ from settings_app.async_utils import (
 
 
 class MouseView(Gtk.Box):
-    def __init__(self):
+    def __init__(
+        self,
+        embedded=False,
+    ):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
             spacing=18,
@@ -15,9 +18,14 @@ class MouseView(Gtk.Box):
 
         self._loaded = False
 
-        self.get_style_context().add_class(
-            "content"
-        )
+        if embedded:
+            self.get_style_context().add_class(
+                "input-section"
+            )
+        else:
+            self.get_style_context().add_class(
+                "content"
+            )
 
         title = Gtk.Label(
             label="Mouse",
@@ -25,7 +33,11 @@ class MouseView(Gtk.Box):
         )
 
         title.get_style_context().add_class(
-            "page-title"
+            (
+                "subpage-title"
+                if embedded
+                else "page-title"
+            )
         )
 
         description = Gtk.Label(
@@ -98,6 +110,14 @@ class MouseView(Gtk.Box):
             label="Apply"
         )
 
+        self.apply_button.set_halign(
+            Gtk.Align.END
+        )
+
+        self.apply_button.get_style_context().add_class(
+            "primary-action"
+        )
+
         self.apply_button.connect(
             "clicked",
             self.apply_clicked,
@@ -120,6 +140,10 @@ class MouseView(Gtk.Box):
 
         self.status.get_style_context().add_class(
             "page-description"
+        )
+
+        self.status.get_style_context().add_class(
+            "settings-status"
         )
 
         card.pack_start(
@@ -150,9 +174,17 @@ class MouseView(Gtk.Box):
             spacing=16,
         )
 
+        row.get_style_context().add_class(
+            "settings-row"
+        )
+
         row_label = Gtk.Label(
             label=label,
             xalign=0,
+        )
+
+        row_label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         row_label.set_size_request(
@@ -165,6 +197,10 @@ class MouseView(Gtk.Box):
             minimum,
             maximum,
             step,
+        )
+
+        scale.get_style_context().add_class(
+            "settings-scale"
         )
 
         scale.set_hexpand(
@@ -212,9 +248,17 @@ class MouseView(Gtk.Box):
             spacing=12,
         )
 
+        row.get_style_context().add_class(
+            "settings-row"
+        )
+
         row_label = Gtk.Label(
             label=label,
             xalign=0,
+        )
+
+        row_label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         row_label.set_hexpand(
@@ -222,6 +266,10 @@ class MouseView(Gtk.Box):
         )
 
         switch = Gtk.Switch()
+
+        switch.get_style_context().add_class(
+            "settings-switch"
+        )
 
         row.pack_start(
             row_label,

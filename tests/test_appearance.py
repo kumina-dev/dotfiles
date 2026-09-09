@@ -95,6 +95,137 @@ class AppearanceTests(
                 ),
             )
 
+    def test_wallpaper_source_is_preferred(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(
+                directory
+            )
+
+            source = (
+                directory
+                / "nebula.png"
+            )
+
+            source.write_bytes(
+                b"image"
+            )
+
+            source_file = (
+                directory
+                / "wallpaper-source"
+            )
+
+            source_file.write_text(
+                f"{source}\n",
+                encoding="utf-8",
+            )
+
+            current = (
+                directory
+                / "main.png"
+            )
+
+            current.write_bytes(
+                b"runtime-copy"
+            )
+
+            with (
+                patch.object(
+                    appearance,
+                    "WALLPAPER_SOURCE_FILE",
+                    source_file,
+                ),
+                patch.object(
+                    appearance,
+                    "CURRENT_WALLPAPER",
+                    current,
+                ),
+            ):
+                self.assertEqual(
+                    appearance.get_wallpaper(),
+                    str(source.resolve()),
+                )
+
+    def test_missing_source_falls_back_to_runtime_wallpaper(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(
+                directory
+            )
+
+            source_file = (
+                directory
+                / "wallpaper-source"
+            )
+
+            source_file.write_text(
+                (
+                    "/definitely/missing/"
+                    "wallpaper.png\n"
+                ),
+                encoding="utf-8",
+            )
+
+            current = (
+                directory
+                / "main.png"
+            )
+
+            current.write_bytes(
+                b"runtime-copy"
+            )
+
+            with (
+                patch.object(
+                    appearance,
+                    "WALLPAPER_SOURCE_FILE",
+                    source_file,
+                ),
+                patch.object(
+                    appearance,
+                    "CURRENT_WALLPAPER",
+                    current,
+                ),
+            ):
+                self.assertEqual(
+                    appearance.get_wallpaper(),
+                    str(current.resolve()),
+                )
+
+    def test_no_wallpaper_returns_empty_string(
+        self,
+    ):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(
+                directory
+            )
+
+            with (
+                patch.object(
+                    appearance,
+                    "WALLPAPER_SOURCE_FILE",
+                    (
+                        directory
+                        / "wallpaper-source"
+                    ),
+                ),
+                patch.object(
+                    appearance,
+                    "CURRENT_WALLPAPER",
+                    (
+                        directory
+                        / "main.png"
+                    ),
+                ),
+            ):
+                self.assertEqual(
+                    appearance.get_wallpaper(),
+                    "",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -97,6 +97,14 @@ class DisplayView(Gtk.Box):
             label="Apply"
         )
 
+        self.apply_button.set_halign(
+            Gtk.Align.END
+        )
+
+        self.apply_button.get_style_context().add_class(
+            "primary-action"
+        )
+
         self.apply_button.connect(
             "clicked",
             self.apply_clicked,
@@ -119,6 +127,10 @@ class DisplayView(Gtk.Box):
 
         self.status.get_style_context().add_class(
             "page-description"
+        )
+
+        self.status.get_style_context().add_class(
+            "settings-status"
         )
 
         card.pack_start(
@@ -145,9 +157,17 @@ class DisplayView(Gtk.Box):
             spacing=12,
         )
 
+        row.get_style_context().add_class(
+            "settings-row"
+        )
+
         row_label = Gtk.Label(
             label=label,
             xalign=0,
+        )
+
+        row_label.get_style_context().add_class(
+            "settings-row-title"
         )
 
         row_label.set_hexpand(
@@ -155,6 +175,10 @@ class DisplayView(Gtk.Box):
         )
 
         combo = Gtk.ComboBoxText()
+
+        combo.get_style_context().add_class(
+            "settings-control"
+        )
 
         combo.set_size_request(
             260,

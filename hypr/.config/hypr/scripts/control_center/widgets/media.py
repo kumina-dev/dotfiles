@@ -1,4 +1,4 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 
 from .. import media
 from ..async_utils import run_async
@@ -23,35 +23,17 @@ class MediaCard(Gtk.Box):
         self.build()
 
     def build(self):
-        title = Gtk.Label(
-            label="Media"
-        )
-
-        title.set_halign(
-            Gtk.Align.START
-        )
-
-        title.get_style_context().add_class(
-            "section-title"
-        )
-
-        self.pack_start(
-            title,
-            False,
-            False,
-            0,
-        )
-
         self.media_label = Gtk.Label(
             label="Nothing playing"
         )
 
-        self.media_label.set_halign(
-            Gtk.Align.START
-        )
+        self.media_label.set_xalign(0)
+        self.media_label.set_hexpand(True)
+        self.media_label.set_single_line_mode(True)
+        self.media_label.set_max_width_chars(36)
 
         self.media_label.set_ellipsize(
-            3
+            Pango.EllipsizeMode.END
         )
 
         self.media_label.get_style_context().add_class(
@@ -84,9 +66,13 @@ class MediaCard(Gtk.Box):
             label="󰒭"
         )
 
-        self.previous_button.set_can_focus(False)
-        self.play_pause_button.set_can_focus(False)
-        self.next_button.set_can_focus(False)
+        for button, title in (
+            (self.previous_button, "Previous track"),
+            (self.play_pause_button, "Play / pause"),
+            (self.next_button, "Next track"),
+        ):
+            button.set_tooltip_text(title)
+            button.get_accessible().set_name(title)
 
         self.previous_button.connect(
             "clicked",
@@ -141,9 +127,9 @@ class MediaCard(Gtk.Box):
             xalign=0,
         )
 
-        self.error_label.set_line_wrap(
-            True
-        )
+        self.error_label.set_single_line_mode(True)
+        self.error_label.set_ellipsize(Pango.EllipsizeMode.END)
+        self.error_label.set_max_width_chars(36)
 
         self.error_label.get_style_context().add_class(
             "secondary"
@@ -188,6 +174,7 @@ class MediaCard(Gtk.Box):
         self.error_label.set_text(
             message or ""
         )
+        self.error_label.set_tooltip_text(message or None)
 
     def refresh(self):
         if self._refreshing:
@@ -221,6 +208,7 @@ class MediaCard(Gtk.Box):
             metadata
             or "Nothing playing"
         )
+        self.media_label.set_tooltip_text(metadata or None)
 
         self.play_pause_button.set_label(
             "󰏤"
@@ -248,6 +236,7 @@ class MediaCard(Gtk.Box):
         self.media_label.set_text(
             "Media unavailable"
         )
+        self.media_label.set_tooltip_text(None)
 
         self.set_controls_sensitive(
             False

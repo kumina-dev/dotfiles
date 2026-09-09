@@ -1,4 +1,4 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 
 from .. import bluetooth
 from .. import network
@@ -28,29 +28,11 @@ class ConnectivityCard(Gtk.Box):
         self.build()
 
     def build(self):
-        title = Gtk.Label(
-            label="Connectivity"
-        )
-
-        title.set_halign(
-            Gtk.Align.START
-        )
-
-        title.get_style_context().add_class(
-            "section-title"
-        )
-
-        self.pack_start(
-            title,
-            False,
-            False,
-            0,
-        )
-
         row = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL,
             spacing=10,
         )
+        row.set_homogeneous(True)
 
         wifi_group = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL,
@@ -69,9 +51,8 @@ class ConnectivityCard(Gtk.Box):
             label="›"
         )
 
-        wifi_details.set_can_focus(
-            False
-        )
+        wifi_details.set_tooltip_text("Open Wi-Fi settings")
+        wifi_details.get_accessible().set_name("Open Wi-Fi settings")
 
         self.wifi_button.connect(
             "clicked",
@@ -114,9 +95,8 @@ class ConnectivityCard(Gtk.Box):
             label="›"
         )
 
-        bluetooth_details.set_can_focus(
-            False
-        )
+        bluetooth_details.set_tooltip_text("Open Bluetooth settings")
+        bluetooth_details.get_accessible().set_name("Open Bluetooth settings")
 
         self.bluetooth_button.connect(
             "clicked",
@@ -167,9 +147,15 @@ class ConnectivityCard(Gtk.Box):
             xalign=0,
         )
 
-        self.status.set_line_wrap(
-            True
-        )
+        self.status.set_single_line_mode(True)
+        self.status.set_ellipsize(Pango.EllipsizeMode.END)
+        self.status.set_max_width_chars(36)
+
+        for button in (self.wifi_button, self.bluetooth_button):
+            label = button.get_child()
+            label.set_ellipsize(Pango.EllipsizeMode.END)
+            label.set_single_line_mode(True)
+            label.set_max_width_chars(12)
 
         self.status.get_style_context().add_class(
             "secondary"
@@ -234,6 +220,11 @@ class ConnectivityCard(Gtk.Box):
         self.wifi_button.set_label(
             wifi_label
         )
+        self.wifi_button.set_tooltip_text(
+            f"Wi-Fi: {wifi_name or 'not connected'}. Click to turn off."
+            if wifi_active else "Wi-Fi off. Click to turn on."
+        )
+        self.wifi_button.get_accessible().set_name("Toggle Wi-Fi")
 
         self.set_active_style(
             self.wifi_button,
@@ -265,6 +256,11 @@ class ConnectivityCard(Gtk.Box):
         self.bluetooth_button.set_label(
             bluetooth_label
         )
+        self.bluetooth_button.set_tooltip_text(
+            f"Bluetooth: {device or 'not connected'}. Click to turn off."
+            if bluetooth_active else "Bluetooth off. Click to turn on."
+        )
+        self.bluetooth_button.get_accessible().set_name("Toggle Bluetooth")
 
         self.set_active_style(
             self.bluetooth_button,
@@ -419,3 +415,4 @@ class ConnectivityCard(Gtk.Box):
         self.status.set_text(
             message or ""
         )
+        self.status.set_tooltip_text(message or None)

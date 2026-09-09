@@ -117,6 +117,15 @@ hl.bind(
 
 for i = 1, 9 do
     hl.bind(
+        "SUPER + ALT + " .. i,
+        hl.dsp.window.move({
+            workspace = tostring(i),
+            follow = false,
+        }),
+        { description = "Move window to workspace " .. i }
+    )
+
+    hl.bind(
         "SUPER + " .. i,
         hl.dsp.focus({ workspace = tostring(i) }),
         { description = "Switch to workspace " .. i }

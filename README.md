@@ -68,7 +68,9 @@ The Control Center provides compact daily controls for:
 - Microphone
 - Media playback
 
-Wi-Fi and Bluetooth have lightweight detail pages inside the Control Center, while full management remains available through Kumina Settings.
+All primary controls are on one page without a scroll container. Wi-Fi and Bluetooth arrows open their Settings pages. The Sound button opens device selection and other sound settings; the Settings button opens the overview. Escape closes the Control Center.
+
+Long network names, device names, media titles, and errors do not expand the quick-controls layout. Full text is available through tooltips. Hover the Output or Microphone heading to identify its current default device.
 
 Open it with:
 
@@ -114,9 +116,8 @@ Calendar event integrations are planned separately.
 
 Sound controls use PipeWire and WirePlumber.
 
-Settings and Control Center provide:
+Settings provides default output and microphone selection. Both Settings and Control Center provide:
 
-- Default output and microphone selection
 - Separate output and microphone volume
 - Mute controls
 - Automatic updates while visible
@@ -163,7 +164,17 @@ Settings supports:
 - disconnecting
 - forgetting paired devices
 
-The Control Center only exposes paired-device connection management.
+The Control Center provides an adapter toggle and a shortcut to Bluetooth settings for device management.
+
+## Notifications
+
+SwayNC popup width is 420 pixels, and its popup area has a maximum height of 240 pixels. This bounds the visible notification stack, including long messages. SwayNC may scroll overflow inside that area; this is not a fixed height for each individual notification card. Fixed-size cards remain a separate roadmap item.
+
+The notification center remains available with `Super + N`.
+
+## Workspace shortcuts
+
+`Super + Alt + 1–9` moves the focused window to the selected workspace without following it. The existing `Super + Shift + 1–9` bindings remain available.
 
 ## Appearance
 

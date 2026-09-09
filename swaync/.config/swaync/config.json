@@ -4,6 +4,7 @@
   "layer": "overlay",
   "control-center-layer": "top",
   "notification-window-width": 420,
+  "notification-window-height": 240,
   "control-center-width": 420,
   "control-center-height": 700,
   "notification-icon-size": 48,

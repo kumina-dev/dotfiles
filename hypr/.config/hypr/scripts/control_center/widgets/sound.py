@@ -7,8 +7,9 @@ from ..async_utils import run_async
 class AudioEndpoint(Gtk.Box):
     """One device selector, with ordered writes and a coalesced volume slider."""
 
-    def __init__(self, kind, on_refresh):
+    def __init__(self, kind, on_refresh, compact=False):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.compact = compact
         self.kind = kind
         self.on_refresh = on_refresh
         self.revision = 0
@@ -29,6 +30,7 @@ class AudioEndpoint(Gtk.Box):
         title = "Output" if kind == "output" else "Microphone"
         header = Gtk.Box(spacing=8)
         label = Gtk.Label(label=title, xalign=0)
+        self.title_label = label
         label.get_style_context().add_class("section-title")
         self.volume_label = Gtk.Label(label="—", xalign=1)
         header.pack_start(label, True, True, 0)
@@ -45,6 +47,9 @@ class AudioEndpoint(Gtk.Box):
         self.device_combo.set_active(0)
         self.device_combo.connect("changed", self.device_changed)
         self.pack_start(self.device_combo, False, False, 0)
+        if compact:
+            self.device_combo.set_no_show_all(True)
+            self.device_combo.hide()
 
         row = Gtk.Box(spacing=8)
         self.volume_scale = Gtk.Scale.new_with_range(
@@ -67,7 +72,14 @@ class AudioEndpoint(Gtk.Box):
         self.error_label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
         self.error_label.set_max_width_chars(36)
         self.error_label.set_no_show_all(True)
-        self.pack_start(self.error_label, False, False, 0)
+        if compact:
+            self.error_label.set_line_wrap(False)
+            self.error_label.set_single_line_mode(True)
+            self.error_label.set_ellipsize(Pango.EllipsizeMode.END)
+            self.error_label.set_max_width_chars(12)
+            header.pack_end(self.error_label, False, False, 0)
+        else:
+            self.pack_start(self.error_label, False, False, 0)
         self.connect("destroy", self.on_destroy)
         self.connect("unmap", self.on_unmap)
         self.update_sensitive()
@@ -83,7 +95,8 @@ class AudioEndpoint(Gtk.Box):
         self.mute_button.set_sensitive(available and not self.pending())
 
     def show_error(self, message):
-        self.error_label.set_text(message or "")
+        self.error_label.set_text("Error" if self.compact and message else message or "")
+        self.error_label.set_tooltip_text(message or None)
         self.error_label.set_visible(bool(message))
 
     def apply_state(self, state, revision):
@@ -113,6 +126,9 @@ class AudioEndpoint(Gtk.Box):
             )
             self.device_combo.set_tooltip_text(
                 self._device.description if self._device else "Choose a device",
+            )
+            self.title_label.set_tooltip_text(
+                self._device.description if self._device else "No default device",
             )
             self.volume_scale.set_value(min(self._volume or 0, 100))
             self.volume_label.set_text(
@@ -244,8 +260,9 @@ class AudioEndpoint(Gtk.Box):
 
 
 class SoundCard(Gtk.Box):
-    def __init__(self, card_class="card"):
+    def __init__(self, card_class="card", compact=False):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.compact = compact
         self.get_style_context().add_class(card_class)
         self._refreshing = False
         self._refresh_again = False
@@ -254,7 +271,7 @@ class SoundCard(Gtk.Box):
         self.endpoints = {}
 
         for kind in ("output", "input"):
-            endpoint = AudioEndpoint(kind, self.refresh)
+            endpoint = AudioEndpoint(kind, self.refresh, compact=compact)
             self.endpoints[kind] = endpoint
             self.pack_start(endpoint, False, False, 0)
 
@@ -263,6 +280,10 @@ class SoundCard(Gtk.Box):
         self.error_label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
         self.error_label.set_max_width_chars(36)
         self.error_label.set_no_show_all(True)
+        if compact:
+            self.error_label.set_line_wrap(False)
+            self.error_label.set_single_line_mode(True)
+            self.error_label.set_ellipsize(Pango.EllipsizeMode.END)
         self.pack_start(self.error_label, False, False, 0)
         self.connect("map", self.on_map)
         self.connect("unmap", self.on_unmap)
@@ -310,6 +331,8 @@ class SoundCard(Gtk.Box):
 
     def apply_state(self, state, revisions):
         if not self._destroyed:
+            self.error_label.set_text("")
+            self.error_label.set_tooltip_text(None)
             self.error_label.hide()
             for kind, endpoint in self.endpoints.items():
                 endpoint.apply_state(state[kind], revisions[kind])
@@ -318,6 +341,7 @@ class SoundCard(Gtk.Box):
     def refresh_failed(self, error):
         if not self._destroyed:
             self.error_label.set_text(str(error))
+            self.error_label.set_tooltip_text(str(error))
             self.error_label.show()
             for endpoint in self.endpoints.values():
                 endpoint.set_sensitive(False)

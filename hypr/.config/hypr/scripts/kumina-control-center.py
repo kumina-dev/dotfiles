@@ -15,20 +15,13 @@ if not acquire(
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, Gtk, GLib
 
 from control_center import theme
 
 from control_center.views.main import (
     MainView,
-)
-
-from control_center.views.wifi import (
-    WifiView,
-)
-
-from control_center.views.bluetooth import (
-    BluetoothView,
 )
 
 
@@ -40,101 +33,53 @@ class ControlCenter(Gtk.Window):
 
         self.set_default_size(
             420,
-            520,
+            480,
         )
 
         self.set_resizable(False)
-        self.set_border_width(18)
+        self.set_border_width(12)
+        self.set_decorated(False)
 
         self.connect(
             "destroy",
-            Gtk.main_quit,
+            self.on_destroy,
         )
+        self.connect("key-press-event", self.key_pressed)
 
         theme.load()
 
-        self.stack = Gtk.Stack()
-
-        self.stack.set_transition_type(
-            Gtk.StackTransitionType.SLIDE_LEFT_RIGHT
-        )
-
-        self.stack.set_transition_duration(
-            180
-        )
-
         self.main_view = MainView(
             on_wifi_details=(
-                self.show_wifi_view
+                lambda: self.open_settings("wifi")
             ),
             on_bluetooth_details=(
-                self.show_bluetooth_view
+                lambda: self.open_settings("bluetooth")
             ),
-            on_sound_settings=self.open_sound_settings,
+            on_sound_settings=lambda: self.open_settings("sound"),
+            on_settings=lambda: self.open_settings("overview"),
         )
-
-        self.wifi_view = WifiView(
-            on_back=self.show_main_view,
-            on_connectivity_changed=(
-                self.main_view.connectivity.refresh
-            ),
-            on_open_settings=self.close,
-        )
-
-        self.bluetooth_view = BluetoothView(
-            on_back=self.show_main_view,
-            on_connectivity_changed=(
-                self.main_view.connectivity.refresh
-            ),
-            on_open_settings=self.close,
-        )
-
-        main_scroller = Gtk.ScrolledWindow()
-        main_scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        main_scroller.add(self.main_view)
-        self.stack.add_named(main_scroller, "main")
-
-        self.stack.add_named(
-            self.wifi_view,
-            "wifi",
-        )
-
-        self.stack.add_named(
-            self.bluetooth_view,
-            "bluetooth",
-        )
-
-        self.stack.set_visible_child_name(
-            "main"
-        )
-
-        self.add(self.stack)
+        self.add(self.main_view)
 
         GLib.idle_add(
             self.initial_refresh,
         )
 
-        GLib.timeout_add_seconds(
+        self._refresh_timer = GLib.timeout_add_seconds(
             3,
             self.refresh_state,
         )
 
-    def show_main_view(self):
-        self.stack.set_visible_child_name(
-            "main"
-        )
-
-    def open_sound_settings(self):
+    def open_settings(self, page):
         script = Path(__file__).resolve().parent / "open-settings.sh"
         try:
-            subprocess.Popen([str(script), "sound"], start_new_session=True)
+            subprocess.Popen([str(script), page], start_new_session=True)
         except OSError as error:
             dialog = Gtk.MessageDialog(
                 transient_for=self,
                 modal=True,
                 message_type=Gtk.MessageType.ERROR,
                 buttons=Gtk.ButtonsType.CLOSE,
-                text="Could not open Sound settings",
+                text="Could not open Settings",
             )
             dialog.format_secondary_text(str(error))
             dialog.run()
@@ -142,20 +87,17 @@ class ControlCenter(Gtk.Window):
             return
         self.close()
 
+    def key_pressed(self, _window, event):
+        if event.keyval == Gdk.KEY_Escape:
+            self.close()
+            return True
+        return False
 
-    def show_wifi_view(self):
-        self.stack.set_visible_child_name(
-            "wifi"
-        )
-
-        self.wifi_view.refresh()
-
-    def show_bluetooth_view(self):
-        self.stack.set_visible_child_name(
-            "bluetooth"
-        )
-
-        self.bluetooth_view.refresh()
+    def on_destroy(self, _window):
+        if self._refresh_timer is not None:
+            GLib.source_remove(self._refresh_timer)
+            self._refresh_timer = None
+        Gtk.main_quit()
 
     def initial_refresh(self):
         self.main_view.refresh()

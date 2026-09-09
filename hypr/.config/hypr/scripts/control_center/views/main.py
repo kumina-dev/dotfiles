@@ -19,13 +19,15 @@ class MainView(Gtk.Box):
         on_wifi_details,
         on_bluetooth_details,
         on_sound_settings,
+        on_settings,
     ):
         super().__init__(
             orientation=Gtk.Orientation.VERTICAL,
-            spacing=14,
+            spacing=8,
         )
 
-        self.build_header()
+        self.get_style_context().add_class("quick-controls")
+        self.build_header(on_settings, on_sound_settings)
 
         self.connectivity = (
             ConnectivityCard(
@@ -38,7 +40,7 @@ class MainView(Gtk.Box):
             )
         )
 
-        self.sound = SoundCard()
+        self.sound = SoundCard(compact=True)
         self.media = MediaCard()
 
         self.pack_start(
@@ -55,10 +57,6 @@ class MainView(Gtk.Box):
             0,
         )
 
-        sound_settings = Gtk.Button(label="Sound Settings  ›")
-        sound_settings.connect("clicked", lambda _button: on_sound_settings())
-        self.pack_start(sound_settings, False, False, 0)
-
         self.pack_start(
             self.media,
             False,
@@ -66,7 +64,8 @@ class MainView(Gtk.Box):
             0,
         )
 
-    def build_header(self):
+    def build_header(self, on_settings, on_sound_settings):
+        row = Gtk.Box(spacing=8)
         header = Gtk.Label(
             label="Control Center"
         )
@@ -79,12 +78,15 @@ class MainView(Gtk.Box):
             "title"
         )
 
-        self.pack_start(
-            header,
-            False,
-            False,
-            0,
-        )
+        settings = Gtk.Button(label="Settings")
+        settings.connect("clicked", lambda _button: on_settings())
+        sound_settings = Gtk.Button(label="Sound")
+        sound_settings.set_tooltip_text("Open Sound settings and select devices")
+        sound_settings.connect("clicked", lambda _button: on_sound_settings())
+        row.pack_start(header, True, True, 0)
+        row.pack_end(settings, False, False, 0)
+        row.pack_end(sound_settings, False, False, 0)
+        self.pack_start(row, False, False, 0)
 
     def refresh(self):
         self.connectivity.refresh()

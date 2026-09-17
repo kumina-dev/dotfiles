@@ -37,6 +37,7 @@ GTK 3 settings application with pages for:
   - Keyboard
   - Mouse
 - Sound
+- Language & Region (date/time preferences)
 
 Open the overview:
 
@@ -54,6 +55,7 @@ Open a specific page:
 ~/.config/hypr/scripts/open-settings.sh input
 ~/.config/hypr/scripts/open-settings.sh about
 ~/.config/hypr/scripts/open-settings.sh sound
+~/.config/hypr/scripts/open-settings.sh region
 ```
 
 Display and Input settings persist their generated Hyprland configuration in ignored files under:
@@ -94,6 +96,46 @@ The About page reads the current computer's:
 - Total, used, and free space for the system filesystem and a separate home filesystem when present
 
 Refresh reloads the information. Copy system information copies the displayed values as plain text. Device names are read using `lspci` from the optional `pciutils` package; if unavailable, the other information still loads. Storage values describe mounted filesystems, not the sum of all physical disks.
+
+### Language & Region — date and time
+
+The first Language & Region iteration provides:
+
+- 12/24-hour clock, numeric date format, and Monday/Sunday week start
+- A preview and explicitly applied, per-user preferences
+- System time-zone selection through `timedatectl` and the existing polkit agent
+
+Formats are stored atomically in `$XDG_CONFIG_HOME/kumios/region.json` (normally
+`~/.config/kumios/region.json`). They affect the KumiOS panel clock, its calendar
+tooltip, and the calendar window. Defaults remain 24-hour time, day-first dates,
+and Monday-first weeks. The panel and open calendar observe changes within a
+second, including midnight and system time-zone changes. No logout is required.
+Other applications keep their own regional formats.
+
+The panel clock now uses a Waybar custom JSON stream. Left-click still toggles
+the calendar; right-click opens Language & Region. Reload Waybar once after
+installing this change (`pkill -SIGUSR2 -x waybar`). Subsequent preference changes
+do not need a reload. The calendar keeps its existing Finnish labels; panel
+calendar names follow the process locale.
+
+Time-zone changes apply system-wide and may prompt for authentication. Errors
+and cancelled authentication are shown on the page. Format preferences remain
+usable if timedated is unavailable. Invalid preference files fall back to the
+defaults in the clock/calendar and are reported in Settings; applying formats
+replaces the invalid file.
+
+Interface translations, language selection, and number/currency formatting
+remain planned. Keyboard layouts stay under Input.
+
+Desktop verification:
+
+1. Open `open-settings.sh region`; apply 12-hour time and an ISO date. Check the
+   preview, panel tooltip, and open calendar agree. Restore your preferred values.
+2. Change the week start; check both calendar headers and day columns move together.
+3. Apply the current time zone; this should not request authentication. A different
+   time zone may prompt through polkit; cancellation must show an error. Restore
+   your original zone after testing an actual change.
+4. Close/reopen Settings and the calendar; saved format choices should remain.
 
 ### Lock screen
 

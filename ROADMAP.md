@@ -61,9 +61,11 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
   - Copy system information
 - [ ] Verify About values and clipboard behavior on the desktop
 - [ ] Add Language & Region settings
+  - [x] First iteration: shared clock/date formats, week start, and system time-zone selection
+  - [ ] Verify the new Settings page, live clock/calendar updates, and polkit flow on the desktop
   - Display language and translations for the custom interface
   - Regional date, time, number, and currency formats
-  - Time zone and 12/24-hour clock
+  - [x] Time zone and 12/24-hour clock
   - Keep keyboard layouts under Input
   - Apply preferences consistently and identify changes requiring logout
 

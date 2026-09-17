@@ -11,7 +11,7 @@
 
   "modules-center": [
     "custom/updates",
-    "clock"
+    "custom/clock"
   ],
 
   "modules-right": [
@@ -53,10 +53,13 @@
     "format-en": "EN"
   },
 
-  "clock": {
-    "format": "{:%H:%M}",
-    "tooltip-format": "<tt>{calendar}</tt>",
-    "on-click": "~/.config/hypr/scripts/calendar-toggle.sh"
+  "custom/clock": {
+    "exec": "python3 ~/.config/hypr/scripts/kumina-clock.py",
+    "return-type": "json",
+    "restart-interval": 2,
+    "exec-on-event": false,
+    "on-click": "~/.config/hypr/scripts/calendar-toggle.sh",
+    "on-click-right": "~/.config/hypr/scripts/open-settings.sh region"
   },
 
   "bluetooth": {

@@ -22,6 +22,7 @@ gi.require_version("Gdk", "3.0")
 from gi.repository import Gtk
 
 from settings_app import theme
+from settings_app.views.region import RegionView
 
 from settings_app.views.overview import (
     OverviewView,
@@ -100,6 +101,7 @@ NAVIGATION = (
                 "Input",
                 "input",
             ),
+            ("󰥔", "Language & Region", "region"),
         ),
     ),
     (
@@ -179,6 +181,8 @@ class SettingsWindow(Gtk.Window):
         self.bluetooth_view = BluetoothView()
         self.appearance_view = AppearanceView()
         self.about_view = AboutView()
+        self.region_view = RegionView()
+        self.stack.add_named(self.region_view, "region")
 
         self.stack.add_named(
             self.overview_view,
@@ -252,6 +256,7 @@ class SettingsWindow(Gtk.Window):
             "input",
             "bluetooth",
             "appearance",
+            "region",
             "about",
         ):
             initial_page = "overview"
@@ -451,6 +456,9 @@ class SettingsWindow(Gtk.Window):
         elif page == "appearance":
             child = self.appearance_view
 
+        elif page == "region":
+            child = self.region_view
+
         elif page == "about":
             child = self.about_view
 
@@ -496,6 +504,9 @@ class SettingsWindow(Gtk.Window):
 
         if page == "appearance":
             self.appearance_view.refresh()
+
+        if page == "region":
+            self.region_view.refresh()
 
         if page == "about":
             self.about_view.refresh()

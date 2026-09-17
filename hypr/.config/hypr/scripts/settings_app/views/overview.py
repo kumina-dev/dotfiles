@@ -35,6 +35,7 @@ GROUPS = (
                 "Input",
                 "input",
             ),
+            ("󰥔", "Language & Region", "region"),
         ),
     ),
     (

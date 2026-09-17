@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import calendar
-from datetime import date, timedelta
+from datetime import timedelta
 
+from kumina_common import region
 from single_instance import acquire
 
 
@@ -26,6 +27,7 @@ gi.require_version(
 
 from gi.repository import (
     Gdk,
+    GLib,
     Gtk,
 )
 
@@ -153,7 +155,8 @@ class CalendarWindow(Gtk.Window):
         self.set_resizable(False)
         self.set_position(Gtk.WindowPosition.CENTER)
 
-        self.current_date = date.today()
+        self.preferences = region.read_preferences()
+        self.current_date = region.local_now().date()
         self.display_year = self.current_date.year
         self.display_month = self.current_date.month
 
@@ -163,6 +166,23 @@ class CalendarWindow(Gtk.Window):
         self.load_css()
         self.build_ui()
         self.render_calendar()
+        self.refresh_clock()
+        self._clock_timer = GLib.timeout_add_seconds(1, self.refresh_clock)
+        self.connect("destroy", self.stop_clock)
+
+    def stop_clock(self, _window):
+        GLib.source_remove(self._clock_timer)
+
+    def refresh_clock(self):
+        now = region.local_now()
+        preferences = region.read_preferences()
+        changed = now.date() != self.current_date or preferences != self.preferences
+        self.current_date = now.date()
+        self.preferences = preferences
+        self.clock_label.set_text(f"{region.format_date(now, preferences)} · {region.format_time(now, preferences)}")
+        if changed:
+            self.render_calendar()
+        return GLib.SOURCE_CONTINUE
 
     def load_css(self):
         provider = Gtk.CssProvider()
@@ -222,6 +242,10 @@ class CalendarWindow(Gtk.Window):
 
         root.pack_start(self.calendar_grid, True, True, 0)
 
+        self.clock_label = Gtk.Label()
+        self.clock_label.set_margin_top(12)
+        root.pack_start(self.clock_label, False, False, 0)
+
     def render_calendar(self):
         for child in self.calendar_grid.get_children():
             self.calendar_grid.remove(child)
@@ -230,14 +254,16 @@ class CalendarWindow(Gtk.Window):
             f"{MONTHS[self.display_month - 1]} {self.display_year}"
         )
 
-        for column, weekday in enumerate(WEEKDAYS):
+        first = region.first_weekday(self.preferences)
+        weekdays = WEEKDAYS[first:] + WEEKDAYS[:first]
+        for column, weekday in enumerate(weekdays):
             label = Gtk.Label(label=weekday)
             label.get_style_context().add_class("weekday")
             label.set_halign(Gtk.Align.CENTER)
 
             self.calendar_grid.attach(label, column, 0, 1, 1)
 
-        cal = calendar.Calendar(firstweekday=0)
+        cal = calendar.Calendar(firstweekday=first)
 
         days = list(
             cal.itermonthdates(

@@ -4,6 +4,9 @@
 
 ### Added
 
+- Language & Region first iteration: shared 12/24-hour clock, numeric dates, week start, and system time-zone selection.
+- Live panel/calendar preference updates and a right-click shortcut from the clock to regional settings.
+
 - KumiOS project identity and a single installed development-version file.
 - About this PC with live system information, refresh, and plain-text copy.
 - Super + Alt + 1–9 to move a window without following it.
@@ -24,5 +27,6 @@
 
 - Fixed dimensions for individual notification cards.
 - Conditional password-input visibility during FIDO authentication.
-- Language & Region settings.
+- Language selection, interface translations, and number/currency formats.
+- Desktop verification of regional settings and time-zone authentication.
 - Desktop verification before the first release tag.

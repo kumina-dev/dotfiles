@@ -81,7 +81,7 @@ window#waybar {
 
 /* Clock */
 
-#clock {
+#custom-clock {
     color: @text;
 
     font-weight: 600;
@@ -92,7 +92,7 @@ window#waybar {
     border-radius: 7px;
 }
 
-#clock:hover {
+#custom-clock:hover {
     background: alpha(@primary, 0.12);
 }
 

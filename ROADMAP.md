@@ -75,7 +75,8 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
 ### Further integrations
 
 - [ ] Calendar integrations and events
-- [ ] Add an Account section to Settings using the currently logged-in Linux system account
+- [x] Add a read-only Account section to Settings using the current Linux system account
+  - [ ] Verify account values, copy/refresh, and sidebar scrolling on the desktop
   - No separate Kumina account system
   - No cloud account requirement
   - System username and local account information are the source of truth

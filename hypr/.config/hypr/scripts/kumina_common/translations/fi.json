@@ -235,5 +235,22 @@
   "Currency: {value}": "Valuutta: {value}",
   "Applies to the panel, calendar and About this PC. Other apps keep their own formats.": "Koskee paneelia, kalenteria ja Tietoja tietokoneesta -sivua. Muut sovellukset käyttävät omia muotoilujaan.",
   "Currency is a display preference; it does not convert amounts. Keyboard layouts are under Input.": "Valuutta on näyttöasetus; rahamääriä ei muunneta. Näppäimistöasettelut löytyvät kohdasta Syöttölaitteet.",
-  "Applied. The panel and calendar update automatically. Refresh About this PC for updated numbers.": "Otettu käyttöön. Paneeli ja kalenteri päivittyvät automaattisesti. Päivitä Tietoja tietokoneesta -sivu lukujen päivittämiseksi."
+  "Applied. The panel and calendar update automatically. Refresh About this PC for updated numbers.": "Otettu käyttöön. Paneeli ja kalenteri päivittyvät automaattisesti. Päivitä Tietoja tietokoneesta -sivu lukujen päivittämiseksi.",
+  "Account": "Käyttäjätili",
+  "Linux account": "Linux-käyttäjätili",
+  "Information for the Linux user running Settings.": "Asetuksia käyttävän Linux-käyttäjän tiedot.",
+  "Username": "Käyttäjätunnus",
+  "Full name": "Koko nimi",
+  "Not set": "Ei asetettu",
+  "User ID": "Käyttäjän ID",
+  "Primary group": "Ensisijainen ryhmä",
+  "Session groups": "Istunnon ryhmät",
+  "Home directory": "Kotihakemisto",
+  "Login shell": "Kirjautumiskomentotulkki",
+  "System default": "Järjestelmän oletus",
+  "Unknown group (GID {gid})": "Tuntematon ryhmä (GID {gid})",
+  "Could not read the Linux account for user ID {uid}.": "Käyttäjän {uid} Linux-tilitietoja ei voitu lukea.",
+  "Session groups are the groups active in this running session.": "Istunnon ryhmät ovat tässä istunnossa käytössä olevat ryhmät.",
+  "Open this page to load account information.": "Avaa tämä sivu ladataksesi käyttäjätilin tiedot.",
+  "Copy account information": "Kopioi käyttäjätilin tiedot"
 }

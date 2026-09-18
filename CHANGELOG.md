@@ -4,6 +4,8 @@
 
 ### Added
 
+- Read-only Account page with Linux user details, active session groups, refresh, and plain-text copy in English/Finnish.
+
 - Finnish/English number styles and EUR/USD/GBP currency previews with independent saved preferences.
 - Shared decimal-based number/currency formatting and regional memory/storage values in About this PC.
 
@@ -20,6 +22,8 @@
 
 ### Changed
 
+- Settings navigation scrolls when needed to keep all pages reachable.
+
 - Control Center now presents quick controls on one page, with details in Settings.
 - Long quick-control labels use tooltips instead of expanding the layout.
 - The SwayNC popup area is limited to 240 pixels in height.
@@ -30,6 +34,8 @@
 - Invalid notification-theme font declaration.
 
 ### Still pending
+
+- Desktop verification of Account values, copy/refresh, and sidebar scrolling.
 
 - Fixed dimensions for individual notification cards.
 - Conditional password-input visibility during FIDO authentication.

@@ -25,6 +25,7 @@ from gi.repository import Gtk
 
 from settings_app import theme
 from settings_app.views.region import RegionView
+from settings_app.views.account import AccountView
 
 from settings_app.views.overview import (
     OverviewView,
@@ -119,6 +120,7 @@ NAVIGATION = (
     (
         tr("Information"),
         (
+            ("󰀄", tr("Account"), "account"),
             (
                 "󰋼",
                 tr("About"),
@@ -183,6 +185,8 @@ class SettingsWindow(Gtk.Window):
         self.bluetooth_view = BluetoothView()
         self.appearance_view = AppearanceView()
         self.about_view = AboutView()
+        self.account_view = AccountView()
+        self.stack.add_named(self.account_view, "account")
         self.region_view = RegionView()
         self.stack.add_named(self.region_view, "region")
 
@@ -226,8 +230,13 @@ class SettingsWindow(Gtk.Window):
             "about",
         )
 
+        sidebar_scroll = Gtk.ScrolledWindow()
+        sidebar_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        sidebar_scroll.set_propagate_natural_width(True)
+        sidebar_scroll.add(self.sidebar)
+
         root.pack_start(
-            self.sidebar,
+            sidebar_scroll,
             False,
             False,
             0,
@@ -259,6 +268,7 @@ class SettingsWindow(Gtk.Window):
             "bluetooth",
             "appearance",
             "region",
+            "account",
             "about",
         ):
             initial_page = "overview"
@@ -461,6 +471,9 @@ class SettingsWindow(Gtk.Window):
         elif page == "region":
             child = self.region_view
 
+        elif page == "account":
+            child = self.account_view
+
         elif page == "about":
             child = self.about_view
 
@@ -509,6 +522,9 @@ class SettingsWindow(Gtk.Window):
 
         if page == "region":
             self.region_view.refresh()
+
+        if page == "account":
+            self.account_view.refresh()
 
         if page == "about":
             self.about_view.refresh()

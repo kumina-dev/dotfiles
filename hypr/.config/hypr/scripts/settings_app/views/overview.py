@@ -53,6 +53,7 @@ GROUPS = (
     (
         tr("Information"),
         (
+            ("󰀄", tr("Account"), "account"),
             (
                 "󰋼",
                 tr("About"),

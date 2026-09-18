@@ -37,6 +37,7 @@ GTK 3 settings application with pages for:
   - Keyboard
   - Mouse
 - Sound
+- Account
 - Language & Region (English/Finnish interface, date/time, numbers, and currency)
 
 Open the overview:
@@ -54,6 +55,7 @@ Open a specific page:
 ~/.config/hypr/scripts/open-settings.sh appearance
 ~/.config/hypr/scripts/open-settings.sh input
 ~/.config/hypr/scripts/open-settings.sh about
+~/.config/hypr/scripts/open-settings.sh account
 ~/.config/hypr/scripts/open-settings.sh sound
 ~/.config/hypr/scripts/open-settings.sh region
 ```
@@ -85,6 +87,30 @@ Open it with:
 ```sh
 ~/.config/hypr/scripts/control-center-toggle.sh
 ```
+
+### Account
+
+Account shows the existing Linux account running Settings. It reads the account
+by the process user ID, not environment variables, so launching Settings as a
+different user correctly shows that user's account.
+
+The page provides the username, full name (when set), user ID, primary group,
+active session groups, home directory, and configured login shell. The heading
+falls back to the username when no full name is set. Unknown groups retain their
+numeric IDs. Session groups describe the current process's group membership;
+they may differ from newly edited account group assignments until a new session.
+
+Refresh reloads the data. Copy account information copies the displayed snapshot
+as plain text. Only the name portion of the GECOS field is used; office and phone
+fields are omitted. Both English and Finnish are supported. Long values wrap
+inside a scrollable page; the Settings sidebar also scrolls when necessary.
+
+This first iteration is read-only and uses the existing Linux account. It has
+no separate login, cloud account, account editing, or password-management flow.
+
+Desktop check: open `open-settings.sh account`, compare the details with your
+account, try Refresh and Copy account information, and check the page/sidebar
+at your normal display scale. The copied text should match the displayed values.
 
 ### About this PC
 

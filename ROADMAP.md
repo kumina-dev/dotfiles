@@ -63,7 +63,8 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
 - [ ] Add Language & Region settings
   - [x] First iteration: shared clock/date formats, week start, and system time-zone selection
   - [ ] Verify the new Settings page, live clock/calendar updates, and polkit flow on the desktop
-  - Display language and translations for the custom interface
+  - [x] English/Finnish translations for Settings, Control Center, the power menu, and calendar
+  - [ ] Verify Finnish GTK layouts, confirmations, and language switching on the desktop
   - Regional date, time, number, and currency formats
   - [x] Time zone and 12/24-hour clock
   - Keep keyboard layouts under Input

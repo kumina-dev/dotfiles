@@ -4,6 +4,7 @@ import calendar
 from datetime import timedelta
 
 from kumina_common import region
+from kumina_common.i18n import MONTHS as MONTH_NAMES, WEEKDAYS as DAY_NAMES, translate as tr
 from single_instance import acquire
 
 
@@ -32,30 +33,8 @@ from gi.repository import (
 )
 
 
-MONTHS = [
-    "Tammikuu",
-    "Helmikuu",
-    "Maaliskuu",
-    "Huhtikuu",
-    "Toukokuu",
-    "Kesäkuu",
-    "Heinäkuu",
-    "Elokuu",
-    "Syyskuu",
-    "Lokakuu",
-    "Marraskuu",
-    "Joulukuu",
-]
-
-WEEKDAYS = [
-    "Ma",
-    "Ti",
-    "Ke",
-    "To",
-    "Pe",
-    "La",
-    "Su",
-]
+MONTHS = [tr(name) for name in MONTH_NAMES]
+WEEKDAYS = [tr(name) for name in DAY_NAMES]
 
 
 CSS = """
@@ -211,14 +190,14 @@ class CalendarWindow(Gtk.Window):
         header.set_name("header")
 
         previous = Gtk.Button(label="‹")
-        previous.set_tooltip_text("Edellinen kuukausi")
+        previous.set_tooltip_text(tr("Previous month"))
         previous.connect("clicked", self.previous_month)
 
         next_button = Gtk.Button(label="›")
-        next_button.set_tooltip_text("Seuraava kuukausi")
+        next_button.set_tooltip_text(tr("Next month"))
         next_button.connect("clicked", self.next_month)
 
-        today = Gtk.Button(label="Tänään")
+        today = Gtk.Button(label=tr("Today"))
         today.set_name("today")
         today.connect("clicked", self.go_today)
 

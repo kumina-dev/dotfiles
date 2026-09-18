@@ -4,6 +4,9 @@
 
 ### Added
 
+- English/Finnish interface selection for Settings, Control Center, the power menu, and calendar.
+- Shared translated month/weekday names for the calendar and live Waybar tooltip.
+
 - Language & Region first iteration: shared 12/24-hour clock, numeric dates, week start, and system time-zone selection.
 - Live panel/calendar preference updates and a right-click shortcut from the clock to regional settings.
 
@@ -27,6 +30,7 @@
 
 - Fixed dimensions for individual notification cards.
 - Conditional password-input visibility during FIDO authentication.
-- Language selection, interface translations, and number/currency formats.
+- Number/currency formats.
+- Desktop verification of Finnish layouts and language switching.
 - Desktop verification of regional settings and time-zone authentication.
 - Desktop verification before the first release tag.

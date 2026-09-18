@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk, Pango
 
 from .. import media
@@ -24,7 +26,7 @@ class MediaCard(Gtk.Box):
 
     def build(self):
         self.media_label = Gtk.Label(
-            label="Nothing playing"
+            label=tr("Nothing playing")
         )
 
         self.media_label.set_xalign(0)
@@ -67,9 +69,9 @@ class MediaCard(Gtk.Box):
         )
 
         for button, title in (
-            (self.previous_button, "Previous track"),
-            (self.play_pause_button, "Play / pause"),
-            (self.next_button, "Next track"),
+            (self.previous_button, tr("Previous track")),
+            (self.play_pause_button, tr("Play / pause")),
+            (self.next_button, tr("Next track")),
         ):
             button.set_tooltip_text(title)
             button.get_accessible().set_name(title)
@@ -206,7 +208,7 @@ class MediaCard(Gtk.Box):
 
         self.media_label.set_text(
             metadata
-            or "Nothing playing"
+            or tr("Nothing playing")
         )
         self.media_label.set_tooltip_text(metadata or None)
 
@@ -234,7 +236,7 @@ class MediaCard(Gtk.Box):
         self._has_player = False
 
         self.media_label.set_text(
-            "Media unavailable"
+            tr("Media unavailable")
         )
         self.media_label.set_tooltip_text(None)
 

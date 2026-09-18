@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from settings_app import mouse
@@ -28,7 +30,7 @@ class MouseView(Gtk.Box):
             )
 
         title = Gtk.Label(
-            label="Mouse",
+            label=tr("Mouse"),
             xalign=0,
         )
 
@@ -42,7 +44,7 @@ class MouseView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Configure pointer and scrolling behaviour."
+                tr("Configure pointer and scrolling behaviour.")
             ),
             xalign=0,
         )
@@ -80,7 +82,7 @@ class MouseView(Gtk.Box):
 
         self.sensitivity = self.add_scale_row(
             card,
-            "Pointer speed",
+            tr("Pointer speed"),
             -1.0,
             1.0,
             0.05,
@@ -89,7 +91,7 @@ class MouseView(Gtk.Box):
 
         self.scroll_factor = self.add_scale_row(
             card,
-            "Scroll speed",
+            tr("Scroll speed"),
             0.0,
             2.0,
             0.05,
@@ -98,16 +100,16 @@ class MouseView(Gtk.Box):
 
         self.natural_scroll = self.add_switch_row(
             card,
-            "Natural scrolling",
+            tr("Natural scrolling"),
         )
 
         self.left_handed = self.add_switch_row(
             card,
-            "Left-handed buttons",
+            tr("Left-handed buttons"),
         )
 
         self.apply_button = Gtk.Button(
-            label="Apply"
+            label=tr("Apply")
         )
 
         self.apply_button.set_halign(
@@ -324,7 +326,7 @@ class MouseView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Loading mouse settings…"
+            tr("Loading mouse settings…")
         )
 
         run_async(
@@ -372,7 +374,7 @@ class MouseView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Applying…"
+            tr("Applying…")
         )
 
         run_async(
@@ -391,7 +393,7 @@ class MouseView(Gtk.Box):
         _result,
     ):
         self.status.set_text(
-            "Applied."
+            tr("Applied.")
         )
 
         self.set_controls_sensitive(

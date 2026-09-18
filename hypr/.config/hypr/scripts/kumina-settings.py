@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from kumina_common.i18n import translate as tr
+
 import sys
 
 from single_instance import acquire
@@ -63,13 +65,13 @@ NAVIGATION = (
         (
             (
                 "󰋜",
-                "Overview",
+                tr("Overview"),
                 "overview",
             ),
         ),
     ),
     (
-        "Connectivity",
+        tr("Connectivity"),
         (
             (
                 "󰤨",
@@ -84,42 +86,42 @@ NAVIGATION = (
         ),
     ),
     (
-        "System",
+        tr("System"),
         (
             (
                 "󰕾",
-                "Sound",
+                tr("Sound"),
                 "sound",
             ),
             (
                 "󰍹",
-                "Display",
+                tr("Display"),
                 "display",
             ),
             (
                 "󰌌",
-                "Input",
+                tr("Input"),
                 "input",
             ),
-            ("󰥔", "Language & Region", "region"),
+            ("󰥔", tr("Language & Region"), "region"),
         ),
     ),
     (
-        "Personalization",
+        tr("Personalization"),
         (
             (
                 "󰏘",
-                "Appearance",
+                tr("Appearance"),
                 "appearance",
             ),
         ),
     ),
     (
-        "Information",
+        tr("Information"),
         (
             (
                 "󰋼",
-                "About",
+                tr("About"),
                 "about",
             ),
         ),
@@ -279,7 +281,7 @@ class SettingsWindow(Gtk.Window):
         )
 
         title = Gtk.Label(
-            label="Settings",
+            label=tr("Settings"),
             xalign=0,
         )
 
@@ -288,7 +290,7 @@ class SettingsWindow(Gtk.Window):
         )
 
         subtitle = Gtk.Label(
-            label="System & desktop",
+            label=tr("System & desktop"),
             xalign=0,
         )
 

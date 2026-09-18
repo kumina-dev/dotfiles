@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from control_center.widgets.sound import SoundCard
@@ -8,10 +10,10 @@ class SoundView(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=18)
         self.get_style_context().add_class("content")
 
-        title = Gtk.Label(label="Sound", xalign=0)
+        title = Gtk.Label(label=tr("Sound"), xalign=0)
         title.get_style_context().add_class("page-title")
         description = Gtk.Label(
-            label="Choose your output and microphone, then adjust their volume.",
+            label=tr("Choose your output and microphone, then adjust their volume."),
             xalign=0,
         )
         description.set_line_wrap(True)

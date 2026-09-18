@@ -1,5 +1,7 @@
 """Read-only system information; no GTK dependency or elevated commands."""
 
+from kumina_common.i18n import translate as tr
+
 import platform
 import re
 import shutil
@@ -9,7 +11,7 @@ from kumina_common.process import CommandError, output
 
 
 VERSION_FILE = Path(__file__).resolve().parents[2] / "VERSION"
-UNAVAILABLE = "Unavailable"
+UNAVAILABLE = tr("Unavailable")
 
 
 def read_text(path):
@@ -20,7 +22,7 @@ def read_text(path):
 
 
 def version():
-    return read_text(VERSION_FILE) or "Development (version unavailable)"
+    return read_text(VERSION_FILE) or tr("Development (version unavailable)")
 
 
 def format_bytes(value):
@@ -43,7 +45,7 @@ def memory_size(meminfo):
     match = re.search(r"^MemTotal:\s+(\d+)\s+kB\s*$", meminfo, re.MULTILINE)
     if not match:
         return UNAVAILABLE
-    return f"{format_bytes(int(match[1]) * 1024)} usable"
+    return tr("{size} usable", size=format_bytes(int(match[1]) * 1024))
 
 
 def parse_graphics(text):
@@ -66,7 +68,7 @@ def parse_graphics(text):
 
 def graphics():
     if shutil.which("lspci") is None:
-        return "Unavailable — install pciutils for GPU details"
+        return tr("Unavailable — install pciutils for GPU details")
     try:
         result = output(
             ["lspci", "-D", "-vmm", "-nn"],
@@ -74,8 +76,8 @@ def graphics():
             check=True,
         )
     except CommandError:
-        return "Unavailable — could not read PCI devices"
-    return parse_graphics(result) or "No PCI graphics device reported"
+        return tr("Unavailable — could not read PCI devices")
+    return parse_graphics(result) or tr("No PCI graphics device reported")
 
 
 def storage(path):
@@ -84,9 +86,9 @@ def storage(path):
     except OSError:
         return UNAVAILABLE
     return (
-        f"{format_bytes(usage.total)} total · "
-        f"{format_bytes(usage.used)} used · "
-        f"{format_bytes(usage.free)} free"
+        tr("{total} total · {used} used · {free} free",
+           total=format_bytes(usage.total), used=format_bytes(usage.used),
+           free=format_bytes(usage.free))
     )
 
 
@@ -98,14 +100,14 @@ def collect():
         distribution = UNAVAILABLE
 
     rows = [
-        ("KumiOS version", version()),
-        ("Computer name", platform.node() or UNAVAILABLE),
-        ("Operating system", distribution),
-        ("Kernel", f"{platform.release()} ({platform.machine()})"),
-        ("Processor", cpu_model(read_text("/proc/cpuinfo"))),
-        ("Graphics", graphics()),
-        ("Memory", memory_size(read_text("/proc/meminfo"))),
-        ("System storage (/)", storage("/")),
+        (tr("KumiOS version"), version()),
+        (tr("Computer name"), platform.node() or UNAVAILABLE),
+        (tr("Operating system"), distribution),
+        (tr("Kernel"), f"{platform.release()} ({platform.machine()})"),
+        (tr("Processor"), cpu_model(read_text("/proc/cpuinfo"))),
+        (tr("Graphics"), graphics()),
+        (tr("Memory"), memory_size(read_text("/proc/meminfo"))),
+        (tr("System storage (/)"), storage("/")),
     ]
 
     # Show home separately only when it is on a different filesystem.
@@ -115,7 +117,7 @@ def collect():
     except OSError:
         separate_home = False
     if separate_home:
-        rows.append(("Home storage", storage(home)))
+        rows.append((tr("Home storage"), storage(home)))
     return rows
 
 

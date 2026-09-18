@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk, Pango
 
 from .. import bluetooth
@@ -51,8 +53,8 @@ class ConnectivityCard(Gtk.Box):
             label="›"
         )
 
-        wifi_details.set_tooltip_text("Open Wi-Fi settings")
-        wifi_details.get_accessible().set_name("Open Wi-Fi settings")
+        wifi_details.set_tooltip_text(tr("Open Wi-Fi settings"))
+        wifi_details.get_accessible().set_name(tr("Open Wi-Fi settings"))
 
         self.wifi_button.connect(
             "clicked",
@@ -95,8 +97,8 @@ class ConnectivityCard(Gtk.Box):
             label="›"
         )
 
-        bluetooth_details.set_tooltip_text("Open Bluetooth settings")
-        bluetooth_details.get_accessible().set_name("Open Bluetooth settings")
+        bluetooth_details.set_tooltip_text(tr("Open Bluetooth settings"))
+        bluetooth_details.get_accessible().set_name(tr("Open Bluetooth settings"))
 
         self.bluetooth_button.connect(
             "clicked",
@@ -221,10 +223,10 @@ class ConnectivityCard(Gtk.Box):
             wifi_label
         )
         self.wifi_button.set_tooltip_text(
-            f"Wi-Fi: {wifi_name or 'not connected'}. Click to turn off."
-            if wifi_active else "Wi-Fi off. Click to turn on."
+            tr("Wi-Fi: {name}. Click to turn off.", name=wifi_name or tr("Not connected"))
+            if wifi_active else tr("Wi-Fi off. Click to turn on.")
         )
-        self.wifi_button.get_accessible().set_name("Toggle Wi-Fi")
+        self.wifi_button.get_accessible().set_name(tr("Toggle Wi-Fi"))
 
         self.set_active_style(
             self.wifi_button,
@@ -257,10 +259,10 @@ class ConnectivityCard(Gtk.Box):
             bluetooth_label
         )
         self.bluetooth_button.set_tooltip_text(
-            f"Bluetooth: {device or 'not connected'}. Click to turn off."
-            if bluetooth_active else "Bluetooth off. Click to turn on."
+            tr("Bluetooth: {name}. Click to turn off.", name=device or tr("Not connected"))
+            if bluetooth_active else tr("Bluetooth off. Click to turn on.")
         )
-        self.bluetooth_button.get_accessible().set_name("Toggle Bluetooth")
+        self.bluetooth_button.get_accessible().set_name(tr("Toggle Bluetooth"))
 
         self.set_active_style(
             self.bluetooth_button,

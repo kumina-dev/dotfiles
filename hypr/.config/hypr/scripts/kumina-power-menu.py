@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from kumina_common.i18n import translate as tr
+
 import subprocess
 
 from single_instance import acquire
@@ -57,27 +59,25 @@ ACTIONS = {
 
 CONFIRMATIONS = {
     "logout": {
-        "title": "Log out?",
+        "title": tr("Log out?"),
         "description": (
-            "Open applications will be closed."
+            tr("Open applications will be closed.")
         ),
-        "button": "Log Out",
+        "button": tr("Log Out"),
     },
     "restart": {
-        "title": "Restart?",
+        "title": tr("Restart?"),
         "description": (
-            "The computer will restart and "
-            "open applications will be closed."
+            tr("The computer will restart and open applications will be closed.")
         ),
-        "button": "Restart",
+        "button": tr("Restart"),
     },
     "shutdown": {
-        "title": "Shut down?",
+        "title": tr("Shut down?"),
         "description": (
-            "The computer will turn off and "
-            "open applications will be closed."
+            tr("The computer will turn off and open applications will be closed.")
         ),
-        "button": "Shut Down",
+        "button": tr("Shut Down"),
     },
 }
 
@@ -170,7 +170,7 @@ class PowerMenu(Gtk.Window):
         )
 
         title = Gtk.Label(
-            label="Power",
+            label=tr("Power"),
             xalign=0,
         )
 
@@ -188,7 +188,7 @@ class PowerMenu(Gtk.Window):
         self.first_button = self.add_action(
             box,
             "󰌾",
-            "Lock",
+            tr("Lock"),
             lambda _button: self.execute_action(
                 "lock"
             ),
@@ -197,7 +197,7 @@ class PowerMenu(Gtk.Window):
         self.add_action(
             box,
             "󰒲",
-            "Sleep",
+            tr("Sleep"),
             lambda _button: self.execute_action(
                 "sleep"
             ),
@@ -217,7 +217,7 @@ class PowerMenu(Gtk.Window):
         self.add_action(
             box,
             "󰍃",
-            "Log Out",
+            tr("Log Out"),
             lambda _button: self.show_confirmation(
                 "logout"
             ),
@@ -226,7 +226,7 @@ class PowerMenu(Gtk.Window):
         self.add_action(
             box,
             "󰜉",
-            "Restart",
+            tr("Restart"),
             lambda _button: self.show_confirmation(
                 "restart"
             ),
@@ -235,7 +235,7 @@ class PowerMenu(Gtk.Window):
         self.add_action(
             box,
             "󰐥",
-            "Shut Down",
+            tr("Shut Down"),
             lambda _button: self.show_confirmation(
                 "shutdown"
             ),
@@ -353,7 +353,7 @@ class PowerMenu(Gtk.Window):
         )
 
         cancel = Gtk.Button(
-            label="Cancel"
+            label=tr("Cancel")
         )
 
         cancel.connect(
@@ -476,7 +476,7 @@ class PowerMenu(Gtk.Window):
             modal=True,
             message_type=Gtk.MessageType.ERROR,
             buttons=Gtk.ButtonsType.CLOSE,
-            text="Power action failed",
+            text=tr("Power action failed"),
         )
 
         dialog.format_secondary_text(

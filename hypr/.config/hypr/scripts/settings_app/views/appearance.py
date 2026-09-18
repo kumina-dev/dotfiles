@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from settings_app import appearance
@@ -18,7 +20,7 @@ class AppearanceView(Gtk.Box):
         )
 
         title = Gtk.Label(
-            label="Appearance",
+            label=tr("Appearance"),
             xalign=0,
         )
 
@@ -28,7 +30,7 @@ class AppearanceView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Choose your wallpaper and desktop color mode."
+                tr("Choose your wallpaper and desktop color mode.")
             ),
             xalign=0,
         )
@@ -73,7 +75,7 @@ class AppearanceView(Gtk.Box):
         )
 
         self.apply_button = Gtk.Button(
-            label="Apply"
+            label=tr("Apply")
         )
 
         self.apply_button.set_halign(
@@ -140,7 +142,7 @@ class AppearanceView(Gtk.Box):
         )
 
         label = Gtk.Label(
-            label="Wallpaper",
+            label=tr("Wallpaper"),
             xalign=0,
         )
 
@@ -150,7 +152,7 @@ class AppearanceView(Gtk.Box):
 
         self.wallpaper_chooser = (
             Gtk.FileChooserButton(
-                title="Choose wallpaper",
+                title=tr("Choose wallpaper"),
                 action=(
                     Gtk.FileChooserAction.OPEN
                 ),
@@ -168,7 +170,7 @@ class AppearanceView(Gtk.Box):
         image_filter = Gtk.FileFilter()
 
         image_filter.set_name(
-            "Images"
+            tr("Images")
         )
 
         image_filter.add_mime_type(
@@ -245,7 +247,7 @@ class AppearanceView(Gtk.Box):
         )
 
         label = Gtk.Label(
-            label="Color mode",
+            label=tr("Color mode"),
             xalign=0,
         )
 
@@ -265,12 +267,12 @@ class AppearanceView(Gtk.Box):
 
         self.mode_combo.append(
             "dark",
-            "Dark",
+            tr("Dark"),
         )
 
         self.mode_combo.append(
             "light",
-            "Light",
+            tr("Light"),
         )
 
         row.pack_start(
@@ -316,7 +318,7 @@ class AppearanceView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Loading appearance settings…"
+            tr("Loading appearance settings…")
         )
 
         run_async(
@@ -339,7 +341,7 @@ class AppearanceView(Gtk.Box):
 
         if wallpaper:
             self.current_wallpaper.set_text(
-                f"Current: {wallpaper}"
+                tr("Current: {value}", value=wallpaper)
             )
 
             try:
@@ -350,7 +352,7 @@ class AppearanceView(Gtk.Box):
                 pass
         else:
             self.current_wallpaper.set_text(
-                "No wallpaper configured."
+                tr("No wallpaper configured.")
             )
 
         self.set_controls_sensitive(
@@ -377,7 +379,7 @@ class AppearanceView(Gtk.Box):
 
         if not mode:
             self.status.set_text(
-                "Choose a color mode."
+                tr("Choose a color mode.")
             )
             return
 
@@ -386,7 +388,7 @@ class AppearanceView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Applying appearance…"
+            tr("Applying appearance…")
         )
 
         run_async(
@@ -408,8 +410,7 @@ class AppearanceView(Gtk.Box):
 
         self.current_wallpaper.set_text(
             (
-                "Current: "
-                f'{state["wallpaper"]}'
+                tr("Current: {value}", value=state['wallpaper'])
             )
         )
 
@@ -418,7 +419,7 @@ class AppearanceView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Applied."
+            tr("Applied.")
         )
 
         return False

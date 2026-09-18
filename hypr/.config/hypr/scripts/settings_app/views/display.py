@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from settings_app import display
@@ -20,7 +22,7 @@ class DisplayView(Gtk.Box):
         self.monitors = []
 
         title = Gtk.Label(
-            label="Display",
+            label=tr("Display"),
             xalign=0,
         )
 
@@ -30,8 +32,7 @@ class DisplayView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Choose the active display mode and scale. "
-                "Changes are saved for future sessions."
+                tr("Choose the active display mode and scale. Changes are saved for future sessions.")
             ),
             xalign=0,
         )
@@ -70,21 +71,21 @@ class DisplayView(Gtk.Box):
         self.monitor_combo = (
             self.add_combo_row(
                 card,
-                "Display",
+                tr("Display"),
             )
         )
 
         self.mode_combo = (
             self.add_combo_row(
                 card,
-                "Resolution / refresh rate",
+                tr("Resolution / refresh rate"),
             )
         )
 
         self.scale_combo = (
             self.add_combo_row(
                 card,
-                "Scale",
+                tr("Scale"),
             )
         )
 
@@ -94,7 +95,7 @@ class DisplayView(Gtk.Box):
         )
 
         self.apply_button = Gtk.Button(
-            label="Apply"
+            label=tr("Apply")
         )
 
         self.apply_button.set_halign(
@@ -234,7 +235,7 @@ class DisplayView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Loading displays…"
+            tr("Loading displays…")
         )
 
         run_async(
@@ -262,7 +263,7 @@ class DisplayView(Gtk.Box):
             self.scale_combo.remove_all()
 
             self.status.set_text(
-                "No active displays found."
+                tr("No active displays found.")
             )
 
             self.set_controls_sensitive(
@@ -368,7 +369,7 @@ class DisplayView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Applying…"
+            tr("Applying…")
         )
 
         run_async(
@@ -386,7 +387,7 @@ class DisplayView(Gtk.Box):
         _monitor,
     ):
         self.status.set_text(
-            "Applied."
+            tr("Applied.")
         )
 
         self.set_controls_sensitive(

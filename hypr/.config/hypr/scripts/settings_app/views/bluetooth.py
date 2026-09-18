@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from control_center import bluetooth
@@ -33,7 +35,7 @@ class BluetoothView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Connect and manage Bluetooth devices."
+                tr("Connect and manage Bluetooth devices.")
             ),
             xalign=0,
         )
@@ -138,7 +140,7 @@ class BluetoothView(Gtk.Box):
         )
 
         title = Gtk.Label(
-            label="Devices",
+            label=tr("Devices"),
             xalign=0,
         )
 
@@ -151,7 +153,7 @@ class BluetoothView(Gtk.Box):
         )
 
         self.scan_button = Gtk.Button(
-            label="Scan for devices"
+            label=tr("Scan for devices")
         )
 
         self.scan_button.connect(
@@ -272,7 +274,7 @@ class BluetoothView(Gtk.Box):
 
         if not devices:
             empty = Gtk.Label(
-                label="No devices found.",
+                label=tr("No devices found."),
                 xalign=0,
             )
 
@@ -326,11 +328,11 @@ class BluetoothView(Gtk.Box):
         )
 
         if device["connected"]:
-            state = "Connected"
+            state = tr("Connected")
         elif device["paired"]:
-            state = "Paired"
+            state = tr("Paired")
         else:
-            state = "Available"
+            state = tr("Available")
 
         detail = Gtk.Label(
             label=(
@@ -366,11 +368,11 @@ class BluetoothView(Gtk.Box):
         )
 
         if device["connected"]:
-            action_label = "Disconnect"
+            action_label = tr("Disconnect")
         elif device["paired"]:
-            action_label = "Connect"
+            action_label = tr("Connect")
         else:
-            action_label = "Pair"
+            action_label = tr("Pair")
 
         action = Gtk.Button(
             label=action_label
@@ -393,7 +395,7 @@ class BluetoothView(Gtk.Box):
 
         if device["paired"]:
             forget = Gtk.Button(
-                label="Forget"
+                label=tr("Forget")
             )
 
             forget.get_style_context().add_class(
@@ -424,7 +426,7 @@ class BluetoothView(Gtk.Box):
 
     def refresh(self):
         self.status.set_text(
-            "Loading Bluetooth…"
+            tr("Loading Bluetooth…")
         )
 
         self.set_busy(
@@ -469,12 +471,12 @@ class BluetoothView(Gtk.Box):
 
         if not self.available:
             self.status.set_text(
-                "No Bluetooth adapter found."
+                tr("No Bluetooth adapter found.")
             )
 
         elif not self.enabled:
             self.status.set_text(
-                "Bluetooth is turned off."
+                tr("Bluetooth is turned off.")
             )
 
         else:
@@ -499,9 +501,9 @@ class BluetoothView(Gtk.Box):
 
         self.status.set_text(
             (
-                "Turning Bluetooth on…"
+                tr("Turning Bluetooth on…")
                 if desired_state
-                else "Turning Bluetooth off…"
+                else tr("Turning Bluetooth off…")
             )
         )
 
@@ -532,7 +534,7 @@ class BluetoothView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Scanning for devices…"
+            tr("Scanning for devices…")
         )
 
         run_async(
@@ -556,7 +558,7 @@ class BluetoothView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Scan complete."
+            tr("Scan complete.")
         )
 
         return False
@@ -574,8 +576,7 @@ class BluetoothView(Gtk.Box):
                 bluetooth.disconnect
             )
             status = (
-                f'Disconnecting '
-                f'{device["name"]}…'
+                tr("Disconnecting {name}\u2026", name=device["name"])
             )
 
         elif device["paired"]:
@@ -583,8 +584,7 @@ class BluetoothView(Gtk.Box):
                 bluetooth.connect
             )
             status = (
-                f'Connecting '
-                f'{device["name"]}…'
+                tr("Connecting {name}\u2026", name=device["name"])
             )
 
         else:
@@ -592,8 +592,7 @@ class BluetoothView(Gtk.Box):
                 bluetooth.pair
             )
             status = (
-                f'Pairing '
-                f'{device["name"]}…'
+                tr("Pairing {name}\u2026", name=device["name"])
             )
 
         self.set_busy(
@@ -622,8 +621,7 @@ class BluetoothView(Gtk.Box):
 
         self.status.set_text(
             (
-                f'Forgetting '
-                f'{device["name"]}…'
+                tr("Forgetting {name}\u2026", name=device["name"])
             )
         )
 

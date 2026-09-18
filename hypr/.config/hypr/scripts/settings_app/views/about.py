@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gdk, Gtk, Pango
 
 from settings_app import system_info
@@ -16,12 +18,12 @@ class AboutView(Gtk.Box):
         self._rows = []
         self.connect("destroy", self.on_destroy)
 
-        title = Gtk.Label(label="About this PC", xalign=0)
+        title = Gtk.Label(label=tr("About this PC"), xalign=0)
         title.get_style_context().add_class("page-title")
         self.pack_start(title, False, False, 0)
 
         description = Gtk.Label(
-            label="Hardware, system, and desktop information.",
+            label=tr("Hardware, system, and desktop information."),
             xalign=0,
         )
         description.get_style_context().add_class("page-description")
@@ -47,7 +49,7 @@ class AboutView(Gtk.Box):
         identity = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         name = Gtk.Label(label="KumiOS", xalign=0)
         name.get_style_context().add_class("section-title")
-        subtitle = Gtk.Label(label="Personal Arch Linux + Hyprland desktop", xalign=0)
+        subtitle = Gtk.Label(label=tr("Personal Arch Linux + Hyprland desktop"), xalign=0)
         subtitle.set_line_wrap(True)
         subtitle.set_max_width_chars(36)
         subtitle.get_style_context().add_class("page-description")
@@ -62,16 +64,16 @@ class AboutView(Gtk.Box):
         self.pack_start(scroller, True, True, 0)
 
         footer = Gtk.Box(spacing=8)
-        self.status = Gtk.Label(label="Open this page to load system information.", xalign=0)
+        self.status = Gtk.Label(label=tr("Open this page to load system information."), xalign=0)
         self.status.set_ellipsize(Pango.EllipsizeMode.END)
         self.status.set_max_width_chars(22)
         self.status.get_style_context().add_class("page-description")
         footer.pack_start(self.status, True, True, 0)
 
-        self.refresh_button = Gtk.Button(label="Refresh")
+        self.refresh_button = Gtk.Button(label=tr("Refresh"))
         self.refresh_button.connect("clicked", lambda _button: self.refresh())
         footer.pack_start(self.refresh_button, False, False, 0)
-        self.copy_button = Gtk.Button(label="Copy system information")
+        self.copy_button = Gtk.Button(label=tr("Copy system information"))
         self.copy_button.set_sensitive(False)
         self.copy_button.connect("clicked", self.copy_information)
         footer.pack_start(self.copy_button, False, False, 0)
@@ -83,7 +85,7 @@ class AboutView(Gtk.Box):
         self._refreshing = True
         self.refresh_button.set_sensitive(False)
         self.copy_button.set_sensitive(False)
-        self.set_status("Loading…")
+        self.set_status(tr("Loading…"))
         run_async(system_info.collect, self.apply_info, self.show_error)
 
     def apply_info(self, rows):
@@ -107,7 +109,7 @@ class AboutView(Gtk.Box):
         self._refreshing = False
         self.refresh_button.set_sensitive(True)
         self.copy_button.set_sensitive(bool(self._rows))
-        prefix = "Refresh failed; previous information shown. " if self._rows else "Could not read system information. "
+        prefix = tr("Refresh failed; previous information shown. ") if self._rows else tr("Could not read system information. ")
         self.set_status(prefix + str(error))
         return False
 
@@ -121,7 +123,7 @@ class AboutView(Gtk.Box):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(system_info.format_report(self._rows), -1)
         clipboard.store()
-        self.set_status("Copied")
+        self.set_status(tr("Copied"))
 
     def on_destroy(self, _widget):
         self._destroyed = True

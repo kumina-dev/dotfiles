@@ -28,6 +28,15 @@ Device:\tAudio [9999]
 
 
 class SystemInfoTests(unittest.TestCase):
+    def setUp(self):
+        # Assertions describe English output regardless of the user's saved UI language.
+        language = patch("kumina_common.i18n.LANGUAGE", "en")
+        unavailable = patch.object(system_info, "UNAVAILABLE", "Unavailable")
+        language.start()
+        unavailable.start()
+        self.addCleanup(language.stop)
+        self.addCleanup(unavailable.stop)
+
     def test_gpu_parser_handles_multiple_devices_and_reordered_tags(self):
         self.assertEqual(system_info.parse_graphics(PCI_OUTPUT),
                          "Intel Corporation [8086] Integrated graphics [1234]\n"

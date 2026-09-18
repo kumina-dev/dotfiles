@@ -43,6 +43,9 @@ def pump_until(condition, timeout=1):
 @unittest.skipUnless(HAS_GTK, "GTK 3 and a display are required")
 class WidgetTests(unittest.TestCase):
     def setUp(self):
+        language = patch("kumina_common.i18n.LANGUAGE", "en")
+        language.start()
+        self.addCleanup(language.stop)
         self.jobs = []
         self.refreshes = []
         self.patcher = patch.object(sound, "run_async", side_effect=self.defer)

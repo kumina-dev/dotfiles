@@ -1,9 +1,11 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 
 GROUPS = (
     (
-        "Connectivity",
+        tr("Connectivity"),
         (
             (
                 "󰤨",
@@ -18,42 +20,42 @@ GROUPS = (
         ),
     ),
     (
-        "System",
+        tr("System"),
         (
             (
                 "󰕾",
-                "Sound",
+                tr("Sound"),
                 "sound",
             ),
             (
                 "󰍹",
-                "Display",
+                tr("Display"),
                 "display",
             ),
             (
                 "󰌌",
-                "Input",
+                tr("Input"),
                 "input",
             ),
-            ("󰥔", "Language & Region", "region"),
+            ("󰥔", tr("Language & Region"), "region"),
         ),
     ),
     (
-        "Personalization",
+        tr("Personalization"),
         (
             (
                 "󰏘",
-                "Appearance",
+                tr("Appearance"),
                 "appearance",
             ),
         ),
     ),
     (
-        "Information",
+        tr("Information"),
         (
             (
                 "󰋼",
-                "About",
+                tr("About"),
                 "about",
             ),
         ),
@@ -80,7 +82,7 @@ class OverviewView(Gtk.Box):
         )
 
         title = Gtk.Label(
-            label="Settings",
+            label=tr("Settings"),
             xalign=0,
         )
 
@@ -90,8 +92,7 @@ class OverviewView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Manage your system and "
-                "desktop configuration."
+                tr("Manage your system and desktop configuration.")
             ),
             xalign=0,
         )

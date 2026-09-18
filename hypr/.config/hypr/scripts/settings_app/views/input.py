@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from settings_app.views.keyboard import (
@@ -21,7 +23,7 @@ class InputView(Gtk.Box):
         )
 
         title = Gtk.Label(
-            label="Input",
+            label=tr("Input"),
             xalign=0,
         )
 
@@ -31,8 +33,7 @@ class InputView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Configure keyboard, pointer "
-                "and scrolling behaviour."
+                tr("Configure keyboard, pointer and scrolling behaviour.")
             ),
             xalign=0,
         )

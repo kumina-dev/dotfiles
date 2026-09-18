@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from ..widgets.connectivity import (
@@ -67,7 +69,7 @@ class MainView(Gtk.Box):
     def build_header(self, on_settings, on_sound_settings):
         row = Gtk.Box(spacing=8)
         header = Gtk.Label(
-            label="Control Center"
+            label=tr("Control Center")
         )
 
         header.set_halign(
@@ -78,10 +80,10 @@ class MainView(Gtk.Box):
             "title"
         )
 
-        settings = Gtk.Button(label="Settings")
+        settings = Gtk.Button(label=tr("Settings"))
         settings.connect("clicked", lambda _button: on_settings())
-        sound_settings = Gtk.Button(label="Sound")
-        sound_settings.set_tooltip_text("Open Sound settings and select devices")
+        sound_settings = Gtk.Button(label=tr("Sound"))
+        sound_settings.set_tooltip_text(tr("Open Sound settings and select devices"))
         sound_settings.connect("clicked", lambda _button: on_sound_settings())
         row.pack_start(header, True, True, 0)
         row.pack_end(settings, False, False, 0)

@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import GLib, Gtk, Pango
 
 from .. import audio
@@ -27,7 +29,7 @@ class AudioEndpoint(Gtk.Box):
         self._destroyed = False
         self._action_error = None
 
-        title = "Output" if kind == "output" else "Microphone"
+        title = tr("Output") if kind == "output" else tr("Microphone")
         header = Gtk.Box(spacing=8)
         label = Gtk.Label(label=title, xalign=0)
         self.title_label = label
@@ -39,11 +41,11 @@ class AudioEndpoint(Gtk.Box):
 
         self.device_combo = Gtk.ComboBoxText()
         self.device_combo.set_hexpand(True)
-        self.device_combo.set_tooltip_text(f"Default {title.lower()} device")
+        self.device_combo.set_tooltip_text(tr("Default output device") if kind == "output" else tr("Default microphone device"))
         for cell in self.device_combo.get_cells():
             cell.set_property("ellipsize", Pango.EllipsizeMode.END)
             cell.set_property("max-width-chars", 28)
-        self.device_combo.append("none", "Loading devices…")
+        self.device_combo.append("none", tr("Loading devices…"))
         self.device_combo.set_active(0)
         self.device_combo.connect("changed", self.device_changed)
         self.pack_start(self.device_combo, False, False, 0)
@@ -57,11 +59,11 @@ class AudioEndpoint(Gtk.Box):
         )
         self.volume_scale.set_draw_value(False)
         self.volume_scale.set_hexpand(True)
-        self.volume_scale.set_tooltip_text(f"{title} volume")
+        self.volume_scale.set_tooltip_text(tr("Output volume") if kind == "output" else tr("Microphone volume"))
         self.volume_scale.connect("value-changed", self.volume_changed)
         self.volume_scale.connect("button-press-event", self.volume_press)
         self.volume_scale.connect("button-release-event", self.volume_release)
-        self.mute_button = Gtk.Button(label="Mute")
+        self.mute_button = Gtk.Button(label=tr("Mute"))
         self.mute_button.connect("clicked", self.toggle_mute)
         row.pack_start(self.volume_scale, True, True, 0)
         row.pack_end(self.mute_button, False, False, 0)
@@ -95,7 +97,7 @@ class AudioEndpoint(Gtk.Box):
         self.mute_button.set_sensitive(available and not self.pending())
 
     def show_error(self, message):
-        self.error_label.set_text("Error" if self.compact and message else message or "")
+        self.error_label.set_text(tr("Error") if self.compact and message else message or "")
         self.error_label.set_tooltip_text(message or None)
         self.error_label.set_visible(bool(message))
 
@@ -114,9 +116,10 @@ class AudioEndpoint(Gtk.Box):
             if choices != self._choices:
                 self.device_combo.remove_all()
                 if self._device is None:
-                    title = "output" if self.kind == "output" else "input"
-                    message = (f"Choose an {title} device" if self._devices
-                               else f"No {title} device")
+                    if self.kind == "output":
+                        message = tr("Choose an output device") if self._devices else tr("No output device")
+                    else:
+                        message = tr("Choose an input device") if self._devices else tr("No input device")
                     self.device_combo.append("none", message)
                 for device in state["devices"]:
                     self.device_combo.append(str(device.id), device.description)
@@ -125,19 +128,20 @@ class AudioEndpoint(Gtk.Box):
                 str(self._device.id) if self._device else "none",
             )
             self.device_combo.set_tooltip_text(
-                self._device.description if self._device else "Choose a device",
+                self._device.description if self._device else tr("Choose a device"),
             )
             self.title_label.set_tooltip_text(
-                self._device.description if self._device else "No default device",
+                self._device.description if self._device else tr("No default device"),
             )
             self.volume_scale.set_value(min(self._volume or 0, 100))
             self.volume_label.set_text(
                 f"{self._volume}%" if self._volume is not None else "—",
             )
-            self.mute_button.set_label("Unmute" if self._muted else "Mute")
+            self.mute_button.set_label(tr("Unmute") if self._muted else tr("Mute"))
             self.mute_button.set_tooltip_text(
-                ("Unmute " if self._muted else "Mute ")
-                + ("output" if self.kind == "output" else "microphone"),
+                (tr("Unmute output") if self._muted else tr("Mute output"))
+                if self.kind == "output" else
+                (tr("Unmute microphone") if self._muted else tr("Mute microphone")),
             )
             context = self.mute_button.get_style_context()
             if self._muted:

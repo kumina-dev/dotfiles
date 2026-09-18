@@ -1,6 +1,9 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import GLib, Gtk
 
 from kumina_common import region as preferences
+from kumina_common import i18n
 from settings_app import region
 from settings_app.async_utils import run_async
 
@@ -12,9 +15,9 @@ class RegionView(Gtk.Box):
         self._busy = False
         self._zones_loaded = False
         self._preferences_loaded = False
-        title = self.label("Language & Region", "page-title")
+        title = self.label(tr("Language & Region"), "page-title")
         self.pack_start(title, False, False, 0)
-        self.pack_start(self.label("Date, time and calendar preferences.", "page-description"), False, False, 0)
+        self.pack_start(self.label(tr("Date, time and calendar preferences."), "page-description"), False, False, 0)
 
         sections = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
         scroller = Gtk.ScrolledWindow()
@@ -23,35 +26,52 @@ class RegionView(Gtk.Box):
         self.pack_start(scroller, True, True, 0)
 
         card = self.card(sections)
-        self.pack_label(card, "Formats", "section-title")
-        self.clock = self.combo(card, "Clock", (("24", "24-hour"), ("12", "12-hour")))
-        self.date = self.combo(card, "Date", (("day-first", "Day.Month.Year"), ("iso", "Year-Month-Day"), ("month-first", "Month/Day/Year")))
-        self.week = self.combo(card, "Week starts on", (("monday", "Monday"), ("sunday", "Sunday")))
+        self.pack_label(card, tr("Interface language"), "section-title")
+        self.language = self.combo(card, tr("Interface language"), i18n.LANGUAGES.items())
+        apply_language = Gtk.Button(label=tr("Apply language"))
+        apply_language.get_style_context().add_class("primary-action")
+        apply_language.connect("clicked", self.save_language)
+        card.pack_start(apply_language, False, False, 0)
+        self.pack_label(card, tr("Applies to KumiOS apps only. Keyboard layouts and other apps are unchanged. No logout needed."), "page-description")
+        self.language_status = self.label("", "settings-status")
+        card.pack_start(self.language_status, False, False, 0)
+        try:
+            language = i18n.read_language(strict=True)
+        except RuntimeError as error:
+            language = "en"
+            self.language_status.set_text(str(error) + tr(" Apply language to replace the invalid file."))
+        self.language.set_active_id(language)
+
+        card = self.card(sections)
+        self.pack_label(card, tr("Formats"), "section-title")
+        self.clock = self.combo(card, tr("Clock"), (("24", tr("24-hour")), ("12", tr("12-hour"))))
+        self.date = self.combo(card, tr("Date"), (("day-first", tr("Day.Month.Year")), ("iso", tr("Year-Month-Day")), ("month-first", tr("Month/Day/Year"))))
+        self.week = self.combo(card, tr("Week starts on"), (("monday", tr("Monday")), ("sunday", tr("Sunday"))))
         self.preview = self.label("", "page-description")
         card.pack_start(self.preview, False, False, 0)
         for combo in (self.clock, self.date, self.week):
             combo.connect("changed", lambda *_: self.update_preview())
-        save = Gtk.Button(label="Apply formats")
+        save = Gtk.Button(label=tr("Apply formats"))
         save.get_style_context().add_class("primary-action")
         save.connect("clicked", self.save_formats)
         card.pack_start(save, False, False, 0)
-        self.pack_label(card, "Applies to the KumiOS panel clock and calendar. Other apps keep their own formats.", "page-description")
+        self.pack_label(card, tr("Applies to the KumiOS panel clock and calendar. Other apps keep their own formats."), "page-description")
         self.format_status = self.label("", "settings-status")
         card.pack_start(self.format_status, False, False, 0)
 
         card = self.card(sections)
-        self.pack_label(card, "System time zone", "section-title")
-        self.timezone = self.combo(card, "Time zone", ())
-        self.zone_button = Gtk.Button(label="Apply time zone")
+        self.pack_label(card, tr("System time zone"), "section-title")
+        self.timezone = self.combo(card, tr("Time zone"), ())
+        self.zone_button = Gtk.Button(label=tr("Apply time zone"))
         self.zone_button.connect("clicked", self.apply_timezone)
         card.pack_start(self.zone_button, False, False, 0)
-        self.pack_label(card, "Changes the time zone for all users. Authentication may be requested.", "page-description")
+        self.pack_label(card, tr("Changes the time zone for all users. Authentication may be requested."), "page-description")
         self.zone_status = self.label("", "settings-status")
         card.pack_start(self.zone_status, False, False, 0)
-        retry = Gtk.Button(label="Refresh")
+        retry = Gtk.Button(label=tr("Refresh"))
         retry.connect("clicked", lambda *_: self.refresh())
         card.pack_start(retry, False, False, 0)
-        self.pack_label(sections, "Interface translations and number/currency formats are not available yet. Keyboard layouts are under Input.", "page-description")
+        self.pack_label(sections, tr("Number/currency formats are not available yet. Keyboard layouts are under Input."), "page-description")
         self.load_preferences()
         self.set_zone_busy(False)
 
@@ -87,13 +107,25 @@ class RegionView(Gtk.Box):
     def values(self):
         return {"clock": self.clock.get_active_id(), "date": self.date.get_active_id(), "week_start": self.week.get_active_id()}
 
+    def save_language(self, _button):
+        selected = self.language.get_active_id()
+        try:
+            i18n.save_language(selected)
+        except (OSError, ValueError) as error:
+            self.language_status.set_text(str(error))
+            return
+        self.language_status.set_text(tr(
+            "Saved. Close and reopen Settings, Control Center, the power menu and calendar to use the new language. The panel updates automatically.",
+            language=selected,
+        ))
+
     def load_preferences(self):
         if self._preferences_loaded:
             return
         try:
             values = preferences.read_preferences(strict=True)
         except RuntimeError as error:
-            self.format_status.set_text(str(error) + " Apply formats to replace the invalid file.")
+            self.format_status.set_text(str(error) + tr(" Apply formats to replace the invalid file."))
             values = preferences.DEFAULTS
         self.clock.set_active_id(values["clock"])
         self.date.set_active_id(values["date"])
@@ -104,7 +136,7 @@ class RegionView(Gtk.Box):
         values = self.values()
         if all(values.values()):
             now = preferences.local_now()
-            self.preview.set_text(f"Preview: {preferences.format_date(now, values)} · {preferences.format_time(now, values)}")
+            self.preview.set_text(tr("Preview: {date} · {time}", date=preferences.format_date(now, values), time=preferences.format_time(now, values)))
 
     def save_formats(self, _button):
         try:
@@ -112,7 +144,7 @@ class RegionView(Gtk.Box):
         except (OSError, ValueError) as error:
             self.format_status.set_text(str(error))
             return
-        self.format_status.set_text("Applied. The panel and calendar update automatically; no logout needed.")
+        self.format_status.set_text(tr("Applied. The panel and calendar update automatically; no logout needed."))
 
     def set_zone_busy(self, busy):
         self._busy = busy
@@ -124,7 +156,7 @@ class RegionView(Gtk.Box):
         if self._busy:
             return
         self.set_zone_busy(True)
-        self.zone_status.set_text("Loading time zones…")
+        self.zone_status.set_text(tr("Loading time zones…"))
         run_async(region.get_state, self.loaded, self.failed)
 
     def loaded(self, state):
@@ -134,18 +166,18 @@ class RegionView(Gtk.Box):
         self.timezone.set_active_id(state["timezone"])
         self._zones_loaded = True
         self.set_zone_busy(False)
-        self.zone_status.set_text(f"Current: {state['timezone']}")
+        self.zone_status.set_text(tr("Current: {value}", value=state['timezone']))
         return GLib.SOURCE_REMOVE
 
     def apply_timezone(self, _button):
         zone = self.timezone.get_active_id()
         self.set_zone_busy(True)
-        self.zone_status.set_text("Applying time zone…")
+        self.zone_status.set_text(tr("Applying time zone…"))
         run_async(lambda: region.set_timezone(zone), self.applied, self.failed)
 
     def applied(self, zone):
         self.set_zone_busy(False)
-        self.zone_status.set_text(f"Applied: {zone}. No logout needed.")
+        self.zone_status.set_text(tr("Applied: {zone}. No logout needed.", zone=zone))
         self.update_preview()
         return GLib.SOURCE_REMOVE
 

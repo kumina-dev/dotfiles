@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk
 
 from settings_app import keyboard
@@ -31,7 +33,7 @@ class KeyboardView(Gtk.Box):
             )
 
         title = Gtk.Label(
-            label="Keyboard",
+            label=tr("Keyboard"),
             xalign=0,
         )
 
@@ -45,7 +47,7 @@ class KeyboardView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Configure keyboard layouts and key repeat behaviour."
+                tr("Configure keyboard layouts and key repeat behaviour.")
             ),
             xalign=0,
         )
@@ -81,17 +83,17 @@ class KeyboardView(Gtk.Box):
 
         self.primary_combo = self.add_combo_row(
             card,
-            "Primary layout",
+            tr("Primary layout"),
         )
 
         self.secondary_combo = self.add_combo_row(
             card,
-            "Secondary layout",
+            tr("Secondary layout"),
         )
 
         self.repeat_rate = self.add_spin_row(
             card,
-            "Repeat rate",
+            tr("Repeat rate"),
             1,
             100,
             1,
@@ -99,7 +101,7 @@ class KeyboardView(Gtk.Box):
 
         self.repeat_delay = self.add_spin_row(
             card,
-            "Repeat delay",
+            tr("Repeat delay"),
             100,
             2000,
             50,
@@ -115,7 +117,7 @@ class KeyboardView(Gtk.Box):
         )
 
         numlock_label = Gtk.Label(
-            label="Num Lock on startup",
+            label=tr("Num Lock on startup"),
             xalign=0,
         )
 
@@ -155,7 +157,7 @@ class KeyboardView(Gtk.Box):
         )
 
         self.apply_button = Gtk.Button(
-            label="Apply"
+            label=tr("Apply")
         )
 
         self.apply_button.set_halign(
@@ -376,7 +378,7 @@ class KeyboardView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Loading keyboard settings…"
+            tr("Loading keyboard settings…")
         )
 
         run_async(
@@ -436,7 +438,7 @@ class KeyboardView(Gtk.Box):
 
         self.secondary_combo.prepend(
             NONE_LAYOUT,
-            "None",
+            tr("None"),
         )
 
         self.primary_combo.set_active_id(
@@ -489,7 +491,7 @@ class KeyboardView(Gtk.Box):
 
         if not primary:
             self.status.set_text(
-                "Select a primary keyboard layout."
+                tr("Select a primary keyboard layout.")
             )
             return
 
@@ -498,7 +500,7 @@ class KeyboardView(Gtk.Box):
         )
 
         self.status.set_text(
-            "Applying…"
+            tr("Applying…")
         )
 
         run_async(
@@ -518,7 +520,7 @@ class KeyboardView(Gtk.Box):
         _result,
     ):
         self.status.set_text(
-            "Applied."
+            tr("Applied.")
         )
 
         self.set_controls_sensitive(

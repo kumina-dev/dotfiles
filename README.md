@@ -37,7 +37,7 @@ GTK 3 settings application with pages for:
   - Keyboard
   - Mouse
 - Sound
-- Language & Region (date/time preferences)
+- Language & Region (English/Finnish interface and date/time preferences)
 
 Open the overview:
 
@@ -97,10 +97,11 @@ The About page reads the current computer's:
 
 Refresh reloads the information. Copy system information copies the displayed values as plain text. Device names are read using `lspci` from the optional `pciutils` package; if unavailable, the other information still loads. Storage values describe mounted filesystems, not the sum of all physical disks.
 
-### Language & Region — date and time
+### Language & Region
 
-The first Language & Region iteration provides:
+Language & Region provides:
 
+- English/Finnish interface selection for Settings, Control Center, the power menu, and calendar
 - 12/24-hour clock, numeric date format, and Monday/Sunday week start
 - A preview and explicitly applied, per-user preferences
 - System time-zone selection through `timedatectl` and the existing polkit agent
@@ -115,8 +116,8 @@ Other applications keep their own regional formats.
 The panel clock now uses a Waybar custom JSON stream. Left-click still toggles
 the calendar; right-click opens Language & Region. Reload Waybar once after
 installing this change (`pkill -SIGUSR2 -x waybar`). Subsequent preference changes
-do not need a reload. The calendar keeps its existing Finnish labels; panel
-calendar names follow the process locale.
+do not need a reload. Both calendars use month and weekday names from the
+selected KumiOS interface language.
 
 Time-zone changes apply system-wide and may prompt for authentication. Errors
 and cancelled authentication are shown on the page. Format preferences remain
@@ -124,8 +125,25 @@ usable if timedated is unavailable. Invalid preference files fall back to the
 defaults in the clock/calendar and are reported in Settings; applying formats
 replaces the invalid file.
 
-Interface translations, language selection, and number/currency formatting
-remain planned. Keyboard layouts stay under Input.
+Interface language is stored separately in `$XDG_CONFIG_HOME/kumios/language.json`.
+English is the default. Choose **English** or **Suomi**, then **Apply language**.
+Close and reopen the custom GTK apps to apply it; the panel tooltip updates
+within a second. No logout is needed. Existing windows retain their language
+until reopened, so changing a preference cannot disrupt an in-progress action.
+
+This translates KumiOS-owned labels, actions, status messages, and calendar
+names. Device names, SSIDs, time-zone identifiers, and hardware values are
+preserved. External command errors and GTK-provided standard dialogs still use
+their own language. Hyprland-matched window titles remain stable. Language
+selection does not set system `LANG`/`LC_*`, generate locales, change keyboard
+layouts, or alter saved regional formats. Number/currency formatting remains
+planned. Keyboard layouts stay under Input.
+
+Translations live in `hypr/.config/hypr/scripts/kumina_common/translations/fi.json`.
+Messages use named placeholders; never translate command arguments, device data,
+or internal IDs. Unknown messages fall back to their English source. Invalid
+language preferences fall back to English and are reported on the settings page;
+applying a language replaces the invalid preference file.
 
 Desktop verification:
 
@@ -136,6 +154,11 @@ Desktop verification:
    time zone may prompt through polkit; cancellation must show an error. Restore
    your original zone after testing an actual change.
 4. Close/reopen Settings and the calendar; saved format choices should remain.
+5. Apply **Suomi**, reopen Settings, Control Center, the power menu, and calendar.
+   Check labels, long Finnish confirmations, and both calendar weekday headers.
+   Check that selected devices and keyboard layouts remain the same.
+6. Apply **English** and reopen the apps to switch back. Verify that the panel
+   calendar tooltip switches without restarting Waybar.
 
 ### Lock screen
 

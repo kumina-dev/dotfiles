@@ -1,3 +1,5 @@
+from kumina_common.i18n import translate as tr
+
 from gi.repository import Gtk, Gdk
 
 from .. import network
@@ -45,8 +47,7 @@ class WifiView(Gtk.Box):
 
         description = Gtk.Label(
             label=(
-                "Manage wireless networks "
-                "and connections."
+                tr("Manage wireless networks and connections.")
             )
         )
 
@@ -77,7 +78,7 @@ class WifiView(Gtk.Box):
         )
 
         self.refresh_button.set_tooltip_text(
-            "Refresh networks"
+            tr("Refresh networks")
         )
 
         self.refresh_button.connect(
@@ -158,7 +159,7 @@ class WifiView(Gtk.Box):
         )
 
         self.status_label = Gtk.Label(
-            label="Loading…"
+            label=tr("Loading…")
         )
 
         self.status_label.set_halign(
@@ -192,7 +193,7 @@ class WifiView(Gtk.Box):
 
     def build_network_list(self):
         self.saved_title = Gtk.Label(
-            label="Known Networks"
+            label=tr("Known Networks")
         )
 
         self.saved_title.set_halign(
@@ -227,7 +228,7 @@ class WifiView(Gtk.Box):
         )
 
         self.other_title = Gtk.Label(
-            label="Other Networks"
+            label=tr("Other Networks")
         )
 
         self.other_title.set_halign(
@@ -295,7 +296,7 @@ class WifiView(Gtk.Box):
         self.other_title.hide()
 
         loading = Gtk.Label(
-            label="Searching for networks..."
+            label=tr("Searching for networks...")
         )
 
         loading.set_halign(
@@ -343,7 +344,7 @@ class WifiView(Gtk.Box):
 
         if not enabled:
             self.status_label.set_text(
-                "Wi-Fi is turned off."
+                tr("Wi-Fi is turned off.")
             )
 
             self.clear_networks()
@@ -353,8 +354,7 @@ class WifiView(Gtk.Box):
 
             disabled = Gtk.Label(
                 label=(
-                    "Turn on Wi-Fi to see "
-                    "available networks."
+                    tr("Turn on Wi-Fi to see available networks.")
                 )
             )
 
@@ -381,11 +381,11 @@ class WifiView(Gtk.Box):
 
         if ssid:
             self.status_label.set_text(
-                f"Connected to {ssid}"
+                tr("Connected to {name}", name=ssid)
             )
         else:
             self.status_label.set_text(
-                "Not connected"
+                tr("Not connected")
             )
 
         self.render_networks(
@@ -405,7 +405,7 @@ class WifiView(Gtk.Box):
         )
 
         self.status_label.set_text(
-            "Unable to load Wi-Fi state."
+            tr("Unable to load Wi-Fi state.")
         )
 
         self.clear_networks()
@@ -477,7 +477,7 @@ class WifiView(Gtk.Box):
             and not other
         ):
             label = Gtk.Label(
-                label="No networks found."
+                label=tr("No networks found.")
             )
 
             label.set_halign(
@@ -551,7 +551,7 @@ class WifiView(Gtk.Box):
 
         if item["connected"]:
             status = Gtk.Label(
-                label="Connected"
+                label=tr("Connected")
             )
 
             status.get_style_context().add_class(
@@ -671,18 +671,18 @@ class WifiView(Gtk.Box):
         ssid,
     ):
         dialog = Gtk.Dialog(
-            title=f"Connect to {ssid}",
+            title=tr("Connect to {name}", name=ssid),
             transient_for=self.get_toplevel(),
             modal=True,
         )
 
         dialog.add_button(
-            "Cancel",
+            tr("Cancel"),
             Gtk.ResponseType.CANCEL,
         )
 
         dialog.add_button(
-            "Connect",
+            tr("Connect"),
             Gtk.ResponseType.OK,
         )
 
@@ -694,7 +694,7 @@ class WifiView(Gtk.Box):
         content.set_border_width(18)
 
         label = Gtk.Label(
-            label=f"Password for {ssid}"
+            label=tr("Password for {name}", name=ssid)
         )
 
         label.set_halign(
@@ -710,7 +710,7 @@ class WifiView(Gtk.Box):
         )
 
         entry.set_placeholder_text(
-            "Password"
+            tr("Password")
         )
 
         dialog.set_default_response(
@@ -774,7 +774,7 @@ class WifiView(Gtk.Box):
             modal=True,
             message_type=Gtk.MessageType.ERROR,
             buttons=Gtk.ButtonsType.OK,
-            text="Unable to connect",
+            text=tr("Unable to connect"),
         )
 
         dialog.format_secondary_text(
@@ -802,9 +802,9 @@ class WifiView(Gtk.Box):
 
         self.status_label.set_text(
             (
-                "Turning Wi-Fi on…"
+                tr("Turning Wi-Fi on…")
                 if enabled
-                else "Turning Wi-Fi off…"
+                else tr("Turning Wi-Fi off…")
             )
         )
 
@@ -849,7 +849,7 @@ class WifiView(Gtk.Box):
         )
 
         self.status_label.set_text(
-            "Unable to change Wi-Fi state."
+            tr("Unable to change Wi-Fi state.")
         )
 
         self.show_connection_error(
@@ -892,7 +892,7 @@ class WifiView(Gtk.Box):
 
         if item["connected"]:
             disconnect_item = Gtk.MenuItem(
-                label="Disconnect"
+                label=tr("Disconnect")
             )
 
             disconnect_item.connect(
@@ -906,7 +906,7 @@ class WifiView(Gtk.Box):
 
         if item["saved"]:
             forget_item = Gtk.MenuItem(
-                label="Forget Network"
+                label=tr("Forget Network")
             )
 
             forget_item.connect(
@@ -933,7 +933,7 @@ class WifiView(Gtk.Box):
         self,
     ):
         self.status_label.set_text(
-            "Disconnecting…"
+            tr("Disconnecting…")
         )
 
         run_async(
@@ -960,21 +960,20 @@ class WifiView(Gtk.Box):
             modal=True,
             message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.NONE,
-            text=f"Forget {item['ssid']}?",
+            text=tr("Forget {name}?", name=item["ssid"]),
         )
 
         dialog.format_secondary_text(
-            "You will need to enter the password "
-            "again the next time you connect."
+            tr("You will need to enter the password again the next time you connect.")
         )
 
         dialog.add_button(
-            "Cancel",
+            tr("Cancel"),
             Gtk.ResponseType.CANCEL,
         )
 
         dialog.add_button(
-            "Forget",
+            tr("Forget"),
             Gtk.ResponseType.OK,
         )
 

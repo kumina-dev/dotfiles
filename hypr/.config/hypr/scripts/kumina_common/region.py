@@ -8,6 +8,8 @@ from pathlib import Path
 import tempfile
 import time
 
+from .i18n import MONTHS, WEEKDAYS, translate
+
 DEFAULTS = {"clock": "24", "date": "day-first", "week_start": "monday"}
 CHOICES = {
     "clock": ("24", "12"),
@@ -77,8 +79,14 @@ def first_weekday(preferences):
     return 6 if preferences["week_start"] == "sunday" else 0
 
 
-def clock_payload(moment, preferences):
-    month = calendar.TextCalendar(first_weekday(preferences)).formatmonth(moment.year, moment.month).rstrip()
+def clock_payload(moment, preferences, language="en"):
+    first = first_weekday(preferences)
+    days = WEEKDAYS[first:] + WEEKDAYS[:first]
+    title = f"{translate(MONTHS[moment.month - 1], language=language)} {moment.year}"
+    heading = " ".join(translate(day, language=language)[:2] for day in days)
+    weeks = calendar.Calendar(first).monthdayscalendar(moment.year, moment.month)
+    rows = [" ".join(f"{day:2d}" if day else "  " for day in week).rstrip() for week in weeks]
+    month = "\n".join([title.center(20).rstrip(), heading, *rows])
     return {
         "text": format_time(moment, preferences),
         "tooltip": html.escape(format_date(moment, preferences)) + "\n<tt>" + html.escape(month) + "</tt>",

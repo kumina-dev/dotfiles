@@ -4,6 +4,7 @@ from gi.repository import GLib, Gtk
 
 from kumina_common import region as preferences
 from kumina_common import i18n
+from kumina_common.formatting import format_number, format_currency
 from settings_app import region
 from settings_app.async_utils import run_async
 
@@ -17,7 +18,7 @@ class RegionView(Gtk.Box):
         self._preferences_loaded = False
         title = self.label(tr("Language & Region"), "page-title")
         self.pack_start(title, False, False, 0)
-        self.pack_start(self.label(tr("Date, time and calendar preferences."), "page-description"), False, False, 0)
+        self.pack_start(self.label(tr("Language, date, time and number preferences."), "page-description"), False, False, 0)
 
         sections = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
         scroller = Gtk.ScrolledWindow()
@@ -47,15 +48,24 @@ class RegionView(Gtk.Box):
         self.clock = self.combo(card, tr("Clock"), (("24", tr("24-hour")), ("12", tr("12-hour"))))
         self.date = self.combo(card, tr("Date"), (("day-first", tr("Day.Month.Year")), ("iso", tr("Year-Month-Day")), ("month-first", tr("Month/Day/Year"))))
         self.week = self.combo(card, tr("Week starts on"), (("monday", tr("Monday")), ("sunday", tr("Sunday"))))
+        self.number_format = self.combo(card, tr("Number format"), (
+            ("fi", tr("Finnish · 1 234,56")),
+            ("en", tr("English · 1,234.56")),
+        ))
+        self.currency = self.combo(card, tr("Currency"), (
+            ("EUR", tr("Euro (EUR)")),
+            ("USD", tr("US dollar (USD)")),
+            ("GBP", tr("Pound sterling (GBP)")),
+        ))
         self.preview = self.label("", "page-description")
         card.pack_start(self.preview, False, False, 0)
-        for combo in (self.clock, self.date, self.week):
+        for combo in (self.clock, self.date, self.week, self.number_format, self.currency):
             combo.connect("changed", lambda *_: self.update_preview())
         save = Gtk.Button(label=tr("Apply formats"))
         save.get_style_context().add_class("primary-action")
         save.connect("clicked", self.save_formats)
         card.pack_start(save, False, False, 0)
-        self.pack_label(card, tr("Applies to the KumiOS panel clock and calendar. Other apps keep their own formats."), "page-description")
+        self.pack_label(card, tr("Applies to the panel, calendar and About this PC. Other apps keep their own formats."), "page-description")
         self.format_status = self.label("", "settings-status")
         card.pack_start(self.format_status, False, False, 0)
 
@@ -71,7 +81,7 @@ class RegionView(Gtk.Box):
         retry = Gtk.Button(label=tr("Refresh"))
         retry.connect("clicked", lambda *_: self.refresh())
         card.pack_start(retry, False, False, 0)
-        self.pack_label(sections, tr("Number/currency formats are not available yet. Keyboard layouts are under Input."), "page-description")
+        self.pack_label(sections, tr("Currency is a display preference; it does not convert amounts. Keyboard layouts are under Input."), "page-description")
         self.load_preferences()
         self.set_zone_busy(False)
 
@@ -105,7 +115,13 @@ class RegionView(Gtk.Box):
         return combo
 
     def values(self):
-        return {"clock": self.clock.get_active_id(), "date": self.date.get_active_id(), "week_start": self.week.get_active_id()}
+        return {
+            "clock": self.clock.get_active_id(),
+            "date": self.date.get_active_id(),
+            "week_start": self.week.get_active_id(),
+            "number_format": self.number_format.get_active_id(),
+            "currency": self.currency.get_active_id(),
+        }
 
     def save_language(self, _button):
         selected = self.language.get_active_id()
@@ -130,13 +146,20 @@ class RegionView(Gtk.Box):
         self.clock.set_active_id(values["clock"])
         self.date.set_active_id(values["date"])
         self.week.set_active_id(values["week_start"])
+        self.number_format.set_active_id(values["number_format"])
+        self.currency.set_active_id(values["currency"])
         self._preferences_loaded = True
 
     def update_preview(self):
         values = self.values()
         if all(values.values()):
             now = preferences.local_now()
-            self.preview.set_text(tr("Preview: {date} · {time}", date=preferences.format_date(now, values), time=preferences.format_time(now, values)))
+            lines = [
+                tr("Preview: {date} · {time}", date=preferences.format_date(now, values), time=preferences.format_time(now, values)),
+                tr("Number: {value}", value=format_number("1234567.89", values)),
+                tr("Currency: {value}", value=format_currency("1234.56", values)),
+            ]
+            self.preview.set_text("\n".join(lines))
 
     def save_formats(self, _button):
         try:
@@ -144,7 +167,7 @@ class RegionView(Gtk.Box):
         except (OSError, ValueError) as error:
             self.format_status.set_text(str(error))
             return
-        self.format_status.set_text(tr("Applied. The panel and calendar update automatically; no logout needed."))
+        self.format_status.set_text(tr("Applied. The panel and calendar update automatically. Refresh About this PC for updated numbers."))
 
     def set_zone_busy(self, busy):
         self._busy = busy

@@ -61,7 +61,7 @@ class TranslationTests(unittest.TestCase):
 
     def test_system_information_phrases_localize_without_modifying_machine_data(self):
         with patch.object(i18n, 'LANGUAGE', 'fi'):
-            self.assertEqual(system_info.memory_size('MemTotal: 1048576 kB'), '1.0 GiB käytettävissä')
+            self.assertEqual(system_info.memory_size('MemTotal: 1048576 kB', dict(region.DEFAULTS, number_format='en')), '1.0 GiB käytettävissä')
             self.assertEqual(system_info.cpu_model('model name: Example CPU'), 'Example CPU')
             self.assertEqual(system_info.format_report([('Suoritin', 'Example CPU')]), 'Suoritin: Example CPU')
 

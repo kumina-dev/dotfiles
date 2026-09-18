@@ -1,6 +1,8 @@
 """Read-only system information; no GTK dependency or elevated commands."""
 
 from kumina_common.i18n import translate as tr
+from kumina_common.formatting import format_number
+from kumina_common.region import read_preferences
 
 import platform
 import re
@@ -25,11 +27,11 @@ def version():
     return read_text(VERSION_FILE) or tr("Development (version unavailable)")
 
 
-def format_bytes(value):
+def format_bytes(value, preferences=None):
     size = float(value)
     for unit in ("B", "KiB", "MiB", "GiB", "TiB"):
         if size < 1024 or unit == "TiB":
-            return f"{size:.1f} {unit}"
+            return f"{format_number(size, preferences, decimals=1)} {unit}"
         size /= 1024
 
 
@@ -41,11 +43,11 @@ def cpu_model(cpuinfo):
     return UNAVAILABLE
 
 
-def memory_size(meminfo):
+def memory_size(meminfo, preferences=None):
     match = re.search(r"^MemTotal:\s+(\d+)\s+kB\s*$", meminfo, re.MULTILINE)
     if not match:
         return UNAVAILABLE
-    return tr("{size} usable", size=format_bytes(int(match[1]) * 1024))
+    return tr("{size} usable", size=format_bytes(int(match[1]) * 1024, preferences))
 
 
 def parse_graphics(text):
@@ -80,19 +82,20 @@ def graphics():
     return parse_graphics(result) or tr("No PCI graphics device reported")
 
 
-def storage(path):
+def storage(path, preferences=None):
     try:
         usage = shutil.disk_usage(path)
     except OSError:
         return UNAVAILABLE
     return (
         tr("{total} total · {used} used · {free} free",
-           total=format_bytes(usage.total), used=format_bytes(usage.used),
-           free=format_bytes(usage.free))
+           total=format_bytes(usage.total, preferences), used=format_bytes(usage.used, preferences),
+           free=format_bytes(usage.free, preferences))
     )
 
 
 def collect():
+    preferences = read_preferences()
     try:
         release = platform.freedesktop_os_release()
         distribution = release.get("PRETTY_NAME") or release.get("NAME") or "Linux"
@@ -106,8 +109,8 @@ def collect():
         (tr("Kernel"), f"{platform.release()} ({platform.machine()})"),
         (tr("Processor"), cpu_model(read_text("/proc/cpuinfo"))),
         (tr("Graphics"), graphics()),
-        (tr("Memory"), memory_size(read_text("/proc/meminfo"))),
-        (tr("System storage (/)"), storage("/")),
+        (tr("Memory"), memory_size(read_text("/proc/meminfo"), preferences)),
+        (tr("System storage (/)"), storage("/", preferences)),
     ]
 
     # Show home separately only when it is on a different filesystem.
@@ -117,7 +120,7 @@ def collect():
     except OSError:
         separate_home = False
     if separate_home:
-        rows.append((tr("Home storage"), storage(home)))
+        rows.append((tr("Home storage"), storage(home, preferences)))
     return rows
 
 

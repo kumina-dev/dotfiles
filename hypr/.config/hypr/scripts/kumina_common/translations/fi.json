@@ -222,5 +222,18 @@
   "Thu": "To",
   "Fri": "Pe",
   "Sat": "La",
-  "Sun": "Su"
+  "Sun": "Su",
+  "Language, date, time and number preferences.": "Kielen, päivämäärän, kellon ja lukujen asetukset.",
+  "Number format": "Lukujen muotoilu",
+  "Finnish · 1 234,56": "Suomalainen · 1 234,56",
+  "English · 1,234.56": "Englantilainen · 1,234.56",
+  "Currency": "Valuutta",
+  "Euro (EUR)": "Euro (EUR)",
+  "US dollar (USD)": "Yhdysvaltain dollari (USD)",
+  "Pound sterling (GBP)": "Englannin punta (GBP)",
+  "Number: {value}": "Luku: {value}",
+  "Currency: {value}": "Valuutta: {value}",
+  "Applies to the panel, calendar and About this PC. Other apps keep their own formats.": "Koskee paneelia, kalenteria ja Tietoja tietokoneesta -sivua. Muut sovellukset käyttävät omia muotoilujaan.",
+  "Currency is a display preference; it does not convert amounts. Keyboard layouts are under Input.": "Valuutta on näyttöasetus; rahamääriä ei muunneta. Näppäimistöasettelut löytyvät kohdasta Syöttölaitteet.",
+  "Applied. The panel and calendar update automatically. Refresh About this PC for updated numbers.": "Otettu käyttöön. Paneeli ja kalenteri päivittyvät automaattisesti. Päivitä Tietoja tietokoneesta -sivu lukujen päivittämiseksi."
 }

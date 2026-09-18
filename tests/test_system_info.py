@@ -47,7 +47,7 @@ class SystemInfoTests(unittest.TestCase):
         self.assertEqual(system_info.parse_graphics("Not PCI data"), "")
 
     def test_ram_is_explicitly_usable_memory(self):
-        self.assertEqual(system_info.memory_size("MemTotal:  8388608 kB\nMemFree: 1 kB"),
+        self.assertEqual(system_info.memory_size("MemTotal:  8388608 kB\nMemFree: 1 kB", {"number_format": "en"}),
                          "8.0 GiB usable")
         self.assertEqual(system_info.memory_size("MemTotal: invalid kB"), "Unavailable")
 

@@ -37,7 +37,7 @@ GTK 3 settings application with pages for:
   - Keyboard
   - Mouse
 - Sound
-- Language & Region (English/Finnish interface and date/time preferences)
+- Language & Region (English/Finnish interface, date/time, numbers, and currency)
 
 Open the overview:
 
@@ -103,15 +103,33 @@ Language & Region provides:
 
 - English/Finnish interface selection for Settings, Control Center, the power menu, and calendar
 - 12/24-hour clock, numeric date format, and Monday/Sunday week start
+- Finnish/English number styles and EUR/USD/GBP currency previews
 - A preview and explicitly applied, per-user preferences
 - System time-zone selection through `timedatectl` and the existing polkit agent
 
 Formats are stored atomically in `$XDG_CONFIG_HOME/kumios/region.json` (normally
 `~/.config/kumios/region.json`). They affect the KumiOS panel clock, its calendar
-tooltip, and the calendar window. Defaults remain 24-hour time, day-first dates,
+tooltip, the calendar window, and memory/storage quantities in About this PC. Defaults remain 24-hour time, day-first dates,
 and Monday-first weeks. The panel and open calendar observe changes within a
 second, including midnight and system time-zone changes. No logout is required.
 Other applications keep their own regional formats.
+
+Number formatting is independent of the interface language: Finnish uses
+`1 234,56` (with non-breaking grouping spaces), while English uses `1,234.56`.
+The default is Finnish numbers and EUR. Existing preference files gain these
+defaults when read without changing their saved clock/date/week choices.
+
+The live currency preview supports EUR, USD, and GBP. Finnish formatting places
+the symbol after the amount; English places it before. Currency is a display
+preference, not conversion. The desktop has no monetary data view yet; currency
+formatting is currently used by the preview and is available through the shared
+`format_currency` helper. Callers with monetary data should pass its actual
+currency explicitly. Display rounding uses decimal half-up rounding.
+
+Choose **Apply formats**, then open or refresh **About this PC** to see the new
+number style in memory/storage values. Copy system information preserves the
+values from that same displayed snapshot. Technical identifiers and editable
+backend values (such as display mode IDs) are not reformatted.
 
 The panel clock now uses a Waybar custom JSON stream. Left-click still toggles
 the calendar; right-click opens Language & Region. Reload Waybar once after
@@ -136,8 +154,7 @@ names. Device names, SSIDs, time-zone identifiers, and hardware values are
 preserved. External command errors and GTK-provided standard dialogs still use
 their own language. Hyprland-matched window titles remain stable. Language
 selection does not set system `LANG`/`LC_*`, generate locales, change keyboard
-layouts, or alter saved regional formats. Number/currency formatting remains
-planned. Keyboard layouts stay under Input.
+layouts, or alter saved regional formats. Keyboard layouts stay under Input.
 
 Translations live in `hypr/.config/hypr/scripts/kumina_common/translations/fi.json`.
 Messages use named placeholders; never translate command arguments, device data,
@@ -159,6 +176,10 @@ Desktop verification:
    Check that selected devices and keyboard layouts remain the same.
 6. Apply **English** and reopen the apps to switch back. Verify that the panel
    calendar tooltip switches without restarting Waybar.
+7. Change the number style and currency. Check both previews before applying;
+   applying must preserve the selected date, clock, week start, and interface language.
+8. Refresh About this PC and copy the system information. Memory/storage values
+   should use the selected decimal separator both on screen and in the copied text.
 
 ### Lock screen
 

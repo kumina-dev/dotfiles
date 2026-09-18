@@ -1,4 +1,4 @@
-"""Shared, user-scoped clock preferences (no system locale changes)."""
+"""Shared, user-scoped regional preferences (no system locale changes)."""
 import calendar
 from datetime import datetime
 import html
@@ -10,11 +10,16 @@ import time
 
 from .i18n import MONTHS, WEEKDAYS, translate
 
-DEFAULTS = {"clock": "24", "date": "day-first", "week_start": "monday"}
+DEFAULTS = {
+    "clock": "24", "date": "day-first", "week_start": "monday",
+    "number_format": "fi", "currency": "EUR",
+}
 CHOICES = {
     "clock": ("24", "12"),
     "date": ("day-first", "iso", "month-first"),
     "week_start": ("monday", "sunday"),
+    "number_format": ("fi", "en"),
+    "currency": ("EUR", "USD", "GBP"),
 }
 
 

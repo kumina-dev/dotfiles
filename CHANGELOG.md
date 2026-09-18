@@ -4,6 +4,9 @@
 
 ### Added
 
+- Finnish/English number styles and EUR/USD/GBP currency previews with independent saved preferences.
+- Shared decimal-based number/currency formatting and regional memory/storage values in About this PC.
+
 - English/Finnish interface selection for Settings, Control Center, the power menu, and calendar.
 - Shared translated month/weekday names for the calendar and live Waybar tooltip.
 
@@ -30,7 +33,6 @@
 
 - Fixed dimensions for individual notification cards.
 - Conditional password-input visibility during FIDO authentication.
-- Number/currency formats.
-- Desktop verification of Finnish layouts and language switching.
+- Desktop verification of number/currency controls and About formatting.
 - Desktop verification of regional settings and time-zone authentication.
 - Desktop verification before the first release tag.

@@ -60,15 +60,17 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
   - KumiOS version, distribution, kernel, hostname, CPU, GPU, RAM, storage
   - Copy system information
 - [ ] Verify About values and clipboard behavior on the desktop
-- [ ] Add Language & Region settings
+- [x] Add Language & Region settings
   - [x] First iteration: shared clock/date formats, week start, and system time-zone selection
   - [ ] Verify the new Settings page, live clock/calendar updates, and polkit flow on the desktop
   - [x] English/Finnish translations for Settings, Control Center, the power menu, and calendar
-  - [ ] Verify Finnish GTK layouts, confirmations, and language switching on the desktop
-  - Regional date, time, number, and currency formats
+  - [x] Desktop verification of the English/Finnish language update (user confirmed)
+  - [x] Regional date/time formats, Finnish/English number styles, and EUR/USD/GBP currency previews
+  - [x] Shared number formatting in About this PC and copied system information
+  - [ ] Verify number/currency controls and About formatting on the desktop
   - [x] Time zone and 12/24-hour clock
-  - Keep keyboard layouts under Input
-  - Apply preferences consistently and identify changes requiring logout
+  - [x] Keep keyboard layouts under Input
+  - [x] Apply preferences consistently and explain refresh/reopen requirements (no logout needed)
 
 ### Further integrations
 

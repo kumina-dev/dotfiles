@@ -75,6 +75,10 @@ The priority is a simple, reliable daily-driver desktop first. Essential functio
 ### Further integrations
 
 - [ ] Calendar integrations and events
+  - [x] Local all-day events with title/notes, date selection, editing, and confirmed deletion
+  - [x] Persistent SQLite storage and month-grid event markers
+  - [ ] Desktop verification of event dialogs, persistence, and two-pane calendar layout
+  - [ ] Timed events, reminders, recurrence, and external calendar integrations
 - [x] Add a read-only Account section to Settings using the current Linux system account
   - [ ] Verify account values, copy/refresh, and sidebar scrolling on the desktop
   - No separate Kumina account system

@@ -4,6 +4,9 @@
 
 ### Added
 
+- Local all-day calendar events with notes, date changes, editing, confirmed deletion, and persistent SQLite storage.
+- Selected-day event list and month-grid event markers in English/Finnish.
+
 - Read-only Account page with Linux user details, active session groups, refresh, and plain-text copy in English/Finnish.
 
 - Finnish/English number styles and EUR/USD/GBP currency previews with independent saved preferences.
@@ -22,6 +25,8 @@
 
 ### Changed
 
+- Calendar window expanded to 740×480 for the month grid and event list.
+
 - Settings navigation scrolls when needed to keep all pages reachable.
 
 - Control Center now presents quick controls on one page, with details in Settings.
@@ -34,6 +39,8 @@
 - Invalid notification-theme font declaration.
 
 ### Still pending
+
+- Desktop verification of local calendar events and the wider calendar layout.
 
 - Desktop verification of Account values, copy/refresh, and sidebar scrolling.
 

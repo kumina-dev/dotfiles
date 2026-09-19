@@ -70,7 +70,7 @@ hl.window_rule({
     },
     float = true,
     center = true,
-    size = { 340, 350 },
+    size = { 740, 480 },
 })
 
 hl.window_rule({

@@ -243,13 +243,39 @@ Super + Shift + L
 
 ### Calendar
 
-The current local calendar utility can be toggled with:
+The calendar combines a fixed six-week month grid with a selected-day event list.
+Click a day to select it, then **Add event**. Events have a title, an all-day date,
+and optional notes. **Edit** can change the title, notes, or date; moving an event
+opens its destination day. **Delete** requires confirmation. Dots mark days with
+events in the calendar window. The month arrows select the first day of the
+previous/next month, and Today returns to the current date.
+
+The calendar can be toggled with:
 
 ```sh
 ~/.config/hypr/scripts/calendar-toggle.sh
 ```
 
-Calendar event integrations are planned separately.
+Events are stored in `$XDG_DATA_HOME/kumios/calendar.sqlite3`, normally
+`~/.local/share/kumios/calendar.sqlite3`. This is user data outside the dotfiles
+repository. Closing/reopening the calendar preserves events. To back up the data,
+close the calendar and copy that file. No external service or extra Python
+package is required.
+
+Titles are limited to 160 characters and notes to 2000. Reads and writes run in
+background workers; database errors appear in the UI. Invalid edits preserve
+existing events. Refresh reloads the selected day's events and visible markers.
+The calendar uses the existing interface language, date format, and week-start
+preference. The 740×480 floating window provides space for both panes.
+
+This iteration supports local all-day events only. Timed events, reminders,
+recurrence, imports/exports, and external calendar sync are not implemented.
+The panel's hover calendar remains a date overview; event markers appear in the
+opened calendar window.
+
+Desktop check: add an event with notes, close/reopen the calendar, edit it onto
+another day, cancel one deletion, then confirm a deletion. Check marker updates,
+month navigation, both week-start settings, and English/Finnish dialogs.
 
 ## Sound
 

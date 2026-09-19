@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import calendar
-from datetime import timedelta
+from datetime import date
 
 from kumina_common import region
 from kumina_common.i18n import MONTHS as MONTH_NAMES, WEEKDAYS as DAY_NAMES, translate as tr
@@ -33,11 +32,33 @@ from gi.repository import (
 )
 
 
+from calendar_app import events
+from calendar_app.model import month_days
+from calendar_app.views import Agenda
+from kumina_common.async_utils import run_async
+
+
 MONTHS = [tr(name) for name in MONTH_NAMES]
 WEEKDAYS = [tr(name) for name in DAY_NAMES]
 
 
 CSS = """
+.day.selected-day {
+    border-color: @accent_color;
+}
+.today.selected-day {
+    border-color: @window_fg_color;
+}
+.agenda-heading {
+    font-size: 18px;
+    font-weight: 600;
+}
+.event-card {
+    background-color: alpha(@window_fg_color, 0.045);
+    border-radius: 10px;
+    padding: 10px;
+}
+
 window {
     background-color: @window_bg_color;
     color: @window_fg_color;
@@ -92,7 +113,8 @@ button:hover {
     background-image: none;
     color: @window_fg_color;
     min-width: 34px;
-    min-height: 34px;
+    min-height: 42px;
+    border: 2px solid transparent;
     padding: 0;
 }
 
@@ -130,12 +152,17 @@ class CalendarWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title="Kumina Calendar")
 
-        self.set_default_size(340, 350)
+        self.set_default_size(740, 480)
         self.set_resizable(False)
         self.set_position(Gtk.WindowPosition.CENTER)
 
         self.preferences = region.read_preferences()
         self.current_date = region.local_now().date()
+        self.selected_date = self.current_date
+        self._destroyed = False
+        self._event_generation = 0
+        self._marked_days = set()
+        self._day_buttons = {}
         self.display_year = self.current_date.year
         self.display_month = self.current_date.month
 
@@ -145,11 +172,14 @@ class CalendarWindow(Gtk.Window):
         self.load_css()
         self.build_ui()
         self.render_calendar()
+        self.agenda.set_day(self.selected_date)
         self.refresh_clock()
         self._clock_timer = GLib.timeout_add_seconds(1, self.refresh_clock)
         self.connect("destroy", self.stop_clock)
 
     def stop_clock(self, _window):
+        self._destroyed = True
+        self._event_generation += 1
         GLib.source_remove(self._clock_timer)
 
     def refresh_clock(self):
@@ -161,6 +191,7 @@ class CalendarWindow(Gtk.Window):
         self.clock_label.set_text(f"{region.format_date(now, preferences)} · {region.format_time(now, preferences)}")
         if changed:
             self.render_calendar()
+            self.agenda.heading.set_text(region.format_date(self.selected_date, self.preferences))
         return GLib.SOURCE_CONTINUE
 
     def load_css(self):
@@ -180,8 +211,14 @@ class CalendarWindow(Gtk.Window):
             orientation=Gtk.Orientation.VERTICAL,
             spacing=0,
         )
-        root.set_name("calendar")
-        self.add(root)
+        outer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)
+        outer.set_name("calendar")
+        root.set_size_request(330, -1)
+        outer.pack_start(root, False, False, 0)
+        self.agenda = Agenda(self.select_day)
+        self.agenda.set_size_request(320, -1)
+        outer.pack_start(self.agenda, True, True, 0)
+        self.add(outer)
 
         header = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL,
@@ -224,8 +261,13 @@ class CalendarWindow(Gtk.Window):
         self.clock_label = Gtk.Label()
         self.clock_label.set_margin_top(12)
         root.pack_start(self.clock_label, False, False, 0)
+        self.event_status = Gtk.Label()
+        self.event_status.set_line_wrap(True)
+        self.event_status.set_max_width_chars(32)
+        root.pack_start(self.event_status, False, False, 0)
 
     def render_calendar(self):
+        self._day_buttons = {}
         for child in self.calendar_grid.get_children():
             self.calendar_grid.remove(child)
 
@@ -242,25 +284,21 @@ class CalendarWindow(Gtk.Window):
 
             self.calendar_grid.attach(label, column, 0, 1, 1)
 
-        cal = calendar.Calendar(firstweekday=first)
-
-        days = list(
-            cal.itermonthdates(
-                self.display_year,
-                self.display_month,
-            )
-        )
-
-        # Always render exactly six weeks / 42 days.
-        while len(days) < 42:
-            days.append(days[-1] + timedelta(days=1))
+        days = month_days(self.display_year, self.display_month, first)
+        self._visible_days = [day for day in days if day is not None]
 
         for index, day_date in enumerate(days):
             row = (index // 7) + 1
             column = index % 7
 
-            button = Gtk.Button(label=str(day_date.day))
+            button = Gtk.Button(label=" ")
             button.get_style_context().add_class("day")
+            if day_date is None:
+                button.set_sensitive(False)
+                self.calendar_grid.attach(button, column, row, 1, 1)
+                continue
+            self._day_buttons[day_date] = button
+            self.update_day_button(day_date, button)
 
             is_current_month = (
                 day_date.year == self.display_year
@@ -273,14 +311,7 @@ class CalendarWindow(Gtk.Window):
             if day_date == self.current_date:
                 button.get_style_context().add_class("today")
 
-            if is_current_month:
-                button.connect(
-                    "clicked",
-                    self.day_clicked,
-                    day_date.year,
-                    day_date.month,
-                    day_date.day,
-                )
+            button.connect("clicked", lambda _button, day=day_date: self.select_day(day))
 
             self.calendar_grid.attach(
                 button,
@@ -291,32 +322,82 @@ class CalendarWindow(Gtk.Window):
             )
 
         self.calendar_grid.show_all()
+        self.refresh_markers()
 
     def previous_month(self, _button):
+        if self.display_year == 1 and self.display_month == 1:
+            return
         if self.display_month == 1:
             self.display_month = 12
             self.display_year -= 1
         else:
             self.display_month -= 1
 
-        self.render_calendar()
+        self.select_day(date(self.display_year, self.display_month, 1))
 
     def next_month(self, _button):
+        if self.display_year == 9999 and self.display_month == 12:
+            return
         if self.display_month == 12:
             self.display_month = 1
             self.display_year += 1
         else:
             self.display_month += 1
 
-        self.render_calendar()
+        self.select_day(date(self.display_year, self.display_month, 1))
 
     def go_today(self, _button):
-        self.display_year = self.current_date.year
-        self.display_month = self.current_date.month
-        self.render_calendar()
+        self.select_day(region.local_now().date())
 
-    def day_clicked(self, _button, year, month, day):
-        print(f"{year:04d}-{month:02d}-{day:02d}")
+    def select_day(self, day):
+        if self._destroyed:
+            return
+        self.selected_date = day
+        self.display_year, self.display_month = day.year, day.month
+        self.render_calendar()
+        self.agenda.set_day(day)
+
+    def update_day_button(self, day, button):
+        has_events = day.isoformat() in self._marked_days
+        button.set_label(f"{day.day}\n{'•' if has_events else ' '}")
+        tooltip = region.format_date(day, self.preferences)
+        if has_events:
+            tooltip += " · " + tr("Has events")
+        button.set_tooltip_text(tooltip)
+        context = button.get_style_context()
+        if day == self.selected_date:
+            context.add_class("selected-day")
+        else:
+            context.remove_class("selected-day")
+
+    def refresh_markers(self):
+        self._event_generation += 1
+        generation = self._event_generation
+        start, end = self._visible_days[0].isoformat(), self._visible_days[-1].isoformat()
+        self.event_status.set_text(tr("Loading events…"))
+        run_async(lambda: events.list_range(start, end),
+                  lambda rows: self.markers_loaded(rows, generation),
+                  lambda error: self.markers_failed(error, generation))
+
+    def markers_loaded(self, rows, generation):
+        if self._destroyed or generation != self._event_generation:
+            return False
+        self._marked_days = {event.day for event in rows}
+        for day, button in self._day_buttons.items():
+            self.update_day_button(day, button)
+        self.event_status.set_text("")
+        self.event_status.set_tooltip_text(None)
+        return False
+
+    def markers_failed(self, error, generation):
+        if self._destroyed or generation != self._event_generation:
+            return False
+        self._marked_days.clear()
+        for day, button in self._day_buttons.items():
+            self.update_day_button(day, button)
+        self.event_status.set_text(tr("Could not load event markers."))
+        self.event_status.set_tooltip_text(str(error))
+        return False
 
     def on_key_press(self, _window, event):
         if event.keyval == Gdk.KEY_Escape:

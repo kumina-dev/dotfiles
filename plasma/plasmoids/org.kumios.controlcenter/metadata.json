@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Id": "org.kumios.controlcenter",
+        "Name": "KumiOS Control Center",
+        "Description": "Quick system controls for KumiOS",
+        "Version": "0.1.0",
+        "License": "GPL-3.0-or-later",
+        "Category": "System Information"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

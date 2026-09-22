@@ -1,0 +1,16 @@
+[Unit]
+Description=KumiOS Audio Service
+Documentation=https://github.com/kumina-dev/dotfiles
+After=pipewire-pulse.service
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+
+ExecStart=%h/.local/share/kumios/venv/bin/python %h/dotfiles/services/kumi-audio/kumi-audio.py
+
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

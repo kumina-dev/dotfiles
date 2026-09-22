@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Id": "org.kumios.activeapp",
+        "Name": "KumiOS Active App",
+        "Description": "Shows the currently focused application",
+        "Version": "0.1.0",
+        "License": "GPL-3.0-or-later",
+        "Category": "Windows and Tasks"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

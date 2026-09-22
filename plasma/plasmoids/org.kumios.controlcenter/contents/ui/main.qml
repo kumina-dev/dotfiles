@@ -45,6 +45,31 @@ PlasmoidItem {
     readonly property bool networkConnected:
         networkState >= 60
 
+    readonly property string primaryConnectionPath:
+        String(
+            networkManagerProperties.properties.PrimaryConnection
+            ?? "/"
+        )
+
+    readonly property bool primaryIsWifi:
+        String(
+            networkManagerProperties.properties.PrimaryConnectionType
+            ?? ""
+        ) === "802-11-wireless"
+
+    readonly property string activeAccessPointPath:
+        primaryIsWifi
+            ? String(
+                activeConnectionProperties.properties.SpecificObject
+                ?? "/"
+            )
+            : "/"
+
+    readonly property string connectedSsid:
+        decodeSsid(
+            accessPointProperties.properties.Ssid
+        )
+
     preferredRepresentation: compactRepresentation
 
     function volumeIcon() {
@@ -126,12 +151,12 @@ PlasmoidItem {
             return "Off"
         }
 
-        if (networkState >= 60) {
-            return "Connected"
-        }
-
         if (networkState === 40) {
             return "Connecting..."
+        }
+
+        if (primaryIsWifi && networkState >= 60) {
+            return "Connected"
         }
 
         return "Not Connected"
@@ -173,6 +198,43 @@ PlasmoidItem {
 
             reply.destroy()
         })
+    }
+
+    function decodeSsid(value) {
+        if (!value || value.length === 0) {
+            return ""
+        }
+
+        try {
+            const bytes = []
+
+            for (let i = 0; i < value.length; ++i) {
+                const item = value[i]
+
+                if (typeof item === "number") {
+                    bytes.push(item)
+                } else if (item && item.value !== undefined) {
+                    bytes.push(Number(item.value))
+                } else {
+                    return ""
+                }
+            }
+
+            let result = ""
+
+            for (let i = 0; i < bytes.length; ++i) {
+                result += String.fromCharCode(bytes[i])
+            }
+
+            return result
+        } catch (error) {
+            console.warn(
+                "KumiOS Control Center: failed to decode SSID:",
+                error
+            )
+
+            return ""
+        }
     }
 
     DBus.DBusServiceWatcher {
@@ -220,6 +282,32 @@ PlasmoidItem {
         service: root.nmService
         path: root.nmPath
         iface: root.nmInterface
+    }
+
+    DBus.Properties {
+        id: activeConnectionProperties
+
+        busType: DBus.BusType.System
+        service: root.nmService
+
+        path: root.primaryIsWifi
+            ? root.primaryConnectionPath
+            : "/"
+
+        iface:
+            "org.freedesktop.NetworkManager.Connection.Active"
+    }
+
+    DBus.Properties {
+        id: accessPointProperties
+
+        busType: DBus.BusType.System
+        service: root.nmService
+
+        path: root.activeAccessPointPath
+
+        iface:
+            "org.freedesktop.NetworkManager.AccessPoint"
     }
 
     compactRepresentation: Controls.ToolButton {
@@ -277,7 +365,9 @@ PlasmoidItem {
                 rowSpacing: Kirigami.Units.mediumSpacing
 
                 QuickTile {
-                    title: "Wi-Fi"
+                    title: root.connectedSsid.length > 0
+                        ? root.connectedSsid
+                        : "Wi-Fi"
                     subtitle: root.wifiSubtitle()
                     iconName: root.wifiIcon()
 

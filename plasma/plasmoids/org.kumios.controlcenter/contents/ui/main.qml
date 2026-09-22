@@ -88,6 +88,30 @@ PlasmoidItem {
                 ?? false
             )
 
+    property string connectedBluetoothName: ""
+
+    readonly property string bluetoothTitle:
+        connectedBluetoothName.length > 0
+            ? connectedBluetoothName
+            : "Bluetooth"
+
+    readonly property string bluetoothSubtitle:
+        !bluetoothAvailable
+            ? "Unavailable"
+            : !bluetoothPowered
+                ? "Off"
+                : connectedBluetoothName.length > 0
+                    ? "Connected"
+                    : "On"
+
+    property DBus.dbusMessage bluetoothObjectsMessage: ({
+        service: root.bluetoothService,
+        path: "/",
+        iface: "org.freedesktop.DBus.ObjectManager",
+        member: "GetManagedObjects",
+        arguments: []
+    })
+
     preferredRepresentation: compactRepresentation
 
     function volumeIcon() {
@@ -243,6 +267,78 @@ PlasmoidItem {
             !root.bluetoothPowered
     }
 
+    function refreshBluetoothDevices() {
+        if (!root.bluetoothAvailable) {
+            root.connectedBluetoothName = ""
+            return
+        }
+
+        const reply = DBus.SystemBus.asyncCall(
+            root.bluetoothObjectsMessage
+        )
+
+        reply.finished.connect(function() {
+            if (reply.isError) {
+                console.warn(
+                    "KumiOS Control Center: failed to read Bluetooth devices:",
+                    reply.error.message
+                )
+
+                root.connectedBluetoothName = ""
+                reply.destroy()
+                return
+            }
+
+            const objects = reply.value
+            let connectedName = ""
+
+            for (const objectPath in objects) {
+                const interfaces = objects[objectPath]
+
+                if (!interfaces) {
+                    continue
+                }
+
+                const device = interfaces["org.bluez.Device1"]
+
+                if (!device) {
+                    continue
+                }
+
+                const connectedValue = device.Connected
+
+                const connected =
+                    connectedValue
+                    && connectedValue.value !== undefined
+                        ? Boolean(connectedValue.value)
+                        : Boolean(connectedValue)
+
+                if (!connected) {
+                    continue
+                }
+
+                const aliasValue = device.Alias
+
+                if (
+                    aliasValue
+                    && aliasValue.value !== undefined
+                ) {
+                    connectedName = String(aliasValue.value)
+                } else if (aliasValue !== undefined) {
+                    connectedName = String(aliasValue)
+                }
+
+                if (connectedName.length > 0) {
+                    break
+                }
+            }
+
+            root.connectedBluetoothName = connectedName
+
+            reply.destroy()
+        })
+    }
+
     DBus.DBusServiceWatcher {
         id: audioServiceWatcher
 
@@ -327,6 +423,9 @@ PlasmoidItem {
 
             if (registered) {
                 bluetoothProperties.updateAll()
+                root.refreshBluetoothDevices()
+            } else {
+                root.connectedBluetoothName = ""
             }
         }
     }
@@ -341,6 +440,7 @@ PlasmoidItem {
 
         onRefreshed: {
             root.bluetoothAvailable = true
+            root.refreshBluetoothDevices()
         }
 
         onPropertiesChanged: function(
@@ -350,7 +450,40 @@ PlasmoidItem {
         ) {
             if (interfaceName === root.bluetoothInterface) {
                 root.bluetoothAvailable = true
+                root.refreshBluetoothDevices()
             }
+        }
+    }
+
+    DBus.SignalWatcher {
+        busType: DBus.BusType.System
+        service: root.bluetoothService
+        path: "/"
+        iface: "org.freedesktop.DBus.ObjectManager"
+
+        function dbusInterfacesAdded(
+            objectPath,
+            interfaces
+        ) {
+            root.refreshBluetoothDevices()
+        }
+
+        function dbusInterfacesRemoved(
+            objectPath,
+            interfaces
+        ) {
+            root.refreshBluetoothDevices()
+        }
+    }
+
+    Timer {
+        interval: 2000
+        repeat: true
+        running: root.bluetoothAvailable
+            && root.bluetoothPowered
+
+        onTriggered: {
+            root.refreshBluetoothDevices()
         }
     }
 
@@ -419,14 +552,8 @@ PlasmoidItem {
                 }
 
                 QuickTile {
-                    title: "Bluetooth"
-                    
-                    subtitle: !root.bluetoothAvailable
-                        ? "Unavailable"
-                        : root.bluetoothPowered
-                            ? "On"
-                            : "Off"
-                    
+                    title: root.bluetoothTitle
+                    subtitle: root.bluetoothSubtitle
                     iconName: "bluetooth"
 
                     enabled: root.bluetoothAvailable

@@ -4,71 +4,213 @@ import QtQuick.Controls as Controls
 
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
+import org.kde.plasma.private.sessions 2.0 as Sessions
 
 PlasmoidItem {
     id: root
 
     preferredRepresentation: compactRepresentation
 
-    compactRepresentation: Controls.ToolButton {
-        text: "K"
+    property string pendingAction: ""
 
-        font.weight: Font.DemiBold
-
-        onClicked: root.expanded = !root.expanded
+    Sessions.SessionManagement {
+        id: session
     }
 
-    fullRepresentation: ColumnLayout {
-        spacing: 0
+    compactRepresentation: Controls.ToolButton {
+        text: "K"
+        font.weight: Font.DemiBold
 
-        implicitWidth: 220
+        onClicked: {
+            root.pendingAction = ""
+            root.expanded = !root.expanded
+        }
+    }
 
-        MenuButton {
-            text: "About This PC"
-            icon.name: "computer"
+    fullRepresentation: Item {
+        id: representation
 
-            onClicked: {
-                root.expanded = false
+        Layout.minimumWidth: 240
+        Layout.maximumWidth: 240
+        Layout.preferredWidth: 240
+
+        Layout.minimumHeight: root.pendingAction === "" ? 220 : 125
+        Layout.preferredHeight: root.pendingAction === "" ? 220 : 125
+
+        Loader {
+            id: pageLoader
+
+            anchors.fill: parent
+
+            sourceComponent:
+                root.pendingAction === ""
+                    ? menuComponent
+                    : confirmationComponent
+        }
+    }
+
+    Component {
+        id: menuComponent
+
+        ColumnLayout {
+            implicitWidth: 240
+            spacing: 0
+
+            MenuButton {
+                text: "About This PC"
+                icon.name: "computer"
+
+                onClicked: {
+                    root.expanded = false
+                }
+            }
+
+            Separator {}
+
+            MenuButton {
+                text: "Sleep"
+                icon.name: "system-suspend"
+
+                enabled: session.canSuspend
+
+                onClicked: {
+                    root.expanded = false
+                    session.suspend()
+                }
+            }
+
+            MenuButton {
+                text: "Restart..."
+                icon.name: "system-reboot"
+
+                enabled: session.canReboot
+
+                onClicked: {
+                    root.pendingAction = "reboot"
+                }
+            }
+
+            MenuButton {
+                text: "Shut Down..."
+                icon.name: "system-shutdown"
+
+                enabled: session.canShutdown
+
+                onClicked: {
+                    root.pendingAction = "shutdown"
+                }
+            }
+
+            Separator {}
+
+            MenuButton {
+                text: "Log Out Kumina…"
+                icon.name: "system-log-out"
+
+                enabled: session.canLogout
+
+                onClicked: {
+                    root.pendingAction = "logout"
+                }
             }
         }
+    }
 
-        Separator {}
+    Component {
+        id: confirmationComponent
 
-        MenuButton {
-            text: "Sleep"
-            icon.name: "system-suspend"
+        ColumnLayout {
+            implicitWidth: 240
+            spacing: Kirigami.Units.mediumSpacing
 
-            onClicked: {
-                root.expanded = false
+            Controls.Label {
+                Layout.fillWidth: true
+
+                text: {
+                    switch (root.pendingAction) {
+                    case "reboot":
+                        return "Restart this PC?"
+                    case "shutdown":
+                        return "Shut down this PC?"
+                    case "logout":
+                        return "Log out?"
+                    default:
+                        return ""
+                    }
+                }
+
+                font.pixelSize: 16
+                font.weight: Font.DemiBold
+                wrapMode: Text.WordWrap
             }
-        }
 
-        MenuButton {
-            text: "Restart…"
-            icon.name: "system-reboot"
+            Controls.Label {
+                Layout.fillWidth: true
 
-            onClicked: {
-                root.expanded = false
+                text: "All open apps will be closed."
+                opacity: 0.75
+                wrapMode: Text.WordWrap
             }
-        }
 
-        MenuButton {
-            text: "Shut Down…"
-            icon.name: "system-shutdown"
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: Kirigami.Units.smallSpacing
 
-            onClicked: {
-                root.expanded = false
-            }
-        }
+                Item {
+                    Layout.fillWidth: true
+                }
 
-        Separator {}
+                Controls.Button {
+                    text: "Cancel"
 
-        MenuButton {
-            text: "Log Out Kumina…"
-            icon.name: "system-log-out"
+                    onClicked: {
+                        root.pendingAction = ""
+                    }
+                }
 
-            onClicked: {
-                root.expanded = false
+                Controls.Button {
+                    highlighted: true
+
+                    text: {
+                        switch (root.pendingAction) {
+                        case "reboot":
+                            return "Restart"
+                        case "shutdown":
+                            return "Shut Down"
+                        case "logout":
+                            return "Log Out"
+                        default:
+                            return "Confirm"
+                        }
+                    }
+
+                    onClicked: {
+                        const action = root.pendingAction
+
+                        root.pendingAction = ""
+                        root.expanded = false
+
+                        switch (action) {
+                        case "reboot":
+                            session.requestReboot(
+                                Sessions.SessionManagement.Skip
+                            )
+                            break
+
+                        case "shutdown":
+                            session.requestShutdown(
+                                Sessions.SessionManagement.Skip
+                            )
+                            break
+
+                        case "logout":
+                            session.requestLogout(
+                                Sessions.SessionManagement.Skip
+                            )
+                            break
+                        }
+                    }
+                }
             }
         }
     }
@@ -93,7 +235,6 @@ PlasmoidItem {
 
             Controls.Label {
                 text: parent.parent.text
-
                 Layout.fillWidth: true
             }
         }
@@ -101,11 +242,9 @@ PlasmoidItem {
 
     component Separator: Rectangle {
         Layout.fillWidth: true
-
         implicitHeight: 1
 
         color: Kirigami.Theme.separatorColor
-
         opacity: 0.5
 
         Layout.topMargin: 5

@@ -70,6 +70,24 @@ PlasmoidItem {
             accessPointProperties.properties.Ssid
         )
 
+    readonly property string bluetoothService:
+        "org.bluez"
+
+    readonly property string bluetoothPath:
+        "/org/bluez/hci0"
+
+    readonly property string bluetoothInterface:
+        "org.bluez.Adapter1"
+
+    property bool bluetoothAvailable: false
+
+    readonly property bool bluetoothPowered:
+        bluetoothAvailable
+            && Boolean(
+                bluetoothProperties.properties.Powered
+                ?? false
+            )
+
     preferredRepresentation: compactRepresentation
 
     function volumeIcon() {
@@ -175,29 +193,8 @@ PlasmoidItem {
     }
 
     function toggleWifi() {
-        const reply = DBus.SystemBus.asyncCall({
-            service: root.nmService,
-            path: root.nmPath,
-            iface: "org.freedesktop.DBus.Properties",
-            member: "Set",
-            signature: "ssv",
-            arguments: [
-                root.nmInterface,
-                "WirelessEnabled",
-                !root.wifiEnabled
-            ]
-        })
-
-        reply.finished.connect(function() {
-            if (reply.isError) {
-                console.warn(
-                    "KumiOS Control Center: Wi-Fi toggle failed:",
-                    reply.error.message
-                )
-            }
-
-            reply.destroy()
-        })
+        networkManagerProperties.properties.WirelessEnabled =
+            !root.wifiEnabled
     }
 
     function decodeSsid(value) {
@@ -235,6 +232,15 @@ PlasmoidItem {
 
             return ""
         }
+    }
+
+    function toggleBluetooth() {
+        if (!root.bluetoothAvailable) {
+            return
+        }
+
+        bluetoothProperties.properties.Powered =
+            !root.bluetoothPowered
     }
 
     DBus.DBusServiceWatcher {
@@ -310,6 +316,44 @@ PlasmoidItem {
             "org.freedesktop.NetworkManager.AccessPoint"
     }
 
+    DBus.DBusServiceWatcher {
+        id: bluetoothServiceWatcher
+
+        busType: DBus.BusType.System
+        watchedService: root.bluetoothService
+
+        onRegisteredChanged: {
+            root.bluetoothAvailable = registered
+
+            if (registered) {
+                bluetoothProperties.updateAll()
+            }
+        }
+    }
+
+    DBus.Properties {
+        id: bluetoothProperties
+
+        busType: DBus.BusType.System
+        service: root.bluetoothService
+        path: root.bluetoothPath
+        iface: root.bluetoothInterface
+
+        onRefreshed: {
+            root.bluetoothAvailable = true
+        }
+
+        onPropertiesChanged: function(
+            interfaceName,
+            changedProperties,
+            invalidatedProperties
+        ) {
+            if (interfaceName === root.bluetoothInterface) {
+                root.bluetoothAvailable = true
+            }
+        }
+    }
+
     compactRepresentation: Controls.ToolButton {
         implicitWidth: 36
         implicitHeight: 30
@@ -376,8 +420,18 @@ PlasmoidItem {
 
                 QuickTile {
                     title: "Bluetooth"
-                    subtitle: "On"
+                    
+                    subtitle: !root.bluetoothAvailable
+                        ? "Unavailable"
+                        : root.bluetoothPowered
+                            ? "On"
+                            : "Off"
+                    
                     iconName: "bluetooth"
+
+                    enabled: root.bluetoothAvailable
+
+                    onClicked: root.toggleBluetooth()
                 }
 
                 QuickTile {

@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Id": "KumiOS",
+        "Name": "KumiOS",
+        "Description": "KumiOS Plasma desktop style",
+        "Version": "0.1.0",
+        "License": "GPL-3.0-or-later"
+    }
+}

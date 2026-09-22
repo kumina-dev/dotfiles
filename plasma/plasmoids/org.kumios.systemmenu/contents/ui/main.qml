@@ -242,10 +242,11 @@ PlasmoidItem {
 
     component Separator: Rectangle {
         Layout.fillWidth: true
+
         implicitHeight: 1
 
-        color: Kirigami.Theme.separatorColor
-        opacity: 0.5
+        color: Kirigami.Theme.textColor
+        opacity: 0.15
 
         Layout.topMargin: 5
         Layout.bottomMargin: 5

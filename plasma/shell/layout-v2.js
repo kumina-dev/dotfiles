@@ -42,11 +42,12 @@ const activeApp = topPanel.addWidget("org.kumios.activeapp");
 // Left-side spacing
 topPanel.addWidget("org.kde.plasma.panelspacer");
 
-topPanel.addWidget("org.kde.plasma.systemtray");
-
+const controlCenter =
+    topPanel.addWidget("org.kumios.controlcenter");
 
 // Clock
-const clock = topPanel.addWidget("org.kde.plasma.digitalclock");
+const clock =
+    topPanel.addWidget("org.kde.plasma.digitalclock");
 
 clock.currentConfigGroup = ["Appearance"];
 

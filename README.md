@@ -207,6 +207,12 @@ Desktop verification:
 8. Refresh About this PC and copy the system information. Memory/storage values
    should use the selected decimal separator both on screen and in the copied text.
 
+### Login screen
+
+The greetd/ReGreet theme is managed separately from user dotfiles. See
+[greeter/README.md](greeter/README.md) for demo preview, installation, and rollback.
+It exports the current wallpaper and palette into system-readable files.
+
 ### Lock screen
 
 The password input stays visible even when empty and uses Hyprlock's `$PAMPROMPT` variable as its placeholder. It displays the actual input prompt when PAM asks for a password or PIN.

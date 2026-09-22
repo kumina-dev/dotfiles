@@ -13,9 +13,6 @@ PlasmoidItem {
     property string activeAppName: ""
     property var activeAppIcon: ""
 
-    implicitWidth: contentRow.implicitWidth
-    implicitHeight: contentRow.implicitHeight
-
     TaskManager.TasksModel {
         id: tasksModel
 
@@ -71,6 +68,12 @@ PlasmoidItem {
 
     fullRepresentation: RowLayout {
         id: contentRow
+
+        implicitWidth: childrenRect.width
+        implicitHeight: Math.max(
+            Kirigami.Units.iconSizes.small,
+            childrenRect.height
+        )
 
         spacing: Kirigami.Units.smallSpacing
 

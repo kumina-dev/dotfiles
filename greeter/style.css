@@ -1,0 +1,48 @@
+/* ReGreet 0.5: theme its existing controls, including authentication prompts. */
+window { background-color: @window_bg_color; color: @window_fg_color; }
+frame.background {
+    background-color: alpha(@window_bg_color, 0.96);
+    color: @window_fg_color;
+    border: 1px solid alpha(@window_fg_color, 0.14);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: 0 12px 36px alpha(black, 0.35);
+}
+frame.background > grid > label:first-child { font-size: 20px; }
+button, entry, passwordentry {
+    background-image: none;
+    background-color: @view_bg_color;
+    color: @window_fg_color;
+    border: 1px solid alpha(@window_fg_color, 0.16);
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: none;
+    text-shadow: none;
+}
+button:hover { background-color: mix(@view_bg_color, @window_fg_color, 0.10); }
+button:focus-visible, entry:focus-within, passwordentry:focus-within {
+    outline: 2px solid @accent_color;
+    outline-offset: 2px;
+}
+button.suggested-action {
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+    border-color: transparent;
+    font-weight: bold;
+}
+button.suggested-action:hover { background-color: shade(@accent_bg_color, 1.10); }
+button.destructive-action {
+    background-color: @window_bg_color;
+    color: @window_fg_color;
+}
+button.destructive-action:hover {
+    background-color: @destructive_bg_color;
+    color: @destructive_fg_color;
+}
+button:disabled { opacity: 0.5; }
+popover > contents {
+    background-color: @window_bg_color;
+    color: @window_fg_color;
+    border-radius: 12px;
+}
+selection { background-color: @accent_bg_color; color: @accent_fg_color; }

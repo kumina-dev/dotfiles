@@ -69,12 +69,6 @@ PlasmoidItem {
     fullRepresentation: RowLayout {
         id: contentRow
 
-        implicitWidth: childrenRect.width
-        implicitHeight: Math.max(
-            Kirigami.Units.iconSizes.small,
-            childrenRect.height
-        )
-
         spacing: Kirigami.Units.smallSpacing
 
         Kirigami.Icon {

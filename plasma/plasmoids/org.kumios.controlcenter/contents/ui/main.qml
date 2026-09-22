@@ -27,6 +27,24 @@ PlasmoidItem {
     
     property bool audioAvailable: false
 
+    readonly property string nmService:
+        "org.freedesktop.NetworkManager"
+
+    readonly property string nmPath:
+        "/org/freedesktop/NetworkManager"
+
+    readonly property string nmInterface:
+        "org.freedesktop.NetworkManager"
+
+    readonly property bool wifiEnabled:
+        Boolean(networkManagerProperties.properties.WirelessEnabled ?? false)
+
+    readonly property int networkState:
+        Number(networkManagerProperties.properties.State ?? 0)
+
+    readonly property bool networkConnected:
+        networkState >= 60
+
     preferredRepresentation: compactRepresentation
 
     function volumeIcon() {
@@ -103,6 +121,60 @@ PlasmoidItem {
         })
     }
 
+    function wifiSubtitle() {
+        if (!wifiEnabled) {
+            return "Off"
+        }
+
+        if (networkState >= 60) {
+            return "Connected"
+        }
+
+        if (networkState === 40) {
+            return "Connecting..."
+        }
+
+        return "Not Connected"
+    }
+
+    function wifiIcon() {
+        if (!wifiEnabled) {
+            return "network-wireless-off"
+        }
+
+        if (networkConnected) {
+            return "network-wireless"
+        }
+
+        return "network-wireless-disconnected"
+    }
+
+    function toggleWifi() {
+        const reply = DBus.SystemBus.asyncCall({
+            service: root.nmService,
+            path: root.nmPath,
+            iface: "org.freedesktop.DBus.Properties",
+            member: "Set",
+            signature: "ssv",
+            arguments: [
+                root.nmInterface,
+                "WirelessEnabled",
+                !root.wifiEnabled
+            ]
+        })
+
+        reply.finished.connect(function() {
+            if (reply.isError) {
+                console.warn(
+                    "KumiOS Control Center: Wi-Fi toggle failed:",
+                    reply.error.message
+                )
+            }
+
+            reply.destroy()
+        })
+    }
+
     DBus.DBusServiceWatcher {
         id: audioServiceWatcher
 
@@ -141,6 +213,15 @@ PlasmoidItem {
         }
     }
 
+    DBus.Properties {
+        id: networkManagerProperties
+
+        busType: DBus.BusType.System
+        service: root.nmService
+        path: root.nmPath
+        iface: root.nmInterface
+    }
+
     compactRepresentation: Controls.ToolButton {
         implicitWidth: 36
         implicitHeight: 30
@@ -151,7 +232,7 @@ PlasmoidItem {
             spacing: 4
 
             Kirigami.Icon {
-                source: "network-wireless"
+                source: root.wifiIcon()
 
                 implicitWidth: 15
                 implicitHeight: 15
@@ -173,12 +254,6 @@ PlasmoidItem {
 
         Layout.preferredHeight: 360
         Layout.minimumHeight: 360
-
-        onVisibleChanged: {
-            if (visible) {
-                root.refreshAudioState()
-            }
-        }
 
         ColumnLayout {
             anchors.fill: parent
@@ -203,8 +278,10 @@ PlasmoidItem {
 
                 QuickTile {
                     title: "Wi-Fi"
-                    subtitle: "Connected"
-                    iconName: "network-wireless"
+                    subtitle: root.wifiSubtitle()
+                    iconName: root.wifiIcon()
+
+                    onClicked: root.toggleWifi()
                 }
 
                 QuickTile {

@@ -30,7 +30,7 @@ topPanel.hiding = "none";
 
 
 // Launcher
-const launcher = topPanel.addWidget("org.kde.plasma.kickoff");
+const launcher = topPanel.addWidget("org.kumios.systemmenu");
 
 launcher.currentConfigGroup = ["General"];
 

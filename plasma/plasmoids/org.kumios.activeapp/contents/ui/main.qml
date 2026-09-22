@@ -31,8 +31,6 @@ PlasmoidItem {
         const index = tasksModel.activeTask
 
         if (!index || !index.valid) {
-            root.activeAppName = ""
-            root.activeAppIcon = ""
             return
         }
 

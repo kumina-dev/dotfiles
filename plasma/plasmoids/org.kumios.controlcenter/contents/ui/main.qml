@@ -112,6 +112,70 @@ PlasmoidItem {
         arguments: []
     })
 
+    property DBus.dbusMessage brightnessSetMessage: ({
+        service: root.brightnessService,
+        path: root.brightnessDisplayPath,
+        iface: root.brightnessDisplayInterface,
+        member: "SetBrightness",
+        signature: "(iu)",
+        arguments: [
+            new DBus.int32(0),
+            new DBus.uint32(1)
+        ]
+    })
+
+    readonly property string brightnessService:
+        "org.kde.ScreenBrightness"
+
+    readonly property string brightnessRootPath:
+        "/org/kde/ScreenBrightness"
+
+    readonly property string brightnessRootInterface:
+        "org.kde.ScreenBrightness"
+
+    readonly property string brightnessDisplayInterface:
+        "org.kde.ScreenBrightness.Display"
+
+    readonly property string brightnessDisplayName:
+        String(
+            brightnessRootProperties.properties.DisplaysDBusNames?.[0]
+            ?? ""
+        )
+
+    readonly property string brightnessDisplayPath:
+        brightnessDisplayName.length > 0
+            ? root.brightnessRootPath + "/" + brightnessDisplayName
+            : "/"
+
+    readonly property int brightnessValue:
+        Number(
+            brightnessDisplayProperties.properties.Brightness
+            ?? 0
+        )
+
+    readonly property int brightnessMax:
+        Number(
+            brightnessDisplayProperties.properties.MaxBrightness
+            ?? 0
+        )
+
+    readonly property bool brightnessAvailable:
+        brightnessDisplayName.length > 0
+            && brightnessMax > 0
+
+    readonly property int brightnessPercent:
+        brightnessAvailable
+            ? Math.round(
+                (brightnessValue / brightnessMax) * 100
+            )
+            : 0
+
+    readonly property string displayLabel:
+        String(
+            brightnessDisplayProperties.properties.Label
+            ?? "Display"
+        )
+
     preferredRepresentation: compactRepresentation
 
     function volumeIcon() {
@@ -339,6 +403,44 @@ PlasmoidItem {
         })
     }
 
+    function setBrightness(ratio) {
+        if (!root.brightnessAvailable) {
+            return
+        }
+
+        const clamped = Math.max(
+            0.0,
+            Math.min(1.0, ratio)
+        )
+
+        const target = Math.round(
+            clamped * root.brightnessMax
+        )
+
+        root.brightnessSetMessage.path =
+            root.brightnessDisplayPath
+
+        root.brightnessSetMessage.arguments = [
+            new DBus.int32(target),
+            new DBus.uint32(1)
+        ]
+
+        const reply = DBus.SessionBus.asyncCall(
+            root.brightnessSetMessage
+        )
+
+        reply.finished.connect(function() {
+            if (reply.isError) {
+                console.warn(
+                    "KumiOS Control Center: brightness change failed:",
+                    reply.error.message
+                )
+            }
+
+            reply.destroy()
+        })
+    }
+
     DBus.DBusServiceWatcher {
         id: audioServiceWatcher
 
@@ -487,6 +589,28 @@ PlasmoidItem {
         }
     }
 
+    DBus.Properties {
+        id: brightnessRootProperties
+
+        busType: DBus.BusType.Session
+        service: root.brightnessService
+        path: root.brightnessRootPath
+        iface: root.brightnessRootInterface
+    }
+
+    DBus.Properties {
+        id: brightnessDisplayProperties
+
+        busType: DBus.BusType.Session
+        service: root.brightnessService
+
+        path: root.brightnessDisplayName.length > 0
+            ? root.brightnessDisplayPath
+            : "/"
+
+        iface: root.brightnessDisplayInterface
+    }
+
     compactRepresentation: Controls.ToolButton {
         implicitWidth: 36
         implicitHeight: 30
@@ -517,8 +641,8 @@ PlasmoidItem {
         Layout.minimumWidth: 320
         Layout.maximumWidth: 320
 
-        Layout.preferredHeight: 360
-        Layout.minimumHeight: 360
+        Layout.preferredHeight: 440
+        Layout.minimumHeight: 440
 
         ColumnLayout {
             anchors.fill: parent
@@ -579,8 +703,14 @@ PlasmoidItem {
 
                 QuickTile {
                     title: "Display"
-                    subtitle: "Brightness"
+
+                    subtitle: root.brightnessAvailable
+                        ? root.brightnessPercent + "%"
+                        : "Unavailable"
+
                     iconName: "video-display"
+
+                    enabled: root.brightnessAvailable
                 }
             }
 
@@ -651,6 +781,83 @@ PlasmoidItem {
                     Layout.fillWidth: true
 
                     text: root.deviceName
+
+                    opacity: 0.6
+                    font.pixelSize: 11
+
+                    elide: Text.ElideRight
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+
+                spacing: Kirigami.Units.smallSpacing
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Controls.Label {
+                        text: "Display"
+                        font.weight: Font.DemiBold
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
+                    Controls.Label {
+                        text: root.brightnessAvailable
+                            ? root.brightnessPercent + "%"
+                            : "Unavailable"
+
+                        opacity: 0.65
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    spacing: Kirigami.Units.mediumSpacing
+
+                    Kirigami.Icon {
+                        source: "brightness-low"
+
+                        implicitWidth: 20
+                        implicitHeight: 20
+                    }
+
+                    Controls.Slider {
+                        Layout.fillWidth: true
+
+                        enabled: root.brightnessAvailable
+
+                        from: 0.0
+                        to: 1.0
+                        stepSize: 0.01
+
+                        value: root.brightnessAvailable
+                            ? root.brightnessValue
+                                / root.brightnessMax
+                            : 0.0
+
+                        onMoved: {
+                            root.setBrightness(value)
+                        }
+                    }
+
+                    Kirigami.Icon {
+                        source: "brightness-high"
+
+                        implicitWidth: 20
+                        implicitHeight: 20
+                    }
+                }
+
+                Controls.Label {
+                    Layout.fillWidth: true
+
+                    text: root.displayLabel
 
                     opacity: 0.6
                     font.pixelSize: 11

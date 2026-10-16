@@ -637,16 +637,29 @@ PlasmoidItem {
     }
 
     fullRepresentation: Item {
-        Layout.preferredWidth: 320
-        Layout.minimumWidth: 320
-        Layout.maximumWidth: 320
+        id: popup
 
-        Layout.preferredHeight: 440
-        Layout.minimumHeight: 440
+        readonly property int popupPadding:
+            Kirigami.Units.largeSpacing
+        
+        Layout.minimumWidth: 320
+        Layout.preferredWidth: 320
+
+        Layout.minimumHeight:
+            content.implicitHeight + popupPadding * 2
+
+        Layout.preferredHeight:
+            content.implicitHeight + popupPadding * 2
 
         ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Kirigami.Units.largeSpacing
+            id: content
+            
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                margins: popup.popupPadding
+            }
 
             spacing: Kirigami.Units.mediumSpacing
 
@@ -683,34 +696,6 @@ PlasmoidItem {
                     enabled: root.bluetoothAvailable
 
                     onClicked: root.toggleBluetooth()
-                }
-
-                QuickTile {
-                    title: "Sound"
-
-                    subtitle: root.audioAvailable
-                        ? (
-                            root.muted
-                                ? "Muted"
-                                : root.volumePercent() + "%"
-                        )
-                        : "Unavailable"
-
-                    iconName: root.volumeIcon()
-
-                    onClicked: root.toggleMuted()
-                }
-
-                QuickTile {
-                    title: "Display"
-
-                    subtitle: root.brightnessAvailable
-                        ? root.brightnessPercent + "%"
-                        : "Unavailable"
-
-                    iconName: "video-display"
-
-                    enabled: root.brightnessAvailable
                 }
             }
 
@@ -864,10 +849,6 @@ PlasmoidItem {
 
                     elide: Text.ElideRight
                 }
-            }
-
-            Item {
-                Layout.fillHeight: true
             }
         }
     }

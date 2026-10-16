@@ -104,6 +104,22 @@ PlasmoidItem {
                     ? "Connected"
                     : "On"
 
+    property string currentPage: "home"
+
+    function openPage(page) {
+        currentPage = page
+    }
+
+    function goHome() {
+        currentPage = "home"
+    }
+
+    onExpandedChanged: {
+        if (!expanded) {
+            goHome()
+        }
+    }
+
     property DBus.dbusMessage bluetoothObjectsMessage: ({
         service: root.bluetoothService,
         path: "/",
@@ -663,11 +679,27 @@ PlasmoidItem {
 
             spacing: Kirigami.Units.mediumSpacing
 
-            Controls.Label {
-                text: "Control Center"
+            RowLayout {
+                Layout.fillWidth: true
 
-                font.pixelSize: 18
-                font.weight: Font.DemiBold
+                Controls.ToolButton {
+                    visible: root.currentPage !== "home"
+
+                    icon.name: "go-previous"
+
+                    onClicked: root.goHome()
+                }
+
+                Controls.Label {
+                    Layout.fillWidth: true
+
+                    text: root.currentPage === "wifi"
+                        ? "Wi-Fi"
+                        : "Control Center"
+
+                    font.pixelSize: 18
+                    font.weight: Font.DemiBold
+                }
             }
 
             GridLayout {
@@ -678,14 +710,19 @@ PlasmoidItem {
                 columnSpacing: Kirigami.Units.mediumSpacing
                 rowSpacing: Kirigami.Units.mediumSpacing
 
+                visible: root.currentPage === "home"
+
                 QuickTile {
                     title: root.connectedSsid.length > 0
                         ? root.connectedSsid
                         : "Wi-Fi"
+
                     subtitle: root.wifiSubtitle()
                     iconName: root.wifiIcon()
 
                     onClicked: root.toggleWifi()
+
+                    onDetailsRequested: root.openPage("wifi")
                 }
 
                 QuickTile {
@@ -703,6 +740,8 @@ PlasmoidItem {
                 Layout.fillWidth: true
 
                 spacing: Kirigami.Units.smallSpacing
+
+                visible: root.currentPage === "home"
 
                 RowLayout {
                     Layout.fillWidth: true
@@ -779,6 +818,8 @@ PlasmoidItem {
 
                 spacing: Kirigami.Units.smallSpacing
 
+                visible: root.currentPage === "home"
+
                 RowLayout {
                     Layout.fillWidth: true
 
@@ -850,6 +891,17 @@ PlasmoidItem {
                     elide: Text.ElideRight
                 }
             }
+
+            WiFiDetails {
+                Layout.fillWidth: true
+
+                visible: root.currentPage === "wifi"
+
+                wifiEnabled: root.wifiEnabled
+                connected: root.primaryIsWifi
+                    && root.networkConnected
+                ssid: root.connectedSsid
+            }
         }
     }
 
@@ -858,8 +910,9 @@ PlasmoidItem {
         required property string subtitle
         required property string iconName
 
-        Layout.fillWidth: true
+        signal detailsRequested()
 
+        Layout.fillWidth: true
         implicitHeight: 72
 
         contentItem: RowLayout {
@@ -873,19 +926,29 @@ PlasmoidItem {
             }
 
             ColumnLayout {
+                Layout.fillWidth: true
                 spacing: 1
 
                 Controls.Label {
                     text: title
                     font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
                 }
 
                 Controls.Label {
                     text: subtitle
-
                     opacity: 0.65
                     font.pixelSize: 11
                 }
+            }
+
+            Controls.ToolButton {
+                visible: title.length > 0
+
+                icon.name: "go-next"
+
+                onClicked: detailsRequested()
             }
         }
     }

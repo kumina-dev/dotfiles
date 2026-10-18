@@ -36,7 +36,8 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 | --- | --- | --- |
 | KUM-5–7 | Done | v0.1.0 outcomes accepted; no reimplementation |
 | KUM-8 | Done, outside v0.2.0 | User reported login/reboot persistence check passed on 2026-10-18 |
-| KUM-9–12 | In Review | Implemented, automatically checked, installed and activated; user/manual acceptance pending |
+| KUM-11 | Done | User task/current-network/radio checks passed; automated mixed-state evidence retained |
+| KUM-9, KUM-10, KUM-12 | In Review | Remaining daemon recovery, adapter/blocked-state and live error/retry gaps |
 
 [Project](https://linear.app/kumina/project/kumios-83beb6551c62).
 Shared Linear verification index:
@@ -75,7 +76,8 @@ links on 2026-10-18. User also passed active-app switching/clearing, current Wi-
 status against KDE, Meta+Space dashboard and top-bar/dock behavior.
 User also passed audio unplug/replug/default switching and recovery, Bluetooth
 reconnect/name/state/settings access, and brightness adjustment/restoration.
-Still unverified: Bluetooth adapter/power/blocked states, network/radio transitions,
+User passed Wi-Fi off/on/reconnect and Bluetooth power/state/settings checks.
+KUM-11 is Done. Still unverified: Bluetooth adapter removal/blocked states,
 live error/retry presentation,
 and audio-daemon restart recovery. KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.

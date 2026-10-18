@@ -57,14 +57,21 @@ audio and popup interaction; further physical evidence is recorded below.
 The user also passed all three desktop/status checks on 2026-10-18: active-app
 labels follow two applications and clear on showing the desktop; current Wi-Fi
 name/status agrees with KDE; Meta+Space opens the usual dashboard and the top
-bar/dock behave normally. Network/radio transition behavior remains unverified.
+bar/dock behave normally. Subsequent network/radio evidence is recorded below.
 
 User passed the next three guided checks on 2026-10-18: audio unplug/replug and
 KDE default switching with labels/controls following and recovering; spare Bluetooth
 device reconnect with name/state updates and native settings accessible; brightness
 adjustment/restoration without a stuck control. This does not establish Bluetooth
-power/adapter changes, network/radio changes, live error/retry presentation or actual
-audio-daemon restart recovery.
+adapter changes, live error/retry presentation or actual audio-daemon restart recovery.
+
+User then passed Wi-Fi off/on/reconnect with accurate status and no stuck controls,
+and Bluetooth off/on with correct state and settings accessible on 2026-10-18.
+KUM-11 is Done on combined automated, native and user task/network evidence.
+Physical wired/VPN-only topology was conditional in the instructions and was not
+separately identified in the user's reply; it is not claimed as independently tested.
+KUM-9, KUM-10 and KUM-12 remain In Review for the specific recovery/adapter/error
+limits below.
 
 Resume audit on 2026-10-18 at source HEAD `bfb21cd`: all eight documented
 suites/probes passed (82 checks including Qt lifecycle checks). Read-only preflight
@@ -106,12 +113,13 @@ performed or explicitly resolved through an acceptance/scope decision.
 - [x] Output volume/mute, input/output names and quick microphone mute (user passed).
 - [x] Audio unplug/replug and changing defaults through KDE settings (user passed).
 - [x] Bluetooth device-name/reconnect updates and native settings access (user passed).
-- [ ] Bluetooth adapter removal/power/blocked states; multiple adapters need appropriate hardware.
+- [x] Bluetooth power off/on, state updates and settings access (user passed).
+- [ ] Bluetooth adapter removal/blocked states; multiple adapters need appropriate hardware.
 - [x] Brightness adjustment/restoration without a stuck control (user passed).
 - [ ] Live pending/error/retry presentation.
 - [x] Popup sizing at the user's scale, keyboard controls, tooltips and settings links (user passed).
 - [x] Launcher/top-bar/dock experience, active-app switching/clearing and current Wi-Fi status (user passed).
-- [ ] Wi-Fi status through physical network/radio transitions.
+- [x] Wi-Fi off/on/reconnect status and no stuck controls (user passed).
 - [ ] Actual audio-daemon restart recovery remains unverified; do not interrupt
       active audio to test it without explicit authorization.
 

@@ -1,4 +1,3 @@
-
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
@@ -14,7 +13,37 @@ ColumnLayout {
     required property bool connected
     required property string ssid
 
+    // Injectable model/bus keep connection regression tests off the real network.
+    property var networkSource: networkModel
+    property var discoveryHandler: networkHandler
+    property alias connection: connection
+    readonly property int networkCount: networkProxy.count
+
     spacing: Kirigami.Units.mediumSpacing
+
+    WiFiConnection { id: connection }
+    PlasmaNM.Handler { id: networkHandler }
+
+    function refreshNetworks() {
+        if (visible && wifiEnabled) {
+            discoveryHandler.requestScan()
+        }
+    }
+
+    Component.onCompleted: refreshNetworks()
+    onVisibleChanged: refreshNetworks()
+
+    onWifiEnabledChanged: {
+        refreshNetworks()
+        if (!wifiEnabled) {
+            if (connection.busy) {
+                connection.cancel()
+            } else {
+                connection.message = ""
+                connection.error = ""
+            }
+        }
+    }
 
     PlasmaNM.NetworkModel {
         id: networkModel
@@ -23,9 +52,13 @@ ColumnLayout {
     // Filter before layout so wired/VPN entries do not occupy list rows.
     KItemModels.KSortFilterProxyModel {
         id: networkProxy
-        sourceModel: networkModel
+        objectName: "wifiNetworkModel"
+        sourceModel: root.networkSource
         filterRoleName: "Type"
-        filterRegularExpression: "^" + PlasmaNM.Enums.Wireless + "$"
+        filterRowCallback: function(row, parent) {
+            return sourceModel.data(sourceModel.index(row, 0, parent),
+                                    filterRole) === PlasmaNM.Enums.Wireless
+        }
         sortRoleName: "Signal"
         sortOrder: Qt.DescendingOrder
     }
@@ -70,6 +103,7 @@ ColumnLayout {
             Controls.Label {
                 Layout.fillWidth: true
 
+                textFormat: Text.PlainText
                 text: root.connected
                     ? (root.ssid || "Connected network")
                     : "Not connected"
@@ -89,14 +123,25 @@ ColumnLayout {
         }
     }
 
-    Controls.Label {
+    RowLayout {
         Layout.fillWidth: true
-
         visible: root.wifiEnabled
 
-        text: "Available networks"
+        Controls.Label {
+            Layout.fillWidth: true
+            text: "Available networks"
+            font.weight: Font.DemiBold
+        }
 
-        font.weight: Font.DemiBold
+        Controls.ToolButton {
+            text: "Refresh networks"
+            icon.name: "view-refresh"
+            display: Controls.AbstractButton.IconOnly
+            enabled: !root.discoveryHandler.scanning && !root.connection.busy
+            onClicked: root.refreshNetworks()
+            Controls.ToolTip.visible: hovered
+            Controls.ToolTip.text: text
+        }
     }
 
     ListView {
@@ -124,8 +169,13 @@ ColumnLayout {
 
             width: ListView.view.width
             height: 52
-            // Discovery is read-only until connection handling is implemented.
-            hoverEnabled: false
+            readonly property bool isActivating:
+                model.ConnectionState === PlasmaNM.Enums.Activating
+
+            enabled: !root.connection.busy && !isActivating
+            onClicked: root.connection.connectNetwork(model)
+            Accessible.name: (model.Ssid || model.ItemUniqueName || "Wi-Fi network")
+                + (isConnected ? ", connected" : ", connect")
 
             contentItem: RowLayout {
                 spacing: Kirigami.Units.mediumSpacing
@@ -144,6 +194,7 @@ ColumnLayout {
 
                     Controls.Label {
                         Layout.fillWidth: true
+                        textFormat: Text.PlainText
                         text: model.Ssid || model.ItemUniqueName
                             || "Unknown network"
                         elide: Text.ElideRight
@@ -152,12 +203,21 @@ ColumnLayout {
                     Controls.Label {
                         text: networkItem.isConnected
                             ? "Connected"
-                            : model.SecurityTypeString
+                            : networkItem.isActivating
+                                ? "Connecting…"
+                                : model.SecurityTypeString
                                 || "Available"
 
                         font.pixelSize: 11
                         opacity: 0.65
                     }
+                }
+
+                Controls.BusyIndicator {
+                    running: networkItem.isActivating
+                    visible: running
+                    implicitWidth: 18
+                    implicitHeight: 18
                 }
 
                 Kirigami.Icon {
@@ -174,9 +234,42 @@ ColumnLayout {
     Controls.Label {
         Layout.fillWidth: true
         visible: root.wifiEnabled && networkList.count === 0
-        text: "No Wi-Fi networks found"
+        text: root.discoveryHandler.scanning ? "Scanning for Wi-Fi networks…" : "No Wi-Fi networks found"
         opacity: 0.65
         wrapMode: Text.WordWrap
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        visible: root.connection.busy || root.connection.message.length > 0
+
+        Controls.BusyIndicator {
+            running: root.connection.busy
+            visible: running
+            implicitWidth: 22
+            implicitHeight: 22
+        }
+
+        Controls.Label {
+            Layout.fillWidth: true
+            text: root.connection.message
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+        }
+
+        Controls.Button {
+            text: "Cancel"
+            visible: root.connection.busy
+            enabled: !root.connection.cancelRequested
+            onClicked: root.connection.cancel()
+        }
+    }
+
+    Kirigami.InlineMessage {
+        Layout.fillWidth: true
+        visible: root.connection.error.length > 0
+        type: Kirigami.MessageType.Error
+        text: root.connection.error.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     }
 
 }

@@ -4,6 +4,9 @@
 
 ### Added
 
+- Plasma Control Center Wi-Fi selection, saved/new personal-network activation, native password prompts, progress, cancellation, and inline errors.
+- Wi-Fi refresh controls and QML regression coverage for filtering and connection state handling.
+
 - Local all-day calendar events with notes, date changes, editing, confirmed deletion, and persistent SQLite storage.
 - Selected-day event list and month-grid event markers in English/Finnish.
 
@@ -36,9 +39,13 @@
 
 ### Fixed
 
+- Plasma Wi-Fi discovery filtering: wired, bridge, and loopback connections no longer appear as available wireless networks.
+
 - Invalid notification-theme font declaration.
 
 ### Still pending
+
+- Real-network verification of saved/new Wi-Fi activation, password cancellation, and retries in the installed Plasma panel.
 
 - Desktop verification of local calendar events and the wider calendar layout.
 

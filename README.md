@@ -37,11 +37,52 @@ run through Plasma's scripting console.
 ## Plasma Control Center
 
 The Plasma widget sources are in `plasma/plasmoids/org.kumios.controlcenter`.
-Its Wi-Fi detail page shows discovered wireless networks ordered by signal
-strength, security labels, and a checkmark for active connections. The list is
-hidden while Wi-Fi is off and shows an empty message when no networks are
-available. It requires Plasma Network Management and KDE's `org.kde.kitemmodels`
-QML module. Network selection and connection handling in this view remain pending.
+Its Wi-Fi detail page filters out wired, bridge, loopback, and VPN entries before
+layout and sorts wireless networks by signal strength. Active connections have
+a checkmark. Opening the page or pressing Refresh requests a scan; the list is
+hidden when Wi-Fi is off and shows an empty/scanning message when appropriate.
+
+Click an available network to connect. Saved profiles are reused; new open and
+personal Wi-Fi networks are added through NetworkManager. Plasma's native secrets
+agent requests passwords, keeping credentials out of widget state and command
+arguments. Initial enterprise/certificate setup belongs in Plasma Network Settings;
+after a profile is saved it can be selected here.
+
+The page shows connection progress, prevents duplicate requests, and offers Cancel.
+Success follows the active connection's state, rather than just accepting a request.
+Backend request errors and failed/cancelled authentication are shown inline. A slow
+request shows a warning after 90 seconds and remains cancellable. NetworkManager
+may save a new profile even if activation fails or is cancelled; this view does not
+forget profiles. A connected state does not imply Internet reachability.
+
+Requires Plasma Network Management, KDE's `org.kde.kitemmodels` and
+`org.kde.plasma.plasma5support` QML modules, `gdbus` (GLib), and the running Plasma
+NetworkManager secrets agent. New-profile creation uses `gdbus` because Plasma's
+QML D-Bus encoder currently marshals nested settings dictionaries as `a{sv}` instead
+of NetworkManager's required `a{sa{sv}}`. Device and access-point arguments are shell
+quoted. Saved-profile activation and cancellation use the QML D-Bus API directly.
+
+The installed widget is a separate copy. Apply repository changes and reload Plasma:
+
+```sh
+cp -a ~/dotfiles/plasma/plasmoids/org.kumios.controlcenter/. \
+  ~/.local/share/plasma/plasmoids/org.kumios.controlcenter/
+systemctl --user restart plasma-plasmashell.service
+```
+
+Run connection/filter regression tests with the Qt **6** runner (the unqualified
+`qmltestrunner` may launch Qt 5 on systems with both installed):
+
+```sh
+QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software \
+  /usr/lib/qt6/bin/qmltestrunner -input tests/qml -o -,txt
+```
+
+The tests use mock connection requests and scan handlers. Live desktop check:
+verify only wireless entries appear, connect to a saved network, try a new personal
+network's password dialog, cancel authentication, and retry after an error. Check
+that progress and the connected checkmark follow the actual NetworkManager state.
+These steps may switch the active network; use a network you can safely test.
 
 ## Versioning
 

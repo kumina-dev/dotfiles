@@ -7,6 +7,7 @@ TestCase {
     id: test
     name: "WiFi"
     when: windowShown
+    visible: true
     width: 320
     height: 600
 
@@ -66,8 +67,13 @@ TestCase {
         view.wifiEnabled = true
         view.connection.bus = bus
         view.connection.busy = false
+        view.connection.operation = "connect"
+        view.connection.disconnectAccepted = false
+        view.connection.cancelInFlight = false
+        view.connection.cancelAccepted = false
         view.connection.activePath = "/"
         view.connection.error = ""
+        view.connection.failureDetail = ""
         view.connection.message = ""
         view.connection.cancelRequested = false
         view.connection.timeoutInterval = 90000
@@ -120,7 +126,7 @@ TestCase {
         view.connection.activationFinished(newConnectionRunner.calls[0].serial, "/test/active", "")
         compare(view.connection.activePath, "/test/active")
         view.connection.observeState(4)
-        verify(!view.connection.busy)
+        tryVerify(function() { return !view.connection.busy })
         verify(view.connection.error.indexOf("Could not connect") >= 0)
     }
 
@@ -151,6 +157,8 @@ TestCase {
         compare(bus.calls[1].message.member, "DeactivateConnection")
         compare(bus.calls[1].message.arguments, ["/test/active"])
         bus.calls[1].resolve({values: []})
+        verify(view.connection.busy)
+        view.connection.observeState(4)
         verify(!view.connection.busy)
         compare(view.connection.message, "Connection cancelled")
     }
@@ -215,7 +223,88 @@ TestCase {
         view.connection.cancel()
         compare(bus.calls.length, 3)
         bus.calls[2].resolve({values: []})
+        view.connection.observeState(4)
         verify(!view.connection.busy)
+    }
+
+    function test_disconnectWaitsForDeviceState() {
+        view.connection.disconnectNetwork(network({ConnectionState: PlasmaNM.Enums.Activated}))
+        compare(bus.calls.length, 1)
+        compare(bus.calls[0].message.member, "Disconnect")
+        compare(bus.calls[0].message.path, "/test/device")
+        compare(bus.calls[0].message.iface, "org.freedesktop.NetworkManager.Device")
+        compare(bus.calls[0].message.arguments.length, 0)
+        view.connection.observeDeviceState(30)
+        verify(view.connection.busy) // State alone cannot precede request acceptance.
+        bus.calls[0].resolve({values: []})
+        verify(view.connection.busy) // Acceptance alone is not completion.
+        view.connection.observeDeviceState(30)
+        verify(!view.connection.busy)
+        compare(view.connection.message, "Disconnected from Test network")
+    }
+
+    function test_disconnectFailureCanRetryAndBlocksDuplicates() {
+        const connected = network({ConnectionState: PlasmaNM.Enums.Activated})
+        view.connection.disconnectNetwork(connected)
+        view.connection.disconnectNetwork(connected)
+        view.connection.connectNetwork(network())
+        view.connection.cancel() // A disconnect cannot be cancelled as an activation.
+        compare(bus.calls.length, 1)
+        bus.calls[0].reject({error: {message: "Permission denied"}})
+        verify(!view.connection.busy)
+        verify(view.connection.error.indexOf("Could not disconnect") >= 0)
+        view.connection.disconnectNetwork(connected)
+        compare(bus.calls.length, 2)
+        compare(view.connection.error, "")
+    }
+
+    function test_disconnectTimeoutDoesNotLeaveViewBusy() {
+        view.connection.timeoutInterval = 20
+        view.connection.disconnectNetwork(network({ConnectionState: PlasmaNM.Enums.Activated}))
+        tryVerify(function() { return !view.connection.busy })
+        verify(view.connection.error.indexOf("did not complete") >= 0)
+        bus.calls[0].resolve({values: []})
+        verify(!view.connection.disconnectAccepted) // Late reply ignored.
+    }
+
+    function test_cancelAcknowledgementWaitsAndDoesNotDuplicate() {
+        view.connection.connectNetwork(network())
+        bus.calls[0].resolve({values: ["/test/active"]})
+        view.connection.cancel()
+        view.connection.cancel()
+        compare(bus.calls.length, 2)
+        bus.calls[1].resolve({values: []})
+        view.connection.observeState(2)
+        verify(view.connection.busy)
+        view.connection.observeState(4)
+        verify(!view.connection.busy)
+    }
+
+    function test_nativeFailureReasonSurvivesTerminalStateAndRetry() {
+        view.connection.connectNetwork(network())
+        bus.calls[0].resolve({values: ["/test/active"]})
+        view.connection.observeState(4)
+        view.connection.recordDeviceReason(120, 53)
+        tryVerify(function() { return !view.connection.busy })
+        verify(view.connection.error.indexOf("access point could not be reached") >= 0)
+        view.connection.connectNetwork(network())
+        compare(view.connection.failureDetail, "")
+        bus.calls[1].resolve({values: ["/test/another_active"]})
+        view.connection.recordDeviceReason(120, 7)
+        view.connection.observeState(4)
+        tryVerify(function() { return !view.connection.busy })
+        verify(view.connection.error.indexOf("Authentication was cancelled") >= 0)
+    }
+
+    function test_disconnectButtonDoesNotActivateParentRow() {
+        networks.append(network({ConnectionState: PlasmaNM.Enums.Activated}))
+        tryVerify(function() { return findChild(view, "disconnectNetwork") !== null })
+        const button = findChild(view, "disconnectNetwork")
+        tryVerify(function() { return button.visible && button.width > 0 })
+        mouseClick(button)
+        compare(bus.calls.length, 1)
+        compare(bus.calls[0].message.member, "Disconnect")
+        verify(view.wifiEnabled)
     }
 
 }

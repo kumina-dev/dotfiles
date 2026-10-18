@@ -50,10 +50,19 @@ after a profile is saved it can be selected here.
 
 The page shows connection progress, prevents duplicate requests, and offers Cancel.
 Success follows the active connection's state, rather than just accepting a request.
-Backend request errors and failed/cancelled authentication are shown inline. A slow
+Backend request errors and failed/cancelled authentication are shown inline, with
+NetworkManager reasons for missing passwords, authentication timeouts, unreachable
+access points, and address configuration failures. Cancellation waits for the
+active connection to stop before reporting completion. A slow
 request shows a warning after 90 seconds and remains cancellable. NetworkManager
 may save a new profile even if activation fails or is cancelled; this view does not
 forget profiles. A connected state does not imply Internet reachability.
+
+The active network's disconnect icon disconnects its Wi-Fi adapter without turning
+the radio off or forgetting the saved profile. It waits for the adapter to become
+disconnected and reports errors inline. NetworkManager's device-level Disconnect
+prevents an immediate automatic reconnect; select a network to connect again.
+Concurrent connect/disconnect requests are blocked while an operation is pending.
 
 Requires Plasma Network Management, KDE's `org.kde.kitemmodels` and
 `org.kde.plasma.plasma5support` QML modules, `gdbus` (GLib), and the running Plasma
@@ -82,6 +91,16 @@ The tests use mock connection requests and scan handlers. Live desktop check:
 verify only wireless entries appear, connect to a saved network, try a new personal
 network's password dialog, cancel authentication, and retry after an error. Check
 that progress and the connected checkmark follow the actual NetworkManager state.
+Use the disconnect icon on an active row, confirm the radio stays on, then select
+that saved network to reconnect.
+
+Verified in a live Plasma session on 2026-10-18 using the installed Wi-Fi components:
+saved-profile disconnect/reconnect, cancellation of an activation followed by retry,
+native password-dialog cancellation followed by saved-profile recovery, and a
+successful fresh-profile connection after entering the password in Plasma. The
+original saved connection was restored and temporary test profiles were removed.
+An earlier fresh-profile attempt failed association; that failure prompted the
+more specific NetworkManager error messages.
 These steps may switch the active network; use a network you can safely test.
 
 ## Versioning

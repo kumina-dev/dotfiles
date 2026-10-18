@@ -220,6 +220,18 @@ ColumnLayout {
                     implicitHeight: 18
                 }
 
+                Controls.ToolButton {
+                    objectName: "disconnectNetwork"
+                    visible: networkItem.isConnected
+                    icon.name: "network-disconnect"
+                    text: "Disconnect"
+                    display: Controls.AbstractButton.IconOnly
+                    Accessible.name: "Disconnect from " + (model.Ssid || model.ItemUniqueName || "Wi-Fi network")
+                    onClicked: root.connection.disconnectNetwork(model)
+                    Controls.ToolTip.visible: hovered
+                    Controls.ToolTip.text: text
+                }
+
                 Kirigami.Icon {
                     visible: networkItem.isConnected
                     source: "checkmark"
@@ -259,7 +271,7 @@ ColumnLayout {
 
         Controls.Button {
             text: "Cancel"
-            visible: root.connection.busy
+            visible: root.connection.busy && root.connection.operation === "connect"
             enabled: !root.connection.cancelRequested
             onClicked: root.connection.cancel()
         }

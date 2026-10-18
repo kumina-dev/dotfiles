@@ -4,6 +4,8 @@
 
 ### Added
 
+- Plasma Wi-Fi disconnect controls with device-state progress and reconnect support.
+
 - Plasma Control Center Wi-Fi selection, saved/new personal-network activation, native password prompts, progress, cancellation, and inline errors.
 - Wi-Fi refresh controls and QML regression coverage for filtering and connection state handling.
 
@@ -39,13 +41,15 @@
 
 ### Fixed
 
+- Wi-Fi cancellation now waits for the active connection to stop and blocks duplicate cancellation requests.
+- Connection failures show NetworkManager reasons instead of a generic authentication/network error.
+
 - Plasma Wi-Fi discovery filtering: wired, bridge, and loopback connections no longer appear as available wireless networks.
 
 - Invalid notification-theme font declaration.
 
 ### Still pending
 
-- Real-network verification of saved/new Wi-Fi activation, password cancellation, and retries in the installed Plasma panel.
 
 - Desktop verification of local calendar events and the wider calendar layout.
 

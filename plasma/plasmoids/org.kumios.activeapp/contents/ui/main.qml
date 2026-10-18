@@ -10,6 +10,8 @@ PlasmoidItem {
 
     preferredRepresentation: fullRepresentation
 
+    property var taskSource: tasksModel
+
     property string activeAppName: ""
     property var activeAppIcon: ""
 
@@ -25,27 +27,29 @@ PlasmoidItem {
     }
 
     function updateActiveTask() {
-        const index = tasksModel.activeTask
+        const index = root.taskSource.activeTask
 
         if (!index || !index.valid) {
+            root.activeAppName = ""
+            root.activeAppIcon = ""
             return
         }
 
         root.activeAppName =
-            tasksModel.data(
+            root.taskSource.data(
                 index,
                 TaskManager.AbstractTasksModel.AppName
             ) || ""
 
         root.activeAppIcon =
-            tasksModel.data(
+            root.taskSource.data(
                 index,
                 Qt.DecorationRole
             ) || ""
     }
 
     Connections {
-        target: tasksModel
+        target: root.taskSource
 
         function onActiveTaskChanged() {
             root.updateActiveTask()
@@ -62,8 +66,11 @@ PlasmoidItem {
         function onRowsRemoved() {
             root.updateActiveTask()
         }
+        function onModelReset() { root.updateActiveTask() }
+        function onLayoutChanged() { root.updateActiveTask() }
     }
 
+    onTaskSourceChanged: updateActiveTask()
     Component.onCompleted: updateActiveTask()
 
     fullRepresentation: RowLayout {

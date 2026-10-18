@@ -45,3 +45,20 @@ class PlasmaSetupTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'missing module'):
                 setup.main()
         backup.assert_not_called()
+
+    def test_widget_only_install_does_not_evaluate_layout(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / 'source'
+            widget = source / 'plasmoids/org.kumios.controlcenter'
+            widget.mkdir(parents=True)
+            (widget / 'metadata.json').write_text('{}')
+            with patch.object(setup, 'SOURCE', source), \
+                 patch.object(setup, 'preflight', return_value={}), \
+                 patch.object(setup, 'backup', return_value=root / 'backup'), \
+                 patch.object(setup, 'plasma') as plasma, \
+                 patch.dict(setup.os.environ, {'XDG_CONFIG_HOME':str(root / 'config'), 'XDG_DATA_HOME':str(root / 'data')}), \
+                 patch('sys.argv', ['setup.py', '--install-widgets']):
+                setup.main()
+            plasma.assert_not_called()
+            self.assertEqual((root / 'data/plasma/plasmoids/org.kumios.controlcenter/metadata.json').read_text(), '{}')

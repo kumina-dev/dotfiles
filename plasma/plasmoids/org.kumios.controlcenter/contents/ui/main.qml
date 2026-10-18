@@ -10,23 +10,11 @@ import org.kde.plasma.workspace.dbus as DBus
 PlasmoidItem {
     id: root
 
-    readonly property string audioService: "org.kumios.Audio"
-    readonly property string audioPath: "/org/kumios/Audio"
-    readonly property string audioInterface: "org.kumios.Audio"
-
-    readonly property real volume:
-        Number(audioProperties.properties.Volume ?? 0.0)
-
-    readonly property bool muted:
-        Boolean(audioProperties.properties.Muted ?? false)
-
-    readonly property string deviceName:
-        String(
-            audioProperties.properties.DeviceName
-            ?? "No audio output"
-        )
-    
-    property bool audioAvailable: false
+    NativeAudio { id: audio }
+    readonly property real volume: audio.output.volume
+    readonly property bool muted: audio.output.muted
+    readonly property string deviceName: audio.output.deviceName
+    readonly property bool audioAvailable: audio.output.available
 
     readonly property string nmService:
         "org.freedesktop.NetworkManager"
@@ -40,70 +28,14 @@ PlasmoidItem {
     readonly property bool wifiEnabled:
         Boolean(networkManagerProperties.properties.WirelessEnabled ?? false)
 
-    readonly property int networkState:
-        Number(networkManagerProperties.properties.State ?? 0)
+    WiFiStatus { id: wifiStatus; radioEnabled: root.wifiEnabled }
+    readonly property bool networkConnected: wifiStatus.connected
+    readonly property string connectedSsid: wifiStatus.ssid
 
-    readonly property bool networkConnected:
-        networkState >= 60
-
-    readonly property string primaryConnectionPath:
-        String(
-            networkManagerProperties.properties.PrimaryConnection
-            ?? "/"
-        )
-
-    readonly property bool primaryIsWifi:
-        String(
-            networkManagerProperties.properties.PrimaryConnectionType
-            ?? ""
-        ) === "802-11-wireless"
-
-    readonly property string activeAccessPointPath:
-        primaryIsWifi
-            ? String(
-                activeConnectionProperties.properties.SpecificObject
-                ?? "/"
-            )
-            : "/"
-
-    readonly property string connectedSsid:
-        decodeSsid(
-            accessPointProperties.properties.Ssid
-        )
-
-    readonly property string bluetoothService:
-        "org.bluez"
-
-    readonly property string bluetoothPath:
-        "/org/bluez/hci0"
-
-    readonly property string bluetoothInterface:
-        "org.bluez.Adapter1"
-
-    property bool bluetoothAvailable: false
-
-    readonly property bool bluetoothPowered:
-        bluetoothAvailable
-            && Boolean(
-                bluetoothProperties.properties.Powered
-                ?? false
-            )
-
-    property string connectedBluetoothName: ""
-
-    readonly property string bluetoothTitle:
-        connectedBluetoothName.length > 0
-            ? connectedBluetoothName
-            : "Bluetooth"
-
-    readonly property string bluetoothSubtitle:
-        !bluetoothAvailable
-            ? "Unavailable"
-            : !bluetoothPowered
-                ? "Off"
-                : connectedBluetoothName.length > 0
-                    ? "Connected"
-                    : "On"
+    BluetoothControl { id: bluetooth }
+    readonly property bool bluetoothAvailable: bluetooth.available
+    readonly property string bluetoothTitle: bluetooth.connectedName || "Bluetooth"
+    readonly property string bluetoothSubtitle: bluetooth.subtitle
 
     property string currentPage: "home"
 
@@ -120,26 +52,6 @@ PlasmoidItem {
             goHome()
         }
     }
-
-    property DBus.dbusMessage bluetoothObjectsMessage: ({
-        service: root.bluetoothService,
-        path: "/",
-        iface: "org.freedesktop.DBus.ObjectManager",
-        member: "GetManagedObjects",
-        arguments: []
-    })
-
-    property DBus.dbusMessage brightnessSetMessage: ({
-        service: root.brightnessService,
-        path: root.brightnessDisplayPath,
-        iface: root.brightnessDisplayInterface,
-        member: "SetBrightness",
-        signature: "(iu)",
-        arguments: [
-            new DBus.int32(0),
-            new DBus.uint32(1)
-        ]
-    })
 
     readonly property string brightnessService:
         "org.kde.ScreenBrightness"
@@ -219,66 +131,21 @@ PlasmoidItem {
         return Math.round(volume * 100)
     }
 
-    function setVolume(value) {
-        const clamped = Math.max(
-            0.0,
-            Math.min(1.0, value)
-        )
-
-        const reply = DBus.SessionBus.asyncCall({
-            service: root.audioService,
-            path: root.audioPath,
-            iface: root.audioInterface,
-            member: "SetVolume",
-            signature: "d",
-            arguments: [
-                clamped
-            ]
-        })
-
-        reply.finished.connect(function() {
-            if (reply.isError) {
-                console.warn(
-                    "KumiOS Control Center: SetVolume failed:",
-                    reply.error.message
-                )
-            }
-
-            reply.destroy()
-        })
-    }
-
-    function toggleMuted() {
-        const reply = DBus.SessionBus.asyncCall({
-            service: root.audioService,
-            path: root.audioPath,
-            iface: root.audioInterface,
-            member: "ToggleMuted",
-            arguments: []
-        })
-
-        reply.finished.connect(function() {
-            if (reply.isError) {
-                console.warn(
-                    "KumiOS Control Center: ToggleMuted failed:",
-                    reply.error.message
-                )
-            }
-
-            reply.destroy()
-        })
-    }
+    function setVolume(value) { audio.output.setVolume(value) }
+    function toggleMuted() { audio.output.toggleMuted() }
 
     function wifiSubtitle() {
+        if (!nmWatcher.registered) return "Unavailable"
+        if (wifiChange.busy) return "Applying…"
         if (!wifiEnabled) {
             return "Off"
         }
 
-        if (networkState === 40) {
+        if (wifiStatus.connecting) {
             return "Connecting..."
         }
 
-        if (primaryIsWifi && networkState >= 60) {
+        if (wifiStatus.connected) {
             return "Connected"
         }
 
@@ -297,203 +164,48 @@ PlasmoidItem {
         return "network-wireless-disconnected"
     }
 
-    function toggleWifi() {
-        networkManagerProperties.properties.WirelessEnabled =
-            !root.wifiEnabled
-    }
-
-    function decodeSsid(value) {
-        if (!value || value.length === 0) {
-            return ""
-        }
-
-        try {
-            const bytes = []
-
-            for (let i = 0; i < value.length; ++i) {
-                const item = value[i]
-
-                if (typeof item === "number") {
-                    bytes.push(item)
-                } else if (item && item.value !== undefined) {
-                    bytes.push(Number(item.value))
-                } else {
-                    return ""
-                }
-            }
-
-            let result = ""
-
-            for (let i = 0; i < bytes.length; ++i) {
-                result += String.fromCharCode(bytes[i])
-            }
-
-            return result
-        } catch (error) {
-            console.warn(
-                "KumiOS Control Center: failed to decode SSID:",
-                error
-            )
-
-            return ""
+    BackendChange {
+        id: wifiChange
+        label: "Wi-Fi"
+        available: nmWatcher.registered
+        identity: root.nmPath
+        observed: root.wifiEnabled
+        makeMessage: function(value) {
+            return {service:root.nmService, path:root.nmPath,
+                iface:"org.freedesktop.DBus.Properties", member:"Set", signature:"(ssv)",
+                arguments:[root.nmInterface, "WirelessEnabled", new DBus.variant(value)]}
         }
     }
-
-    function toggleBluetooth() {
-        if (!root.bluetoothAvailable) {
-            return
+    BackendChange {
+        id: brightnessChange
+        bus: DBus.SessionBus
+        label: "Brightness"
+        available: brightnessWatcher.registered && root.brightnessAvailable
+        identity: root.brightnessDisplayPath
+        observed: root.brightnessValue
+        makeMessage: function(value) {
+            return {service:root.brightnessService, path:root.brightnessDisplayPath,
+                iface:root.brightnessDisplayInterface, member:"SetBrightness", signature:"(iu)",
+                arguments:[new DBus.int32(value), new DBus.uint32(1)]}
         }
-
-        bluetoothProperties.properties.Powered =
-            !root.bluetoothPowered
     }
-
-    function refreshBluetoothDevices() {
-        if (!root.bluetoothAvailable) {
-            root.connectedBluetoothName = ""
-            return
-        }
-
-        const reply = DBus.SystemBus.asyncCall(
-            root.bluetoothObjectsMessage
-        )
-
-        reply.finished.connect(function() {
-            if (reply.isError) {
-                console.warn(
-                    "KumiOS Control Center: failed to read Bluetooth devices:",
-                    reply.error.message
-                )
-
-                root.connectedBluetoothName = ""
-                reply.destroy()
-                return
-            }
-
-            const objects = reply.value
-            let connectedName = ""
-
-            for (const objectPath in objects) {
-                const interfaces = objects[objectPath]
-
-                if (!interfaces) {
-                    continue
-                }
-
-                const device = interfaces["org.bluez.Device1"]
-
-                if (!device) {
-                    continue
-                }
-
-                const connectedValue = device.Connected
-
-                const connected =
-                    connectedValue
-                    && connectedValue.value !== undefined
-                        ? Boolean(connectedValue.value)
-                        : Boolean(connectedValue)
-
-                if (!connected) {
-                    continue
-                }
-
-                const aliasValue = device.Alias
-
-                if (
-                    aliasValue
-                    && aliasValue.value !== undefined
-                ) {
-                    connectedName = String(aliasValue.value)
-                } else if (aliasValue !== undefined) {
-                    connectedName = String(aliasValue)
-                }
-
-                if (connectedName.length > 0) {
-                    break
-                }
-            }
-
-            root.connectedBluetoothName = connectedName
-
-            reply.destroy()
-        })
-    }
-
+    function toggleWifi() { wifiChange.set(!root.wifiEnabled) }
+    function toggleBluetooth() { bluetooth.toggle() }
     function setBrightness(ratio) {
-        if (!root.brightnessAvailable) {
-            return
-        }
-
-        const clamped = Math.max(
-            0.0,
-            Math.min(1.0, ratio)
-        )
-
-        const target = Math.round(
-            clamped * root.brightnessMax
-        )
-
-        root.brightnessSetMessage.path =
-            root.brightnessDisplayPath
-
-        root.brightnessSetMessage.arguments = [
-            new DBus.int32(target),
-            new DBus.uint32(1)
-        ]
-
-        const reply = DBus.SessionBus.asyncCall(
-            root.brightnessSetMessage
-        )
-
-        reply.finished.connect(function() {
-            if (reply.isError) {
-                console.warn(
-                    "KumiOS Control Center: brightness change failed:",
-                    reply.error.message
-                )
-            }
-
-            reply.destroy()
-        })
+        if (!Number.isFinite(ratio)) return
+        brightnessChange.set(Math.round(Math.max(0, Math.min(1, ratio)) * root.brightnessMax))
     }
-
     DBus.DBusServiceWatcher {
-        id: audioServiceWatcher
-
-        busType: DBus.BusType.Session
-        watchedService: root.audioService
-
-        onRegisteredChanged: {
-            root.audioAvailable = registered
-
-            if (registered) {
-                audioProperties.updateAll()
-            }
-        }
+        id: nmWatcher
+        busType: DBus.BusType.System
+        watchedService: root.nmService
+        onRegisteredChanged: if (registered) networkManagerProperties.updateAll()
     }
-
-    DBus.Properties {
-        id: audioProperties
-
+    DBus.DBusServiceWatcher {
+        id: brightnessWatcher
         busType: DBus.BusType.Session
-        service: root.audioService
-        path: root.audioPath
-        iface: root.audioInterface
-
-        onRefreshed: {
-            root.audioAvailable = true
-        }
-
-        onPropertiesChanged: function(
-            interfaceName,
-            changedProperties,
-            invalidatedProperties
-        ) {
-            if (interfaceName === root.audioInterface) {
-                root.audioAvailable = true
-            }
-        }
+        watchedService: root.brightnessService
+        onRegisteredChanged: if (registered) brightnessRootProperties.updateAll()
     }
 
     DBus.Properties {
@@ -503,107 +215,6 @@ PlasmoidItem {
         service: root.nmService
         path: root.nmPath
         iface: root.nmInterface
-    }
-
-    DBus.Properties {
-        id: activeConnectionProperties
-
-        busType: DBus.BusType.System
-        service: root.nmService
-
-        path: root.primaryIsWifi
-            ? root.primaryConnectionPath
-            : "/"
-
-        iface:
-            "org.freedesktop.NetworkManager.Connection.Active"
-    }
-
-    DBus.Properties {
-        id: accessPointProperties
-
-        busType: DBus.BusType.System
-        service: root.nmService
-
-        path: root.activeAccessPointPath
-
-        iface:
-            "org.freedesktop.NetworkManager.AccessPoint"
-    }
-
-    DBus.DBusServiceWatcher {
-        id: bluetoothServiceWatcher
-
-        busType: DBus.BusType.System
-        watchedService: root.bluetoothService
-
-        onRegisteredChanged: {
-            root.bluetoothAvailable = registered
-
-            if (registered) {
-                bluetoothProperties.updateAll()
-                root.refreshBluetoothDevices()
-            } else {
-                root.connectedBluetoothName = ""
-            }
-        }
-    }
-
-    DBus.Properties {
-        id: bluetoothProperties
-
-        busType: DBus.BusType.System
-        service: root.bluetoothService
-        path: root.bluetoothPath
-        iface: root.bluetoothInterface
-
-        onRefreshed: {
-            root.bluetoothAvailable = true
-            root.refreshBluetoothDevices()
-        }
-
-        onPropertiesChanged: function(
-            interfaceName,
-            changedProperties,
-            invalidatedProperties
-        ) {
-            if (interfaceName === root.bluetoothInterface) {
-                root.bluetoothAvailable = true
-                root.refreshBluetoothDevices()
-            }
-        }
-    }
-
-    DBus.SignalWatcher {
-        busType: DBus.BusType.System
-        service: root.bluetoothService
-        path: "/"
-        iface: "org.freedesktop.DBus.ObjectManager"
-
-        function dbusInterfacesAdded(
-            objectPath,
-            interfaces
-        ) {
-            root.refreshBluetoothDevices()
-        }
-
-        function dbusInterfacesRemoved(
-            objectPath,
-            interfaces
-        ) {
-            root.refreshBluetoothDevices()
-        }
-    }
-
-    Timer {
-        interval: 2000
-        repeat: true
-        running: root.bluetoothAvailable
-            && root.bluetoothPowered
-
-        onTriggered: {
-            root.refreshBluetoothDevices()
-        }
     }
 
     DBus.Properties {
@@ -731,14 +342,25 @@ PlasmoidItem {
                     subtitle: root.bluetoothSubtitle
                     iconName: "bluetooth"
 
-                    enabled: root.bluetoothAvailable
-
                     onClicked: root.toggleBluetooth()
                     onDetailsRequested: {
                         root.expanded = false
                         KCM.KCMLauncher.open("kcm_bluetooth")
                     }
                 }
+            }
+
+            Controls.Label {
+                Layout.fillWidth: true
+                visible: root.currentPage === "home" && text.length > 0
+                text: [wifiChange.error, bluetooth.error].filter(Boolean).join("\n")
+                    Controls.ToolTip.visible: radioErrorHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: radioErrorHover }
+                wrapMode: Text.Wrap
+                maximumLineCount: 3
+                elide: Text.ElideRight
+                color: Kirigami.Theme.negativeTextColor
             }
 
             ColumnLayout {
@@ -775,7 +397,10 @@ PlasmoidItem {
                     spacing: Kirigami.Units.mediumSpacing
 
                     Controls.ToolButton {
-                        enabled: root.audioAvailable
+                        enabled: root.audioAvailable && !audio.output.busy
+                        Accessible.name: root.muted ? "Unmute output" : "Mute output"
+                        Controls.ToolTip.visible: hovered
+                        Controls.ToolTip.text: Accessible.name
 
                         onClicked: root.toggleMuted()
 
@@ -789,20 +414,25 @@ PlasmoidItem {
 
                     Controls.Slider {
                         id: volumeSlider
+                        Accessible.name: "Output volume"
 
                         Layout.fillWidth: true
 
-                        enabled: root.audioAvailable
+                        enabled: audio.output.volumeWritable && !audio.output.busy
 
                         from: 0.0
                         to: 1.0
                         stepSize: 0.01
 
-                        value: root.volume
-
-                        onMoved: {
-                            root.setVolume(value)
+                        Binding on value {
+                            value: root.volume
+                            when: !volumeSlider.pressed && !audio.output.busy
+                            restoreMode: Binding.RestoreNone
                         }
+
+                        // Commit on release so a drag does not queue competing writes.
+                        onPressedChanged: if (!pressed) root.setVolume(value)
+                        onMoved: if (!pressed) root.setVolume(value)
                     }
                 }
 
@@ -810,6 +440,9 @@ PlasmoidItem {
                     Layout.fillWidth: true
 
                     text: root.deviceName
+                    Controls.ToolTip.visible: outputDeviceHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: outputDeviceHover }
 
                     opacity: 0.6
                     font.pixelSize: 11
@@ -817,6 +450,50 @@ PlasmoidItem {
                     elide: Text.ElideRight
                 }
 
+                RowLayout {
+                    Layout.fillWidth: true
+                    Controls.ToolButton {
+                        objectName: "microphoneMute"
+                        enabled: audio.input.available && !audio.input.busy
+                        icon.name: audio.input.muted ? "microphone-sensitivity-muted" : "microphone-sensitivity-high"
+                        text: audio.input.muted ? "Unmute mic" : "Mute mic"
+                        Accessible.name: text
+                        onClicked: audio.input.toggleMuted()
+                    }
+                    Controls.Label {
+                        Layout.fillWidth: true
+                        text: audio.input.deviceName
+                        elide: Text.ElideRight
+                        Controls.ToolTip.visible: hovered
+                        Controls.ToolTip.text: text
+                        property bool hovered: micHover.hovered
+                        HoverHandler { id: micHover }
+                    }
+                }
+                Controls.Label {
+                    Layout.fillWidth: true
+                    visible: audio.output.busy || audio.input.busy
+                    text: "Applying audio change…"
+                }
+                Controls.Label {
+                    Layout.fillWidth: true
+                    visible: text.length > 0
+                    text: [audio.output.error, audio.input.error].filter(Boolean).join("\n")
+                    Controls.ToolTip.visible: audioErrorHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: audioErrorHover }
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 3
+                    elide: Text.ElideRight
+                    color: Kirigami.Theme.negativeTextColor
+                }
+
+                Controls.Button {
+                    visible: !audio.ready
+                    text: audio.retrying ? "Reconnecting audio…" : "Retry audio"
+                    enabled: !audio.retrying
+                    onClicked: audio.retry()
+                }
                 Controls.Button {
                     Layout.fillWidth: true
                     text: "Devices & Microphone…"
@@ -869,22 +546,24 @@ PlasmoidItem {
                     }
 
                     Controls.Slider {
+                        id: brightnessSlider
+                        Accessible.name: "Display brightness"
                         Layout.fillWidth: true
 
-                        enabled: root.brightnessAvailable
+                        enabled: brightnessChange.available && !brightnessChange.busy
 
                         from: 0.0
                         to: 1.0
                         stepSize: 0.01
 
-                        value: root.brightnessAvailable
-                            ? root.brightnessValue
-                                / root.brightnessMax
-                            : 0.0
-
-                        onMoved: {
-                            root.setBrightness(value)
+                        Binding on value {
+                            value: root.brightnessAvailable ? root.brightnessValue / root.brightnessMax : 0
+                            when: !brightnessSlider.pressed && !brightnessChange.busy
+                            restoreMode: Binding.RestoreNone
                         }
+
+                        onPressedChanged: if (!pressed) root.setBrightness(value)
+                        onMoved: if (!pressed) root.setBrightness(value)
                     }
 
                     Kirigami.Icon {
@@ -905,6 +584,24 @@ PlasmoidItem {
 
                     elide: Text.ElideRight
                 }
+                Controls.Label {
+                    Layout.fillWidth: true
+                    visible: brightnessChange.busy || brightnessChange.error.length > 0
+                    text: brightnessChange.busy ? "Applying brightness…" : brightnessChange.error
+                    Controls.ToolTip.visible: brightnessErrorHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: brightnessErrorHover }
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 3
+                    elide: Text.ElideRight
+                    color: Kirigami.Theme.negativeTextColor
+                }
+                Controls.ToolButton {
+                    text: "Display settings…"
+                    icon.name: "configure"
+                    onClicked: { root.expanded = false; KCM.KCMLauncher.open("kcm_kscreen") }
+                }
+
             }
 
             WiFiDetails {
@@ -913,8 +610,7 @@ PlasmoidItem {
                 visible: root.currentPage === "wifi"
 
                 wifiEnabled: root.wifiEnabled
-                connected: root.primaryIsWifi
-                    && root.networkConnected
+                connected: root.networkConnected
                 ssid: root.connectedSsid
             }
         }
@@ -926,6 +622,7 @@ PlasmoidItem {
         required property string iconName
 
         signal detailsRequested()
+        Accessible.name: title + ": " + subtitle
 
         Layout.fillWidth: true
         implicitHeight: 72
@@ -953,6 +650,11 @@ PlasmoidItem {
 
                 Controls.Label {
                     text: subtitle
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    Controls.ToolTip.visible: subtitleHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: subtitleHover }
                     opacity: 0.65
                     font.pixelSize: 11
                 }
@@ -960,7 +662,9 @@ PlasmoidItem {
 
             Controls.ToolButton {
                 visible: title.length > 0
-
+                Accessible.name: "Open " + title + " details"
+                Controls.ToolTip.visible: hovered
+                Controls.ToolTip.text: Accessible.name
                 icon.name: "go-next"
 
                 onClicked: detailsRequested()

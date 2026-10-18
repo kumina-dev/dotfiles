@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased
+## Unreleased — 0.2.0-dev
+
+- Control Center uses KDE audio defaults and reconnect handling, with quick
+  microphone mute, actual device labels and optional client-only Retry audio.
+- Bluetooth follows BluezQt adapter/device events rather than hci0 and polling.
+- Wireless connection/SSID state comes from KDE's wireless rows, independently
+  of wired/VPN connectivity. Active-app labels clear when no task is active.
+- Audio, radio and brightness changes show pending state and actionable errors;
+  completion follows observed state, with bounded waits and late-reply protection.
+- Native/read-only and isolated-bus probes complement mock recovery tests.
+- Activated through a user-approved Plasma restart; user acceptance and physical-
+  device checks remain pending. No 0.2.0 tag/publication. KUM-8 remains pending.
 
 ## 0.1.0 — 2026-10-18
 

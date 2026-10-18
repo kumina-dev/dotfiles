@@ -38,12 +38,18 @@ def preflight():
     if missing:
         raise RuntimeError("Missing KDE widgets: " + ", ".join(sorted(missing)))
     modules = {line.split()[0] for line in run("kcmshell6", "--list").splitlines() if line.split()}
-    for module in ("kcm_bluetooth", "kcm_pulseaudio", "kcm_about-distro"):
+    for module in ("kcm_bluetooth", "kcm_pulseaudio", "kcm_about-distro", "kcm_kscreen"):
         if module not in modules:
             raise RuntimeError("Missing KDE settings module: " + module)
-    # The current presentation still needs this existing service; don't silently
-    # provision dependencies or enable services as a side effect of layout setup.
-    run("systemctl", "--user", "is-active", "kumi-audio.service")
+    # Discover Qt's module root from its own runtime, including Arch's sibling
+    # binaries when qtpaths6 is not on PATH. No custom audio service is needed.
+    qtpaths = shutil.which("qtpaths6") or str(Path(shutil.which("qdbus6")).resolve().with_name("qtpaths6"))
+    modules_root = Path(run(qtpaths, "--query", "QT_INSTALL_QML"))
+    for module in ("org/kde/plasma/private/volume", "org/kde/bluezqt", "org/kde/kcmutils"):
+        if not (modules_root / module / "qmldir").is_file():
+            raise RuntimeError("Missing KDE QML module: " + module)
+    # Read-only connection check; never changes volume or enables services.
+    run("pactl", "info")
     for location, kind in (("top", "org.kumios.systemmenu"),
                            ("bottom", "org.kde.plasma.icontasks")):
         matches = [p for p in inventory["panels"] if p["location"] == location and
@@ -88,11 +94,13 @@ def main():
     mode.add_argument("--check", action="store_true", help="read-only preflight (default)")
     mode.add_argument("--apply-layout", action="store_true",
                       help="install widgets and change live panels; obtain session approval first")
+    mode.add_argument("--install-widgets", action="store_true",
+                      help="back up and install widget files without changing panels or restarting Plasma")
     args = parser.parse_args()
     inventory = preflight()
-    print("Preflight passed: KDE dashboard, settings modules and KumiOS audio are available.")
+    print("Preflight passed: KDE dashboard, settings/audio/Bluetooth modules and audio backend are available.")
     print("Top bar + centered dock; existing panels and dock pins will be retained.")
-    if not args.apply_layout:
+    if not args.apply_layout and not args.install_widgets:
         print("Read-only check: no files or panels changed.")
         return
     config = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config")))
@@ -101,6 +109,10 @@ def main():
     print("Backup: " + str(target), flush=True)
     for source in (SOURCE / "plasmoids").iterdir():
         shutil.copytree(source, data / "plasma/plasmoids" / source.name, dirs_exist_ok=True)
+    if args.install_widgets:
+        print("Installed widget files only. No layout change or desktop restart performed.")
+        print("Existing QML may stay cached. Obtain approval before restarting Plasma.")
+        return
     result = plasma("evaluateScript", (SOURCE / "shell/layout-v2.js").read_text())
     if "KumiOS layout reconciled;" not in result:
         raise RuntimeError("Layout did not report success: " + result +

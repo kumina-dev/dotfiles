@@ -4,6 +4,36 @@ Personal Arch Linux + Hyprland desktop environment with familiar Windows-style s
 
 The desktop is built around a small set of custom GTK utilities alongside standard Linux components. The current focus is a reliable daily-driver environment before deeper integrations and visual polish.
 
+## Plasma appearance defaults
+
+The current KumiOS Plasma design uses its custom desktop style with Breeze Dark
+application colors. Apply the same appearance on this desktop or a future Plasma
+6 installation from a terminal in the logged-in desktop session:
+
+```sh
+~/dotfiles/plasma/apply-defaults.sh
+```
+
+Requires Plasma's `plasma-apply-colorscheme`, `plasma-apply-desktoptheme`,
+`kwriteconfig6`, Python 3, and the Breeze Dark color scheme/GTK theme. The command
+installs the repository's KumiOS desktop style, applies Breeze Dark, and sets GTK
+3/4 and (when available) GNOME/libadwaita dark preferences. Reopening an application
+may be necessary. Applications with their own appearance settings may need those
+settings adjusted separately.
+
+Each run prints a backup directory under `~/.config/kumios/appearance-backup-*`
+(or `$XDG_CONFIG_HOME/kumios`). It saves the previous KDE and GTK settings and the
+previous installed KumiOS style. GNOME appearance preferences are recorded there
+when available. Restore the saved config files to their original locations and
+reapply the previous color scheme to revert.
+
+This command preserves the current panels, dock, wallpaper, shortcuts, and display
+configuration. It applies appearance defaults to the user running it; run it once
+for each new user after Plasma is installed. It does not provision a complete
+Plasma desktop or automatically seed system-wide accounts. The existing panel
+layout sources are in `plasma/shell/`; `layout-v2.js` replaces panels when explicitly
+run through Plasma's scripting console.
+
 ## Versioning
 
 The development version is stored in [hypr/.config/hypr/VERSION](hypr/.config/hypr/VERSION). Settings reads that same installed file for About and copied system information.

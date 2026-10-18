@@ -54,6 +54,11 @@ and microphone mute agree with KDE; Tab navigation, slider arrow keys, tooltips,
 Escape dismissal, popup fit and native settings links work. This covers current-session
 audio and popup interaction only; hardware transitions and recovery remain pending.
 
+The user also passed all three desktop/status checks on 2026-10-18: active-app
+labels follow two applications and clear on showing the desktop; current Wi-Fi
+name/status agrees with KDE; Meta+Space opens the usual dashboard and the top
+bar/dock behave normally. Network/radio transition behavior remains unverified.
+
 Resume audit on 2026-10-18 at source HEAD `bfb21cd`: all eight documented
 suites/probes passed (82 checks including Qt lifecycle checks). Read-only preflight
 passed, all 15 installed widget files matched source, and Plasma, KWin, PipeWire,
@@ -97,7 +102,8 @@ performed or explicitly resolved through an acceptance/scope decision.
       when convenient. Multiple adapters require appropriate hardware.
 - [ ] Wi-Fi radio/network changes, brightness, and pending/error presentation.
 - [x] Popup sizing at the user's scale, keyboard controls, tooltips and settings links (user passed).
-- [ ] Unchanged launcher/top-bar/dock experience and live active-app/network status.
+- [x] Launcher/top-bar/dock experience, active-app switching/clearing and current Wi-Fi status (user passed).
+- [ ] Wi-Fi status through physical network/radio transitions.
 - [ ] Actual audio-daemon restart recovery remains unverified; do not interrupt
       active audio to test it without explicit authorization.
 

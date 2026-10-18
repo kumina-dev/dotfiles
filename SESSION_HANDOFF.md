@@ -71,8 +71,10 @@ errors were observed. This audit read current shell/audio health without another
 restart. Activation is complete, not pending. Widget files match source.
 
 User passed live output/mic labels and controls, keyboard/popup/tooltips/settings
-links on 2026-10-18. Still unverified: active-app/network transitions and desktop
-experience, physical hotplug/default switches, Bluetooth reconnect/adapters, radio/brightness transitions,
+links on 2026-10-18. User also passed active-app switching/clearing, current Wi-Fi
+status against KDE, Meta+Space dashboard and top-bar/dock behavior.
+Still unverified: physical hotplug/default switches, Bluetooth reconnect/adapters,
+network/radio/brightness transitions, live error/retry presentation,
 and audio-daemon restart recovery. KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.

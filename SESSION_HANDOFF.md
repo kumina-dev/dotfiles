@@ -73,8 +73,10 @@ restart. Activation is complete, not pending. Widget files match source.
 User passed live output/mic labels and controls, keyboard/popup/tooltips/settings
 links on 2026-10-18. User also passed active-app switching/clearing, current Wi-Fi
 status against KDE, Meta+Space dashboard and top-bar/dock behavior.
-Still unverified: physical hotplug/default switches, Bluetooth reconnect/adapters,
-network/radio/brightness transitions, live error/retry presentation,
+User also passed audio unplug/replug/default switching and recovery, Bluetooth
+reconnect/name/state/settings access, and brightness adjustment/restoration.
+Still unverified: Bluetooth adapter/power/blocked states, network/radio transitions,
+live error/retry presentation,
 and audio-daemon restart recovery. KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.

@@ -52,12 +52,19 @@ Partial user acceptance recorded 2026-10-18: the user reported all three guided
 checks passed: input/output labels agree with KDE Audio; output volume, output mute
 and microphone mute agree with KDE; Tab navigation, slider arrow keys, tooltips,
 Escape dismissal, popup fit and native settings links work. This covers current-session
-audio and popup interaction only; hardware transitions and recovery remain pending.
+audio and popup interaction; further physical evidence is recorded below.
 
 The user also passed all three desktop/status checks on 2026-10-18: active-app
 labels follow two applications and clear on showing the desktop; current Wi-Fi
 name/status agrees with KDE; Meta+Space opens the usual dashboard and the top
 bar/dock behave normally. Network/radio transition behavior remains unverified.
+
+User passed the next three guided checks on 2026-10-18: audio unplug/replug and
+KDE default switching with labels/controls following and recovering; spare Bluetooth
+device reconnect with name/state updates and native settings accessible; brightness
+adjustment/restoration without a stuck control. This does not establish Bluetooth
+power/adapter changes, network/radio changes, live error/retry presentation or actual
+audio-daemon restart recovery.
 
 Resume audit on 2026-10-18 at source HEAD `bfb21cd`: all eight documented
 suites/probes passed (82 checks including Qt lifecycle checks). Read-only preflight
@@ -97,10 +104,11 @@ remains untested. Missing physical/error scenarios remain open evidence gaps unt
 performed or explicitly resolved through an acceptance/scope decision.
 
 - [x] Output volume/mute, input/output names and quick microphone mute (user passed).
-- [ ] Headset/microphone unplug/replug and changing defaults through KDE settings.
-- [ ] Bluetooth device-name/reconnect updates; adapter removal/power changes only
-      when convenient. Multiple adapters require appropriate hardware.
-- [ ] Wi-Fi radio/network changes, brightness, and pending/error presentation.
+- [x] Audio unplug/replug and changing defaults through KDE settings (user passed).
+- [x] Bluetooth device-name/reconnect updates and native settings access (user passed).
+- [ ] Bluetooth adapter removal/power/blocked states; multiple adapters need appropriate hardware.
+- [x] Brightness adjustment/restoration without a stuck control (user passed).
+- [ ] Live pending/error/retry presentation.
 - [x] Popup sizing at the user's scale, keyboard controls, tooltips and settings links (user passed).
 - [x] Launcher/top-bar/dock experience, active-app switching/clearing and current Wi-Fi status (user passed).
 - [ ] Wi-Fi status through physical network/radio transitions.
@@ -119,7 +127,8 @@ v0.2.0. No new feature milestone should start before the current acceptance chec
 KDE's audio QML API is private and needs compatibility validation after KDE upgrades.
 The legacy audio service remains installed for compatibility; new controls do not
 use it. Setup updates the existing desktop rather than provisioning a fresh machine.
-Tests have not established multi-adapter selection or physical recovery reliability.
+Physical audio hotplug/default recovery and Bluetooth reconnect have user evidence;
+multi-adapter selection and daemon-restart recovery remain unverified.
 
 Next: collect the outstanding manual results when the user is ready; fix only
 observed regressions, revalidate affected units, and request acceptance before any

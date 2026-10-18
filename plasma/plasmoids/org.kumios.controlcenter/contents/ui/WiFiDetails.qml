@@ -2,7 +2,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
-import QtQml.Models
+import org.kde.kitemmodels as KItemModels
 
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.networkmanagement as PlasmaNM
@@ -20,23 +20,14 @@ ColumnLayout {
         id: networkModel
     }
 
-    Connections {
-        target: networkProxy
-
-        function onRowsInserted(parent, first, last) {
-            console.log(
-                "KumiOS Wi-Fi: rows inserted:",
-                first, last,
-                "total:", networkProxy.rowCount()
-            )
-        }
-
-        function onModelReset() {
-            console.log(
-                "KumiOS Wi-Fi: model reset:",
-                networkProxy.rowCount()
-            )
-        }
+    // Filter before layout so wired/VPN entries do not occupy list rows.
+    KItemModels.KSortFilterProxyModel {
+        id: networkProxy
+        sourceModel: networkModel
+        filterRoleName: "Type"
+        filterRegularExpression: "^" + PlasmaNM.Enums.Wireless + "$"
+        sortRoleName: "Signal"
+        sortOrder: Qt.DescendingOrder
     }
 
     Controls.Label {
@@ -114,27 +105,27 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: Math.min(contentHeight, 220)
 
+        visible: root.wifiEnabled
         clip: true
         spacing: 0
 
-        model: networkModel
+        model: networkProxy
+
+        Controls.ScrollBar.vertical: Controls.ScrollBar {}
 
         delegate: Controls.ItemDelegate {
             id: networkItem
 
             required property var model
 
-            readonly property bool isWireless:
-                model.Type === 14
-
             readonly property bool isConnected:
                 model.ConnectionState ===
                     PlasmaNM.Enums.Activated
 
             width: ListView.view.width
-            height: isWireless ? 52 : 0
-            visible: isWireless
-            enabled: false
+            height: 52
+            // Discovery is read-only until connection handling is implemented.
+            hoverEnabled: false
 
             contentItem: RowLayout {
                 spacing: Kirigami.Units.mediumSpacing
@@ -153,7 +144,7 @@ ColumnLayout {
 
                     Controls.Label {
                         Layout.fillWidth: true
-                        text: model.ItemUniqueName
+                        text: model.Ssid || model.ItemUniqueName
                             || "Unknown network"
                         elide: Text.ElideRight
                     }
@@ -179,4 +170,13 @@ ColumnLayout {
             }
         }
     }
+
+    Controls.Label {
+        Layout.fillWidth: true
+        visible: root.wifiEnabled && networkList.count === 0
+        text: "No Wi-Fi networks found"
+        opacity: 0.65
+        wrapMode: Text.WordWrap
+    }
+
 }

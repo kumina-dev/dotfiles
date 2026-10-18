@@ -34,6 +34,15 @@ Plasma desktop or automatically seed system-wide accounts. The existing panel
 layout sources are in `plasma/shell/`; `layout-v2.js` replaces panels when explicitly
 run through Plasma's scripting console.
 
+## Plasma Control Center
+
+The Plasma widget sources are in `plasma/plasmoids/org.kumios.controlcenter`.
+Its Wi-Fi detail page shows discovered wireless networks ordered by signal
+strength, security labels, and a checkmark for active connections. The list is
+hidden while Wi-Fi is off and shows an empty message when no networks are
+available. It requires Plasma Network Management and KDE's `org.kde.kitemmodels`
+QML module. Network selection and connection handling in this view remain pending.
+
 ## Versioning
 
 The development version is stored in [hypr/.config/hypr/VERSION](hypr/.config/hypr/VERSION). Settings reads that same installed file for About and copied system information.

@@ -35,7 +35,7 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 | Issues | State at handoff | Remaining outcome |
 | --- | --- | --- |
 | KUM-5–7 | Done | v0.1.0 outcomes accepted; no reimplementation |
-| KUM-8 | Todo, outside v0.2.0 | User's later voluntary login/reboot layout/pin check; unverified |
+| KUM-8 | Done, outside v0.2.0 | User reported login/reboot persistence check passed on 2026-10-18 |
 | KUM-9–12 | In Review | Implemented, automatically checked, installed and activated; user/manual acceptance pending |
 
 [Project](https://linear.app/kumina/project/kumios-83beb6551c62).
@@ -60,8 +60,10 @@ No new architecture, authentication migration or provisioning work is approved h
 Canonical evidence: `plasma/verification-0.2.0.md` (includes test scopes/limits).
 At this checkpoint, standard QML 57, Node 5, Python 4 and private-bus 5 checks
 passed again; preflight, installed-source equality and Git whitespace checks pass.
-Earlier native audio-client reconnect/device-read/offscreen probes passed; those
-were not repeated merely to change documentation.
+Native audio-client reconnect/device-read/offscreen probes also passed in the
+autonomous resume audit (82 total suite/probe checks). All 15 installed widget files
+match source; Plasma/KWin/audio services are active. The verification report now
+contains an ordered hands-on sequence; no manual acceptance has been inferred.
 
 The prior explicitly approved Plasma restart succeeded. Post-restart inventory
 preserved panel/widget identities, order and launcher shortcut; no widget-load
@@ -70,13 +72,16 @@ restart. Activation is complete, not pending. Widget files match source.
 
 Still unverified: live v0.2.0 output/mic/keyboard/popup acceptance, physical device
 hotplug/default switches, Bluetooth reconnect/adapters, radio/brightness transitions,
-and audio-daemon restart recovery. KUM-8's full-session persistence check is separate.
+and audio-daemon restart recovery. KUM-8's separate full-session persistence check
+was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.
 
 ## Next authorized action
 
 Collect the user's v0.2.0 manual results when ready; the shared report lists the
-short checklist. Fix observed regressions only, validate affected units, make local
+ordered hands-on sequence. Resume audit found no automated regression at bfb21cd;
+GitHub/local/remote agreed with 0/0 divergence before this documentation checkpoint.
+Fix observed regressions only, validate affected units, make local
 checkpoint commits, push and verify the relevant remote branch, and update the
 relevant issue plus shared evidence once per meaningful transition. Do not start a new feature milestone or force KUM-8.
 

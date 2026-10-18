@@ -14,8 +14,8 @@ maintained KDE components before building custom backends.
   quick-control feedback. Implemented and activated; acceptance pending. Current
   evidence/gates: [verification](plasma/verification-0.2.0.md); authoritative issue
   state is in Linear KUM-9–12, not duplicated as checkboxes here.
-- **KUM-8:** remains separately pending the user's voluntary login/reboot layout
-  and pinned-app persistence check. Never trigger or silently waive that check.
+- **KUM-8:** user reported the voluntary login/reboot layout and pinned-app
+  persistence check passed on 2026-10-18; acceptance is recorded in Linear.
 
 Do not start another feature milestone before resolving the current checkpoint
 with the user. No v0.2.0 release action before acceptance and authorization.

@@ -35,9 +35,9 @@ checkpoints; remote synchronization is separate from manual/release acceptance.
 | Node layout suite | 5 passed; re-run | Reconciliation/failure behavior with API doubles; not physical persistence |
 | Python setup suite | 4 passed; re-run | Preflight boundaries, backups and widget-only installation without layout evaluation |
 | Private D-Bus probe | 5 checks passed; re-run | Actual `(ssv)` boolean and `(iu)` brightness marshalling, observed-state notifications and permission errors on a fake private service |
-| Native audio probe | 4 checks passed during implementation | Reads real default devices; only the test client's connection is reconnected and defaults recover. No daemon restart or device/mute/volume/routing writes |
-| Native device probe | 4 checks passed during implementation | Read-only BluezQt adapter and PlasmaNM wireless discovery; no scan, pairing or radio/network change |
-| Offscreen popup probe | 3 checks passed during implementation | Construction and default-font geometry (preferred height 358); not live scaling or worst-case error layout |
+| Native audio probe | 4 checks passed; re-run at this checkpoint | Reads real default devices; only the test client's connection is reconnected and defaults recover. No daemon restart or device/mute/volume/routing writes |
+| Native device probe | 4 checks passed; re-run at this checkpoint | Read-only BluezQt adapter and PlasmaNM wireless discovery; no scan, pairing or radio/network change |
+| Offscreen popup probe | 3 checks passed; re-run at this checkpoint | Construction and default-font geometry (preferred height 358); not live scaling or worst-case error layout |
 | Read-only preflight, installed-source comparison, whitespace checks | Passed at this checkpoint | Current dependencies/audio reachability, copied widget equality and diff hygiene |
 
 Qt counts include suite lifecycle checks. Model/endpoint doubles do not prove
@@ -50,6 +50,43 @@ were observed. Do not treat these warnings as verified user-facing defects.
 
 No user acceptance of the activated v0.2.0 controls has been recorded yet.
 
+Resume audit on 2026-10-18 at source HEAD `bfb21cd`: all eight documented
+suites/probes passed (82 checks including Qt lifecycle checks). Read-only preflight
+passed, all 15 installed widget files matched source, and Plasma, KWin, PipeWire,
+pipewire-pulse and WirePlumber were active. GitHub metadata and fetched Git agreed
+on the repository; development HEAD matched the actual remote with 0/0 divergence.
+No source changes, desktop restarts or live device writes were needed.
+
+Hands-on sequence; report each group as pass, fail (with symptom), or untested.
+Restore your original settings after intentional changes. Do device/network changes
+only when they will not interrupt work; do not send device or network identifiers.
+
+1. **KUM-9 / KUM-12 — audio and presentation:** open Control Center; compare input/
+   output labels and mute states with KDE Audio settings. Make a small output-volume
+   change, mute/unmute output and microphone, and verify KDE agrees after each.
+   No microphone recording is required. Check Tab/Shift+Tab, slider arrow keys,
+   tooltips, Escape dismissal and popup fit at your normal display scale. Confirm
+   no stuck pending state and that settings links open the correct native page.
+2. **KUM-11 — desktop/status:** switch between two applications, then show the
+   desktop; confirm the active-app label follows the task and clears when none is
+   valid. Check current Wi-Fi status against KDE. Confirm Meta+Space opens the usual
+   dashboard and the top bar/dock still behave as expected.
+3. **KUM-9–12 — hardware/transitions, when convenient:** unplug/replug an unused
+   headset/microphone and change defaults in KDE; confirm names/controls recover.
+   Reconnect a spare Bluetooth device and observe its name/state; test power only
+   if no keyboard, pointer or active audio depends on it. Test Wi-Fi off/on or a
+   network change only with a safe connection plan; verify wired/VPN alone is not
+   labelled Wi-Fi. Move brightness slightly and restore it. For any naturally
+   occurring error, check readable detail, native settings recovery and retry;
+   do not manufacture a disruptive failure. Record unavailable hardware as untested.
+4. **KUM-8 — passed:** user reported “Login/reboot check passed” on 2026-10-18
+   after being given the layout/dashboard/dock/pins persistence criteria. This is
+   user acceptance evidence for the normal session boundary, separate from probes.
+
+Audio-daemon restart recovery needs a separately approved maintenance action and
+remains untested. Missing physical/error scenarios remain open evidence gaps until
+performed or explicitly resolved through an acceptance/scope decision.
+
 - [ ] Output volume/mute, input/output names and quick microphone mute.
 - [ ] Headset/microphone unplug/replug and changing defaults through KDE settings.
 - [ ] Bluetooth device-name/reconnect updates; adapter removal/power changes only
@@ -60,9 +97,10 @@ No user acceptance of the activated v0.2.0 controls has been recorded yet.
 - [ ] Actual audio-daemon restart recovery remains unverified; do not interrupt
       active audio to test it without explicit authorization.
 
-[KUM-8](https://linear.app/kumina/issue/KUM-8) remains **Todo**, pending only the
-user's later layout/pin persistence check across a voluntary login/reboot. It is
-outside this milestone; a shell restart or automated test does not complete it.
+[KUM-8](https://linear.app/kumina/issue/KUM-8) is **Done**: the user reported the
+voluntary login/reboot layout/pin persistence check passed on 2026-10-18. It remains
+outside this milestone. This user report supplies the evidence a shell restart or
+automated test could not establish.
 The user accepted releasing v0.1.0 before that check, not automatic acceptance of
 v0.2.0. No new feature milestone should start before the current acceptance checkpoint.
 

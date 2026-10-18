@@ -17,12 +17,36 @@ ColumnLayout {
     property var networkSource: networkModel
     property var discoveryHandler: networkHandler
     property alias connection: connection
+    property var pendingForget: null
     readonly property int networkCount: networkProxy.count
 
     spacing: Kirigami.Units.mediumSpacing
 
     WiFiConnection { id: connection }
     PlasmaNM.Handler { id: networkHandler }
+
+    function requestForget(network) {
+        if (connection.busy || pendingForget || !network.Uuid || !network.ConnectionPath
+            || network.ConnectionPath === "/") return
+        pendingForget = {
+            Ssid: String(network.Ssid || network.ItemUniqueName || "Wi-Fi network"),
+            ItemUniqueName: String(network.ItemUniqueName || ""),
+            ProfileName: String(network.Name || network.ItemUniqueName || network.Ssid || "Wi-Fi network"),
+            Uuid: String(network.Uuid),
+            ConnectionPath: String(network.ConnectionPath)
+        }
+    }
+
+    function cancelForget() {
+        pendingForget = null
+    }
+
+    function confirmForget() {
+        if (!pendingForget || connection.busy) return
+        const profile = pendingForget
+        pendingForget = null
+        connection.forgetNetwork(profile)
+    }
 
     function refreshNetworks() {
         if (visible && wifiEnabled) {
@@ -31,11 +55,15 @@ ColumnLayout {
     }
 
     Component.onCompleted: refreshNetworks()
-    onVisibleChanged: refreshNetworks()
+    onVisibleChanged: {
+        if (!visible) cancelForget()
+        refreshNetworks()
+    }
 
     onWifiEnabledChanged: {
         refreshNetworks()
         if (!wifiEnabled) {
+            cancelForget()
             if (connection.busy) {
                 connection.cancel()
             } else {
@@ -125,7 +153,7 @@ ColumnLayout {
 
     RowLayout {
         Layout.fillWidth: true
-        visible: root.wifiEnabled
+        visible: root.wifiEnabled && !root.pendingForget
 
         Controls.Label {
             Layout.fillWidth: true
@@ -137,7 +165,7 @@ ColumnLayout {
             text: "Refresh networks"
             icon.name: "view-refresh"
             display: Controls.AbstractButton.IconOnly
-            enabled: !root.discoveryHandler.scanning && !root.connection.busy
+            enabled: !root.discoveryHandler.scanning && !root.connection.busy && !root.pendingForget
             onClicked: root.refreshNetworks()
             Controls.ToolTip.visible: hovered
             Controls.ToolTip.text: text
@@ -150,7 +178,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: Math.min(contentHeight, 220)
 
-        visible: root.wifiEnabled
+        visible: root.wifiEnabled && !root.pendingForget
         clip: true
         spacing: 0
 
@@ -172,7 +200,7 @@ ColumnLayout {
             readonly property bool isActivating:
                 model.ConnectionState === PlasmaNM.Enums.Activating
 
-            enabled: !root.connection.busy && !isActivating
+            enabled: !root.connection.busy && !root.pendingForget && !isActivating
             onClicked: root.connection.connectNetwork(model)
             Accessible.name: (model.Ssid || model.ItemUniqueName || "Wi-Fi network")
                 + (isConnected ? ", connected" : ", connect")
@@ -221,6 +249,18 @@ ColumnLayout {
                 }
 
                 Controls.ToolButton {
+                    objectName: "forgetNetwork"
+                    visible: Boolean(model.Uuid && model.ConnectionPath && model.ConnectionPath !== "/")
+                    icon.name: "edit-delete"
+                    text: "Forget saved network"
+                    display: Controls.AbstractButton.IconOnly
+                    Accessible.name: "Forget " + (model.Ssid || model.ItemUniqueName || "Wi-Fi network")
+                    onClicked: root.requestForget(model)
+                    Controls.ToolTip.visible: hovered
+                    Controls.ToolTip.text: text
+                }
+
+                Controls.ToolButton {
                     objectName: "disconnectNetwork"
                     visible: networkItem.isConnected
                     icon.name: "network-disconnect"
@@ -245,10 +285,49 @@ ColumnLayout {
 
     Controls.Label {
         Layout.fillWidth: true
-        visible: root.wifiEnabled && networkList.count === 0
+        visible: root.wifiEnabled && !root.pendingForget && networkList.count === 0
         text: root.discoveryHandler.scanning ? "Scanning for Wi-Fi networks…" : "No Wi-Fi networks found"
         opacity: 0.65
         wrapMode: Text.WordWrap
+    }
+
+    ColumnLayout {
+        objectName: "forgetConfirmation"
+        Layout.fillWidth: true
+        visible: root.pendingForget !== null
+
+        Controls.Label {
+            Layout.fillWidth: true
+            text: "Forget “" + (root.pendingForget ? root.pendingForget.Ssid : "") + "”?"
+            textFormat: Text.PlainText
+            font.weight: Font.DemiBold
+            wrapMode: Text.WrapAnywhere
+        }
+        Controls.Label {
+            Layout.fillWidth: true
+            visible: root.pendingForget !== null && root.pendingForget.ProfileName !== root.pendingForget.Ssid
+            text: "Saved profile: " + (root.pendingForget ? root.pendingForget.ProfileName : "")
+            textFormat: Text.PlainText
+            wrapMode: Text.WrapAnywhere
+        }
+        Controls.Label {
+            Layout.fillWidth: true
+            text: "This removes the selected saved profile and its saved password. You may need to enter a password to connect again. If connected, your connection may be interrupted."
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+        }
+        RowLayout {
+            Controls.Button {
+                objectName: "cancelForget"
+                text: "Cancel"
+                onClicked: root.cancelForget()
+            }
+            Controls.Button {
+                objectName: "confirmForget"
+                text: "Forget"
+                onClicked: root.confirmForget()
+            }
+        }
     }
 
     RowLayout {

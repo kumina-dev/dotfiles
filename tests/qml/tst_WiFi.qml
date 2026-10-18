@@ -59,6 +59,8 @@ TestCase {
     }
 
     function init() {
+        view.visible = true
+        view.cancelForget()
         networks.clear()
         runnerSpy.clear()
         bus.calls = []
@@ -305,6 +307,118 @@ TestCase {
         compare(bus.calls.length, 1)
         compare(bus.calls[0].message.member, "Disconnect")
         verify(view.wifiEnabled)
+    }
+
+    function settingsReply(uuid, type) {
+        return {values: [{connection: {uuid: uuid || "saved-profile", type: type || "802-11-wireless"}}]}
+    }
+
+    function test_forgetButtonConfirmsAndCancelDoesNotDelete() {
+        networks.append(network())
+        tryVerify(function() { const button = findChild(view, "forgetNetwork"); return button && button.visible })
+        mouseClick(findChild(view, "forgetNetwork"))
+        verify(view.pendingForget !== null)
+        compare(bus.calls.length, 0)
+        mouseClick(findChild(view, "cancelForget"))
+        compare(view.pendingForget, null)
+        compare(bus.calls.length, 0)
+    }
+
+    function test_forgetConfirmationSurvivesDelegateRemoval() {
+        networks.append(network())
+        waitForRendering(view)
+        tryVerify(function() { const button = findChild(view, "forgetNetwork"); return button && button.visible })
+        mouseClick(findChild(view, "forgetNetwork"))
+        verify(view.pendingForget !== null)
+        networks.clear()
+        waitForRendering(view)
+        mouseClick(findChild(view, "confirmForget"))
+        compare(view.pendingForget, null)
+        verify(view.connection.busy)
+        compare(bus.calls.length, 1)
+        compare(bus.calls[0].message.member, "GetSettings")
+        compare(bus.calls[0].message.path, "/test/profile")
+        bus.calls[0].resolve(settingsReply())
+        compare(bus.calls.length, 2)
+        compare(bus.calls[1].message.member, "Delete")
+        compare(bus.calls[1].message.path, "/test/profile")
+        compare(bus.calls[1].message.iface, "org.freedesktop.NetworkManager.Settings.Connection")
+        verify(view.connection.busy)
+        bus.calls[1].resolve({values: []})
+        verify(!view.connection.busy)
+        compare(view.connection.message, "Forgot Test network")
+    }
+
+    function test_forgetRechecksIdentityAndType() {
+        view.requestForget(network())
+        view.confirmForget()
+        bus.calls[0].resolve(settingsReply("different-profile"))
+        compare(bus.calls.length, 1)
+        verify(view.connection.error.indexOf("profile changed") >= 0)
+        view.requestForget(network())
+        view.confirmForget()
+        bus.calls[1].resolve(settingsReply("saved-profile", "802-3-ethernet"))
+        compare(bus.calls.length, 2)
+        verify(!view.connection.busy)
+    }
+
+    function test_forgetDeleteErrorAndRetry() {
+        view.requestForget(network())
+        view.confirmForget()
+        bus.calls[0].resolve(settingsReply())
+        bus.calls[1].reject({error: {message: "Permission denied"}})
+        verify(!view.connection.busy)
+        verify(view.connection.error.indexOf("Permission denied") >= 0)
+        view.requestForget(network())
+        view.confirmForget()
+        compare(view.connection.error, "")
+        bus.calls[2].resolve(settingsReply())
+        bus.calls[3].resolve({values: []})
+        compare(view.connection.message, "Forgot Test network")
+    }
+
+    function test_forgetReadErrorDoesNotDelete() {
+        view.requestForget(network())
+        view.confirmForget()
+        bus.calls[0].reject({error: {message: "Profile no longer exists"}})
+        compare(bus.calls.length, 1)
+        verify(!view.connection.busy)
+        verify(view.connection.error.indexOf("Profile no longer exists") >= 0)
+    }
+
+    function test_forgetTimeoutNeverDeletesAfterLateRead() {
+        view.connection.timeoutInterval = 20
+        view.requestForget(network())
+        view.confirmForget()
+        tryVerify(function() { return !view.connection.busy })
+        bus.calls[0].resolve(settingsReply())
+        compare(bus.calls.length, 1)
+        verify(view.connection.error.indexOf("No response") >= 0)
+    }
+
+    function test_forgetRequiresSavedProfileAndPageScopedConfirmation() {
+        view.requestForget(network({Uuid: ""}))
+        compare(view.pendingForget, null)
+        view.requestForget(network())
+        view.visible = false
+        compare(view.pendingForget, null)
+        view.visible = true
+        view.requestForget(network())
+        view.wifiEnabled = false
+        compare(view.pendingForget, null)
+        compare(bus.calls.length, 0)
+    }
+
+    function test_forgetBlocksConcurrentOperationsAndDoesNotCancel() {
+        view.requestForget(network())
+        view.confirmForget()
+        view.connection.connectNetwork(network())
+        view.connection.disconnectNetwork(network({ConnectionState: PlasmaNM.Enums.Activated}))
+        view.connection.forgetNetwork(network())
+        view.connection.cancel()
+        compare(bus.calls.length, 1)
+        verify(view.connection.busy)
+        verify(!view.connection.cancelRequested)
     }
 
 }

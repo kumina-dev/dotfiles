@@ -143,6 +143,61 @@ Item {
         }
     }
 
+    function forgetNetwork(network) {
+        if (busy) return
+        operation = "forget"
+        networkName = network.Ssid || network.ItemUniqueName || "Wi-Fi network"
+        error = ""
+        if (!network.Uuid || !network.ConnectionPath || network.ConnectionPath === "/") {
+            finish("This network has no saved profile to forget.", true)
+            return
+        }
+        // Copy identity: scans can remove or replace the originating delegate.
+        const profilePath = String(network.ConnectionPath)
+        const profileUuid = String(network.Uuid)
+        const serial = ++requestId
+        busy = true
+        cancelRequested = false
+        message = "Forgetting " + networkName + "…"
+        deadline.restart()
+        try {
+            bus.asyncCall({
+                service: service,
+                path: profilePath,
+                iface: "org.freedesktop.NetworkManager.Settings.Connection",
+                member: "GetSettings",
+                arguments: []
+            }, function(reply) {
+                if (serial !== root.requestId) return
+                const settings = reply.values[0]
+                if (String(settings && settings.connection ? settings.connection.uuid : "") !== profileUuid
+                    || String(settings && settings.connection ? settings.connection.type : "") !== "802-11-wireless") {
+                    root.finish("The saved profile changed. Select the network again before forgetting it.", true)
+                    return
+                }
+                try {
+                    root.bus.asyncCall({
+                        service: root.service,
+                        path: profilePath,
+                        iface: "org.freedesktop.NetworkManager.Settings.Connection",
+                        member: "Delete",
+                        arguments: []
+                    }, function() {
+                        if (serial === root.requestId) root.finish("Forgot " + root.networkName, false)
+                    }, function(failure) {
+                        if (serial === root.requestId) root.finish("Could not forget " + root.networkName + ": " + failure.error.message, true)
+                    })
+                } catch (failure) {
+                    root.finish("Could not forget " + root.networkName + ": " + failure.message, true)
+                }
+            }, function(failure) {
+                if (serial === root.requestId) root.finish("Could not read the saved profile for " + root.networkName + ": " + failure.error.message, true)
+            })
+        } catch (failure) {
+            finish("Could not start forgetting the network: " + failure.message, true)
+        }
+    }
+
     function observeDeviceState(state) {
         if (!busy || operation !== "disconnect" || !disconnectAccepted) {
             return
@@ -288,6 +343,11 @@ Item {
         id: deadline
         interval: root.timeoutInterval
         onTriggered: {
+            if (root.operation === "forget") {
+                root.finish("No response while forgetting the network. Check whether the profile is still saved before retrying.", true)
+                ++root.requestId
+                return
+            }
             if (root.operation === "disconnect") {
                 root.finish("Disconnect did not complete in time. Check the current network state and retry.", true)
                 ++root.requestId

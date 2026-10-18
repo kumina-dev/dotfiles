@@ -4,6 +4,8 @@
 
 ### Added
 
+- Saved Wi-Fi Forget controls with inline confirmation, profile identity checks, progress, and actionable errors.
+
 - Plasma Wi-Fi disconnect controls with device-state progress and reconnect support.
 
 - Plasma Control Center Wi-Fi selection, saved/new personal-network activation, native password prompts, progress, cancellation, and inline errors.

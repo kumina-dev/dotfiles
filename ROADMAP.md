@@ -11,14 +11,15 @@ maintained KDE components before building custom backends.
   [release notes](releases/0.1.0.md). Keep this tag local.
 - **v0.2.0 — dependable everyday controls:** audio defaults/microphone/recovery,
   Bluetooth adapter/device state, truthful network/task labels and recoverable
-  quick-control feedback. Implemented and activated; acceptance pending. Current
-  evidence/gates: [verification](plasma/verification-0.2.0.md); authoritative issue
-  state is in Linear KUM-9–12, not duplicated as checkboxes here.
+  quick-control feedback. Accepted with explicit unverified limitations on 2026-10-18.
+  No tag/publication/deployment authorized. Evidence and scenario references:
+  [verification](plasma/verification-0.2.0.md); authoritative issue state is in
+  Linear KUM-9–12, not duplicated as checkboxes here.
 - **KUM-8:** user reported the voluntary login/reboot layout and pinned-app
   persistence check passed on 2026-10-18; acceptance is recorded in Linear.
 
-Do not start another feature milestone before resolving the current checkpoint
-with the user. No v0.2.0 release action before acceptance and authorization.
+The v0.2.0 acceptance checkpoint is resolved. v0.3.0 work remains explicitly
+unauthorized; await a new instruction. No v0.2.0 release action is authorized.
 Ordinary validated development-branch synchronization is authorized independently
 of release acceptance; follow AGENTS.md and report the verified remote commit.
 

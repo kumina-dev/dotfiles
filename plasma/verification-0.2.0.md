@@ -1,4 +1,4 @@
-# v0.2.0 verification — awaiting user acceptance
+# v0.2.0 verification — accepted with documented limitations
 
 Audited 2026-10-18. This is the canonical repository evidence record for
 **v0.2.0 — dependable everyday controls**. Git identifies the tested implementation;
@@ -6,14 +6,40 @@ Linear owns issue status and acceptance. Implementation checkpoint: `c937bc1`. R
 Shared Linear index: https://linear.app/kumina/document/v020-verification-and-acceptance-68a1551a0eb3
 Do not copy this report into every issue. Commands live in `README.md` here.
 
+## Final acceptance — 2026-10-18
+
+The user explicitly accepted KumiOS v0.2.0 using the successful automated tests,
+simulated failure scenarios and normal desktop operation as sufficient milestone
+evidence. KUM-9, KUM-10 and KUM-12 are Done with the limitations below; KUM-11
+was already Done. This resolves the acceptance gate without claiming missing tests
+passed. Historical pre-acceptance evidence remains below for traceability.
+
+| Scenario reference | Unverified scenario | Traceability and accepted evidence |
+| --- | --- | --- |
+| V020-AUDIO-RESTART | Native KDE audio-backend restart/recovery | KUM-9; native read-only/client reconnect, user hotplug/default/control checks and legacy-service continuity passed. The legacy service is not the native backend. |
+| V020-BT-HARDWARE | Physical Bluetooth adapter removal or hardware blocking | KUM-10; simulated no-adapter/blocked/removal/recovery and user reconnect/power checks passed. Physical removal/blocking and multi-adapter behavior are not claimed. |
+| V020-LIVE-ERROR | Error notification/display and retry under a real live-shell failure | KUM-12; controlled offscreen popup and isolated D-Bus denial/timeout/retry passed. No real live-shell fault was induced or observed. |
+
+These references remain **unverified**, explicitly accepted as milestone limitations,
+not passed checks or unfinished acceptance gates. Any future investigation must cite
+the relevant reference and issue; do not run disruptive tests merely to close them.
+
+KUM-8 was reviewed separately: its existing criterion requires the user's report
+that top bar, centered dock, unified launcher and saved pins persist across a voluntary
+login/reboot. The earlier “Login/reboot check passed” report followed those criteria
+and satisfies them; KUM-8 remains Done independently of this milestone acceptance.
+
+Acceptance authorizes no Git tag, GitHub release, deployment, additional service
+restart or v0.3.0 work. Source version remains `0.2.0-dev`; only local `v0.1.0` exists.
+
 ## Implementation and activation
 
 | Outcome | Implementation | Linear |
 | --- | --- | --- |
-| Default-device audio, quick microphone mute, recovery | NativeAudio + AudioEndpoint; KDE plasma-pa/PulseAudioQt | KUM-9, In Review |
-| Adapter/device-aware Bluetooth | BluezQt discovery/events; confirmed power changes | KUM-10, In Review |
-| Accurate Wi-Fi and active-app status | PlasmaNM wireless rows/decoded SSIDs; clear invalid active tasks | KUM-11, In Review |
-| Pending states and recoverable errors | ControlRequest + BackendChange; native settings recovery | KUM-12, In Review |
+| Default-device audio, quick microphone mute, recovery | NativeAudio + AudioEndpoint; KDE plasma-pa/PulseAudioQt | KUM-9, Done (V020-AUDIO-RESTART) |
+| Adapter/device-aware Bluetooth | BluezQt discovery/events; confirmed power changes | KUM-10, Done (V020-BT-HARDWARE) |
+| Accurate Wi-Fi and active-app status | PlasmaNM wireless rows/decoded SSIDs; clear invalid active tasks | KUM-11, Done |
+| Pending states and recoverable errors | ControlRequest + BackendChange; native settings recovery | KUM-12, Done (V020-LIVE-ERROR) |
 
 Widget-only installation completed with private backup
 `~/.config/kumios/layout-backup-6dinrdk1`. The user then explicitly approved a
@@ -21,7 +47,7 @@ Plasma shell restart. It succeeded; post-restart panel/widget identities, order
 and Meta+Space binding matched the pre-restart inventory. No widget-loading errors
 were observed at startup. KWin and audio services stayed active. The audit confirms
 Plasma is running and installed widget files still match repository source.
-**Activation is complete; final v0.2.0 acceptance is not.**
+**Activation and milestone acceptance are complete; release actions remain unauthorized.**
 
 Only the local `v0.1.0` tag exists. No new release tag, GitHub release or deployment
 is authorized. Validated development-branch pushes are authorized and required at
@@ -46,7 +72,7 @@ test client reconnected and then recovered. Offscreen PlasmoidItem hosting and
 opaque/dynamic native types produce tooling warnings; no compile/test failures
 were observed. Do not treat these warnings as verified user-facing defects.
 
-## Outstanding manual checks
+## Manual evidence and unverified scenarios
 
 Partial user acceptance recorded 2026-10-18: the user reported all three guided
 checks passed: input/output labels agree with KDE Audio; output volume, output mute
@@ -70,8 +96,8 @@ and Bluetooth off/on with correct state and settings accessible on 2026-10-18.
 KUM-11 is Done on combined automated, native and user task/network evidence.
 Physical wired/VPN-only topology was conditional in the instructions and was not
 separately identified in the user's reply; it is not claimed as independently tested.
-KUM-9, KUM-10 and KUM-12 remain In Review for the specific recovery/adapter/error
-limits below.
+Before final acceptance, KUM-9, KUM-10 and KUM-12 remained In Review for the
+recovery/adapter/error limits below; the explicit decision above resolves that gate.
 
 Resume audit on 2026-10-18 at source HEAD `bfb21cd`: all eight documented
 suites/probes passed (82 checks including Qt lifecycle checks). Read-only preflight
@@ -157,8 +183,8 @@ recovery remains **unverified**: testing it requires separate authorization for 
 appropriate native audio-service interruption; the supplied approval expressly
 excludes that. Physical adapter/blocked-state tests and live-shell fault observation
 also remain unverified; simulations are not physical/user evidence. KUM-9, KUM-10
-and KUM-12 stay In Review pending the user's review of this summary and resolution
-of required remaining evidence. No acceptance gap is silently waived. No release
+and KUM-12 were held In Review until the explicit acceptance decision above. The
+three scenario references preserve the unverified evidence after closure. No release
 status, tag, publication, desktop restart or v0.3.0 work is authorized here.
 
 ## Known constraints and next action
@@ -169,6 +195,6 @@ use it. Setup updates the existing desktop rather than provisioning a fresh mach
 Physical audio hotplug/default recovery and Bluetooth reconnect have user evidence;
 multi-adapter selection and daemon-restart recovery remain unverified.
 
-Next: collect the outstanding manual results when the user is ready; fix only
-observed regressions, revalidate affected units, and request acceptance before any
-v0.2.0 release action. Do not restart the desktop or trigger KUM-8 for this purpose.
+Milestone accepted. Preserve the unverified scenario references and existing evidence.
+No further disruptive testing is requested; await a separately authorized next task.
+No release tag/publication/deployment or v0.3.0 work is authorized.

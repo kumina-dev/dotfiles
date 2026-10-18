@@ -6,7 +6,8 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.2.0 — dependable everyday controls**; no next feature milestone.
+- Milestone: **v0.2.0 — dependable everyday controls**, accepted with documented
+  unverified limitations on 2026-10-18; no next feature milestone authorized.
 - Active branch: `kumios/dependable-controls`.
 - Implementation commit: `c937bc10d74f39579adbc1226f7a98dbb9a2a181`.
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
@@ -37,13 +38,15 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 | KUM-5–7 | Done | v0.1.0 outcomes accepted; no reimplementation |
 | KUM-8 | Done, outside v0.2.0 | User reported login/reboot persistence check passed on 2026-10-18 |
 | KUM-11 | Done | User task/current-network/radio checks passed; automated mixed-state evidence retained |
-| KUM-9, KUM-10, KUM-12 | In Review | Remaining daemon recovery, adapter/blocked-state and live error/retry gaps |
+| KUM-9, KUM-10, KUM-12 | Done | Explicitly accepted with V020-AUDIO-RESTART / V020-BT-HARDWARE / V020-LIVE-ERROR unverified |
 
 [Project](https://linear.app/kumina/project/kumios-83beb6551c62).
 Shared Linear verification index:
 https://linear.app/kumina/document/v020-verification-and-acceptance-68a1551a0eb3
 Read issue-specific acceptance criteria in Linear. No implementation blocker is
-known; remaining gates are manual evidence/user acceptance, not a failed build.
+known. Final user acceptance is recorded; unverified scenarios are limitations,
+not passed tests. KUM-8 was separately reviewed and its existing user-report
+criterion is satisfied by the earlier voluntary login/reboot pass.
 If the connector is unavailable, record sync debt here and continue safe local
 inspection; never guess issue completion or request pasted credentials.
 
@@ -64,7 +67,8 @@ passed again; preflight, installed-source equality and Git whitespace checks pas
 Native audio-client reconnect/device-read/offscreen probes also passed in the
 autonomous resume audit (82 total suite/probe checks). All 15 installed widget files
 match source; Plasma/KWin/audio services are active. The verification report now
-contains an ordered hands-on sequence; no manual acceptance has been inferred.
+contains the evidence sequence and explicit final user acceptance; no unverified
+scenario has been reclassified as passed.
 
 The prior explicitly approved Plasma restart succeeded. Post-restart inventory
 preserved panel/widget identities, order and launcher shortcut; no widget-load
@@ -91,15 +95,13 @@ Automated mocks and test-client reconnect do not prove those behaviors.
 
 ## Next authorized action
 
-Present the controlled-verification acceptance summary to the user. The native
-backend-restart gap cannot be closed under the legacy-only restart approval; obtain
-separate authorization before any native audio-service interruption. Do not infer
-physical adapter or live-shell fault acceptance from the new isolated probes.
-Resume audit found no automated regression at bfb21cd;
-GitHub/local/remote agreed with 0/0 divergence before this documentation checkpoint.
-Fix observed regressions only, validate affected units, make local
-checkpoint commits, push and verify the relevant remote branch, and update the
-relevant issue plus shared evidence once per meaningful transition. Do not start a new feature milestone or force KUM-8.
+Final v0.2.0 acceptance was explicitly given by the user on 2026-10-18 using
+successful automated tests, simulated failures and normal operation as sufficient.
+KUM-9/10/12 are Done with the three unverified scenario references in the canonical
+report; KUM-11 remains Done. KUM-8 remains separately Done on its existing criteria.
+Preserve these limitations; do not run disruptive tests merely to close them.
+Await separately authorized work. No Git release tag, GitHub release, deployment
+or v0.3.0 work is authorized. The legacy-service restart approval is consumed.
 
 Approval boundaries and resume procedure are in `AGENTS.md`. No further desktop/
 audio restart, logout, disruptive device test, release tag or GitHub release is

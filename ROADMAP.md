@@ -1,86 +1,35 @@
-# Roadmap
+# KumiOS first-release roadmap
 
-The priority is a simple, reliable daily-driver desktop first. Essential functionality is implemented before deeper integrations and advanced polish.
+Target: a cohesive KDE Plasma Wayland daily driver with minimal tinkering.
+Keep the top bar, centered dock, unified launcher and custom quick-control
+presentation. Prefer maintained KDE components and native detailed settings.
 
-## First iterations
+## Current release
 
-### Settings and Control Center
+- [x] Inspect source and active desktop; record functional gaps.
+- [x] Create separate product projects in Linear; prioritize KumiOS.
+- [x] Implement in-place layout reconciliation with dock-pin/panel retention.
+- [x] Add read-only preflight and explicit application with private backups.
+- [x] Prepare maintained KDE Dashboard and unified launcher shortcut/helper.
+- [x] Connect custom Bluetooth, audio/microphone and About controls to KDE settings.
+- [x] Test reconciliation and failure boundaries without touching live panels.
+- [x] Apply prepared changes with user approval, preserving live panel and task-manager identities.
+- [x] User confirmed current-session desktop acceptance after approved Plasma restart.
+- [ ] Verify persistence at the next voluntary login; investigate login warnings
+      only if they affect actual use.
+- [x] Prepare local 0.1.0 release commit and annotated v0.1.0 tag; no external publication.
 
-- [x] Wi-Fi settings
-- [x] Bluetooth settings
-- [x] Display settings
-- [x] Appearance settings
-- [x] Input settings
-  - Keyboard
-  - Mouse
-- [x] Sound settings
-- [x] Basic About page
-- [x] Complete the basic Control Center
+## Deferred
 
-### Power
+- Broader redesigns, a replacement login stack, cloud calendar integration,
+  custom device-management backends and legacy Hyprland utility expansion.
+- Bluetooth adapter discovery beyond the current hardcoded hci0 quick toggle;
+  native device settings remain the intended detailed-management surface.
+- Fresh-machine package/service provisioning: this release's setup utility
+  reconciles the existing desktop and requires its audio service to be available.
 
-- [x] macOS-inspired dropdown power menu
+KUM-5 through KUM-8 track the release. Automated success does not substitute for
+live checks. Reversible live updates are authorized. No logout, Plasma restart or disruption of active work without user approval.
 
-## Stabilization
-
-- [x] Remove tracked runtime and Python cache files
-- [x] Prevent duplicate Kumina utility instances
-- [x] Share process and async helpers
-- [x] Harden Settings and Control Center error recovery
-- [x] Add backend regression coverage
-- [x] Refresh project documentation
-- [ ] Complete the visual and UX polish pass
-
-## After first iterations
-
-### KumiOS 1.0
-
-- [ ] Adopt the KumiOS identity and versioned releases
-  - [x] KumiOS identity, one version source, About display, and changelog
-  - [ ] Tag the first tested release
-- [x] Add Super + Alt + 1–9 to move windows without following them
-  - Preserve existing keybindings
-- [x] Make Control Center a single page of quick controls without scrolling
-  - Wi-Fi and Bluetooth toggles, output and microphone volume/mute, media controls
-  - Open Settings for device selection and detailed management
-  - Bound long labels and errors; expose full text in tooltips
-- [ ] Verify the compact Control Center on the desktop at the intended display scales
-- [x] Bound the SwayNC popup area height and repair notification CSS
-- [ ] Give individual notification cards consistent dimensions
-  - The popup-area cap does not enforce per-card height
-  - Truncate overflowing titles/messages and constrain images
-- [ ] Enhance the lock screen using the actual PAM authentication state
-  - [x] Keep the empty password field visible and display Hyprlock's exposed PAM prompt
-  - [x] Show a fingerprint-style icon while this Hyprlock process holds pam_u2f's pending file open
-  - [x] Hide the icon after the pending descriptor closes, including failure and retry transitions
-  - [ ] Verify the live security-key and password fallback behavior on the desktop
-  - [ ] Hide password input during FIDO and restore it for password authentication
-    - Hyprlock 0.9.6 has no configuration option for conditional input-field visibility
-- [x] Turn About into an About this PC screen
-  - KumiOS version, distribution, kernel, hostname, CPU, GPU, RAM, storage
-  - Copy system information
-- [ ] Verify About values and clipboard behavior on the desktop
-- [x] Add Language & Region settings
-  - [x] First iteration: shared clock/date formats, week start, and system time-zone selection
-  - [ ] Verify the new Settings page, live clock/calendar updates, and polkit flow on the desktop
-  - [x] English/Finnish translations for Settings, Control Center, the power menu, and calendar
-  - [x] Desktop verification of the English/Finnish language update (user confirmed)
-  - [x] Regional date/time formats, Finnish/English number styles, and EUR/USD/GBP currency previews
-  - [x] Shared number formatting in About this PC and copied system information
-  - [ ] Verify number/currency controls and About formatting on the desktop
-  - [x] Time zone and 12/24-hour clock
-  - [x] Keep keyboard layouts under Input
-  - [x] Apply preferences consistently and explain refresh/reopen requirements (no logout needed)
-
-### Further integrations
-
-- [ ] Calendar integrations and events
-  - [x] Local all-day events with title/notes, date selection, editing, and confirmed deletion
-  - [x] Persistent SQLite storage and month-grid event markers
-  - [ ] Desktop verification of event dialogs, persistence, and two-pane calendar layout
-  - [ ] Timed events, reminders, recurrence, and external calendar integrations
-- [x] Add a read-only Account section to Settings using the current Linux system account
-  - [ ] Verify account values, copy/refresh, and sidebar scrolling on the desktop
-  - No separate Kumina account system
-  - No cloud account requirement
-  - System username and local account information are the source of truth
+Release decision: user accepts releasing before next-login layout/pin persistence
+verification. KUM-5–7 accepted; KUM-8 tracks only the deferred persistence check.

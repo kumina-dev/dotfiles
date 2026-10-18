@@ -1,8 +1,12 @@
 # KumiOS
 
-Personal Arch Linux + Hyprland desktop environment with familiar Windows-style shortcuts and a macOS-inspired interface.
+Personal Arch Linux daily driver, now targeting KDE Plasma on Wayland. The
+first release preserves a compact top bar, centered dock, unified application
+launcher and cohesive controls, using maintained KDE components wherever they fit.
 
-The desktop is built around a small set of custom GTK utilities alongside standard Linux components. The current focus is a reliable daily-driver environment before deeper integrations and visual polish.
+See [Plasma setup and acceptance](plasma/README.md) for the supported layout,
+read-only preflight, explicit application, backups, recovery and release checklist.
+The older Hyprland/GTK implementation remains available as legacy configuration.
 
 ## Plasma appearance defaults
 
@@ -31,8 +35,8 @@ This command preserves the current panels, dock, wallpaper, shortcuts, and displ
 configuration. It applies appearance defaults to the user running it; run it once
 for each new user after Plasma is installed. It does not provision a complete
 Plasma desktop or automatically seed system-wide accounts. The existing panel
-layout sources are in `plasma/shell/`; `layout-v2.js` replaces panels when explicitly
-run through Plasma's scripting console.
+layout sources are in `plasma/shell/`; `layout-v2.js` reconciles panels in place. Use the backed-up setup command
+documented in [plasma/README.md](plasma/README.md), after approving the live change.
 
 ## Plasma Control Center
 
@@ -125,11 +129,18 @@ These steps may switch the active network; use a network you can safely test.
 
 ## Versioning
 
-The development version is stored in [hypr/.config/hypr/VERSION](hypr/.config/hypr/VERSION). Settings reads that same installed file for About and copied system information.
+The version is stored in [hypr/.config/hypr/VERSION](hypr/.config/hypr/VERSION). Settings reads that same installed file for About and copied system information.
 
-Changes are recorded in [CHANGELOG.md](CHANGELOG.md). Release tags will identify tested desktop snapshots; the current version is a development build.
+Changes are recorded in [CHANGELOG.md](CHANGELOG.md). The first release is `v0.1.0`;
+see [release notes](releases/0.1.0.md). Layout and pinned-app persistence across
+a later login remains unverified under KUM-8.
 
-## Desktop
+## Legacy Hyprland implementation
+
+The following desktop and custom GTK utility sections describe the earlier
+Hyprland setup. They are not requirements for the Plasma first release.
+
+### Desktop
 
 - Hyprland
 - Waybar

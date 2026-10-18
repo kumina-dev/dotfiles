@@ -4,6 +4,7 @@ import QtQuick.Controls as Controls
 
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
+import org.kde.kcmutils as KCM
 import org.kde.plasma.workspace.dbus as DBus
 
 PlasmoidItem {
@@ -733,6 +734,10 @@ PlasmoidItem {
                     enabled: root.bluetoothAvailable
 
                     onClicked: root.toggleBluetooth()
+                    onDetailsRequested: {
+                        root.expanded = false
+                        KCM.KCMLauncher.open("kcm_bluetooth")
+                    }
                 }
             }
 
@@ -810,6 +815,16 @@ PlasmoidItem {
                     font.pixelSize: 11
 
                     elide: Text.ElideRight
+                }
+
+                Controls.Button {
+                    Layout.fillWidth: true
+                    text: "Devices & Microphone…"
+                    icon.name: "configure"
+                    onClicked: {
+                        root.expanded = false
+                        KCM.KCMLauncher.open("kcm_pulseaudio")
+                    }
                 }
             }
 

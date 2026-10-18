@@ -33,6 +33,10 @@ TestCase {
         settingKey="Denied"; setting.set(true); tryCompare(setting,"busy",false,2000)
         verify(setting.error.includes("Permission denied")); compare(setting.observed,false)
         settingKey="Enabled"
+        setting.set(true); tryCompare(setting,"busy",false,2000)
+        compare(setting.error,""); compare(setting.observed,true)
+        setting.set(false); tryCompare(setting,"busy",false,2000)
+        compare(setting.error,""); compare(setting.observed,false)
     }
     function test_variantBooleanRoundTrip() {
         tryVerify(function(){return props.properties.Enabled !== undefined},2000)

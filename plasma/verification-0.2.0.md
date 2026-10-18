@@ -116,7 +116,8 @@ performed or explicitly resolved through an acceptance/scope decision.
 - [x] Bluetooth power off/on, state updates and settings access (user passed).
 - [ ] Bluetooth adapter removal/blocked states; multiple adapters need appropriate hardware.
 - [x] Brightness adjustment/restoration without a stuck control (user passed).
-- [ ] Live pending/error/retry presentation.
+- [x] Controlled offscreen pending/error/retry presentation (simulated; see follow-up).
+- [ ] Live-shell error/retry observation remains unverified.
 - [x] Popup sizing at the user's scale, keyboard controls, tooltips and settings links (user passed).
 - [x] Launcher/top-bar/dock experience, active-app switching/clearing and current Wi-Fi status (user passed).
 - [x] Wi-Fi off/on/reconnect status and no stuck controls (user passed).
@@ -129,6 +130,36 @@ outside this milestone. This user report supplies the evidence a shell restart o
 automated test could not establish.
 The user accepted releasing v0.1.0 before that check, not automatic acceptance of
 v0.2.0. No new feature milestone should start before the current acceptance checkpoint.
+
+## Controlled verification follow-up — 2026-10-18
+
+The user authorized one restart of **only `kumi-audio.service`**, requested safe
+simulated Bluetooth/fault-injection tests, and required a final acceptance summary
+before any release-status change. That restart approval has been consumed.
+
+| Verification | Evidence | Limit |
+| --- | --- | --- |
+| Legacy KumiOS audio service restart | Passed: passive `tst_LegacyAudioContinuity.qml` observer, 3 Qt checks including lifecycle, monitored native readiness and unchanged output/input names, output volume/mute and mic mute during one external `systemctl --user restart kumi-audio.service`. New legacy-service InvocationID; all six audited units active afterward. | NativeAudio stayed ready; it did not lose/recover its backend. The current controls do not use this legacy bridge. This is continuity/independence evidence, **not native audio-daemon restart recovery** or live-popup observation. |
+| Protected services | PipeWire, pipewire-pulse, WirePlumber, Plasma and KWin InvocationIDs unchanged across the approved restart. | No restart of these services was performed or authorized. |
+| Simulated Bluetooth states | Existing `tst_Bluetooth.qml`: 7 checks passed. New popup fault probe covers no adapter, blocked label/action, no write while blocked, removal during pending operation, ignored stale reply, restoration and successful retry. | Fake manager/bus, actual production popup bindings in a disposable instrumented copy. No physical removal, driver unload, rfkill or live Bluetooth write. Physical/multi-adapter behavior is not claimed. |
+| Popup controlled errors/retry | `python3 tests/probes/run_control_fault_probe.py`: 6 checks passed. Audio withheld confirmation shows pending then timeout, authoritative unchanged volume, settings enabled, successful retry clears errors. Bluetooth long denial exposes full tooltip text with three-line display limit and retry clears it. Brightness denial shows an error without changing observed state; confirmed retry clears it. | Offscreen actual popup copy at width 320/default scale. Test aliases/object names expose internals; writers target doubles. No live-shell fault injection or new live visual acceptance. Existing offscreen hosting warnings persist without failures. |
+| Typed private-bus denial/retry | `run_dbus_probe.py`: 5 checks passed. Denial and successful retry/reset now asserted within the same test, not inferred from a later case. | Real D-Bus marshalling against an isolated fake service, no actual policy failure induced. |
+
+The first audio-observer attempt failed to compile because it used an absolute QML
+import without a URL scheme; no restart ran in that attempt. The corrected observer
+passed and the service was restarted exactly once. Initial popup visibility checks
+failed because the offscreen test host was invisible; making only the test host
+visible fixed the harness. No production source fix or widget installation was needed.
+
+**Acceptance summary:** all requested safe simulated/error tests passed. The
+approved legacy-service continuity check passed. Actual native backend restart
+recovery remains **unverified**: testing it requires separate authorization for an
+appropriate native audio-service interruption; the supplied approval expressly
+excludes that. Physical adapter/blocked-state tests and live-shell fault observation
+also remain unverified; simulations are not physical/user evidence. KUM-9, KUM-10
+and KUM-12 stay In Review pending the user's review of this summary and resolution
+of required remaining evidence. No acceptance gap is silently waived. No release
+status, tag, publication, desktop restart or v0.3.0 work is authorized here.
 
 ## Known constraints and next action
 

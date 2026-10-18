@@ -152,6 +152,19 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   client; no audio-daemon restart, recording or routing writes.
 - `tests/probes/tst_NativeDevices.qml`: reads adapters/wireless rows without scans.
 - `tests/probes/tst_ControlCenter.qml`: offscreen construction/geometry, not visual acceptance.
+- `python3 tests/probes/run_control_fault_probe.py`: copies the production popup
+  into a temporary directory and adds test-only aliases/object names. Injects fake
+  audio writers, a fake Bluetooth manager/bus and brightness replies; verifies
+  actual popup pending/error labels, full tooltip text and retry clearing. No
+  installed-widget changes, service restarts or device writes. Run via the Python
+  wrapper only; the QML file needs the disposable `ui/` copy.
+- `tests/probes/tst_LegacyAudioContinuity.qml`: passive four-second native audio
+  observer. It performs no restart. An authorized external legacy-service restart
+  must occur during its `RESTART_WINDOW_READY` window to claim continuity across
+  that restart; a standalone pass proves only four-second continuity. Compare
+  systemd InvocationIDs before/after to distinguish restarted and untouched units.
+  Restarting `kumi-audio.service` tests legacy-bridge independence, because current
+  controls use KDE's native backend. It cannot prove PipeWire/WirePlumber recovery.
 - `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
   service to check typed roundtrips and errors; needs system PyGObject.
 

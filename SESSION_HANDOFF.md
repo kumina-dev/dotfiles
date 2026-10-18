@@ -78,15 +78,24 @@ User also passed audio unplug/replug/default switching and recovery, Bluetooth
 reconnect/name/state/settings access, and brightness adjustment/restoration.
 User passed Wi-Fi off/on/reconnect and Bluetooth power/state/settings checks.
 KUM-11 is Done. Still unverified: Bluetooth adapter removal/blocked states,
-live error/retry presentation,
-and audio-daemon restart recovery. KUM-8's separate full-session persistence check
+live-shell error/retry observation and actual native audio-daemon restart recovery.
+Controlled follow-up: Bluetooth suite 7, popup fault probe 6 and private-bus 5 checks
+passed. One explicitly approved kumi-audio.service restart passed a passive native
+continuity observer (3 checks); the five protected native audio/desktop service
+InvocationIDs stayed unchanged. Legacy-service independence is not backend restart
+recovery. Approval is consumed; no other restart is authorized. See the canonical
+report for exact scopes and harness limitations.
+KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.
 
 ## Next authorized action
 
-Collect the user's v0.2.0 manual results when ready; the shared report lists the
-ordered hands-on sequence. Resume audit found no automated regression at bfb21cd;
+Present the controlled-verification acceptance summary to the user. The native
+backend-restart gap cannot be closed under the legacy-only restart approval; obtain
+separate authorization before any native audio-service interruption. Do not infer
+physical adapter or live-shell fault acceptance from the new isolated probes.
+Resume audit found no automated regression at bfb21cd;
 GitHub/local/remote agreed with 0/0 divergence before this documentation checkpoint.
 Fix observed regressions only, validate affected units, make local
 checkpoint commits, push and verify the relevant remote branch, and update the

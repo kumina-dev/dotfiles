@@ -70,8 +70,9 @@ preserved panel/widget identities, order and launcher shortcut; no widget-load
 errors were observed. This audit read current shell/audio health without another
 restart. Activation is complete, not pending. Widget files match source.
 
-Still unverified: live v0.2.0 output/mic/keyboard/popup acceptance, physical device
-hotplug/default switches, Bluetooth reconnect/adapters, radio/brightness transitions,
+User passed live output/mic labels and controls, keyboard/popup/tooltips/settings
+links on 2026-10-18. Still unverified: active-app/network transitions and desktop
+experience, physical hotplug/default switches, Bluetooth reconnect/adapters, radio/brightness transitions,
 and audio-daemon restart recovery. KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.

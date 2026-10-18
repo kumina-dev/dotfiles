@@ -48,7 +48,11 @@ were observed. Do not treat these warnings as verified user-facing defects.
 
 ## Outstanding manual checks
 
-No user acceptance of the activated v0.2.0 controls has been recorded yet.
+Partial user acceptance recorded 2026-10-18: the user reported all three guided
+checks passed: input/output labels agree with KDE Audio; output volume, output mute
+and microphone mute agree with KDE; Tab navigation, slider arrow keys, tooltips,
+Escape dismissal, popup fit and native settings links work. This covers current-session
+audio and popup interaction only; hardware transitions and recovery remain pending.
 
 Resume audit on 2026-10-18 at source HEAD `bfb21cd`: all eight documented
 suites/probes passed (82 checks including Qt lifecycle checks). Read-only preflight
@@ -87,13 +91,13 @@ Audio-daemon restart recovery needs a separately approved maintenance action and
 remains untested. Missing physical/error scenarios remain open evidence gaps until
 performed or explicitly resolved through an acceptance/scope decision.
 
-- [ ] Output volume/mute, input/output names and quick microphone mute.
+- [x] Output volume/mute, input/output names and quick microphone mute (user passed).
 - [ ] Headset/microphone unplug/replug and changing defaults through KDE settings.
 - [ ] Bluetooth device-name/reconnect updates; adapter removal/power changes only
       when convenient. Multiple adapters require appropriate hardware.
 - [ ] Wi-Fi radio/network changes, brightness, and pending/error presentation.
-- [ ] Popup sizing at the user's scale, keyboard controls, tooltips and unchanged
-      launcher/top-bar/dock experience.
+- [x] Popup sizing at the user's scale, keyboard controls, tooltips and settings links (user passed).
+- [ ] Unchanged launcher/top-bar/dock experience and live active-app/network status.
 - [ ] Actual audio-daemon restart recovery remains unverified; do not interrupt
       active audio to test it without explicit authorization.
 

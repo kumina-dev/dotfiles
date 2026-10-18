@@ -16,7 +16,19 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
 - Only release tag: local `v0.1.0` at `b197802`. Source version is `0.2.0-dev`.
-  Neither checkpoint is a release approval. Nothing pushed/published.
+  Neither checkpoint is a release approval. The tag remains local; source commits
+  may be pushed as ordinary development work.
+- Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
+  `kumios/dependable-controls`. This checkpoint establishes upstream tracking.
+  Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0` and
+  `git ls-remote origin refs/heads/kumios/dependable-controls` must match local HEAD.
+  A clean worktree is insufficient. The final response/shared Linear index records
+  the exact verified tip; rerun these commands rather than trusting a stale snapshot.
+- Remote audit before this update: origin/main at `63b82c6`; current branch absent
+  remotely. Ten existing local commits were missing (seven earlier Wi-Fi/appearance
+  commits plus b197802, c937bc1 and 680c9cf). Synchronize their ancestry through the
+  development branch; do not merge pending v0.2.0 into main merely to catch up.
 
 ## Linear and acceptance
 
@@ -65,9 +77,11 @@ Automated mocks and test-client reconnect do not prove those behaviors.
 
 Collect the user's v0.2.0 manual results when ready; the shared report lists the
 short checklist. Fix observed regressions only, validate affected units, make local
-checkpoint commits, and update the relevant issue plus shared evidence once per
-meaningful transition. Do not start a new feature milestone or force KUM-8.
+checkpoint commits, push and verify the relevant remote branch, and update the
+relevant issue plus shared evidence once per meaningful transition. Do not start a new feature milestone or force KUM-8.
 
 Approval boundaries and resume procedure are in `AGENTS.md`. No further desktop/
-audio restart, logout, disruptive device test, release tag, push or publication is
-authorized by this handoff. Routine reversible source/docs work remains authorized.
+audio restart, logout, disruptive device test, release tag or GitHub release is
+authorized by this handoff. Routine reversible source/docs work and validated
+ordinary development pushes are authorized under AGENTS.md. Record actual push
+failures as sync debt; never treat a local commit alone as a completed checkpoint.

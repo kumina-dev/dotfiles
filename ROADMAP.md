@@ -19,6 +19,8 @@ maintained KDE components before building custom backends.
 
 Do not start another feature milestone before resolving the current checkpoint
 with the user. No v0.2.0 release action before acceptance and authorization.
+Ordinary validated development-branch synchronization is authorized independently
+of release acceptance; follow AGENTS.md and report the verified remote commit.
 
 ## Deferred scope
 

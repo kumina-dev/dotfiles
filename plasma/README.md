@@ -157,8 +157,11 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
 
 Use Qt 6 `qmllint` on changed QML and interpret opaque native/dynamic-model warnings
 alongside compile/runtime evidence. Run `git diff --check` before staging, then
-`git diff --cached --check` and inspect the staged diff before committing. Shell
-pipelines that report test results must enable `set -o pipefail`.
+`git diff --cached --check` and inspect the staged diff before committing. After a
+validated checkpoint, push the relevant branch under the Git policy in AGENTS.md,
+verify the actual remote tip/upstream relation, and report both local and remote
+state. A clean working tree alone does not complete a checkpoint. Shell pipelines
+that report test results must enable `set -o pipefail`.
 
 ## Engineering state
 

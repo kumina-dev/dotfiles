@@ -23,7 +23,9 @@ were observed at startup. KWin and audio services stayed active. The audit confi
 Plasma is running and installed widget files still match repository source.
 **Activation is complete; final v0.2.0 acceptance is not.**
 
-Only the local `v0.1.0` tag exists. No v0.2.0 tag, push or publication is authorized.
+Only the local `v0.1.0` tag exists. No new release tag, GitHub release or deployment
+is authorized. Validated development-branch pushes are authorized and required at
+checkpoints; remote synchronization is separate from manual/release acceptance.
 
 ## Evidence and limits
 

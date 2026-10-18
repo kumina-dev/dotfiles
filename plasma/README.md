@@ -16,9 +16,11 @@ launcher. KRunner remains independently available through Alt+F2.
 
 The custom presentation delegates Bluetooth devices to `kcm_bluetooth`, audio
 output/input selection and microphone controls to `kcm_pulseaudio`, and About This
-PC to `kcm_about-distro`, using KDE's KCMLauncher API. Output quick volume still
-uses the existing KumiOS audio service; this iteration does not replace or expand it.
-The display control and Wi-Fi implementation are retained.
+PC to `kcm_about-distro`, using KDE's KCMLauncher API. Unreleased 0.2.0 controls
+use KDE's plasma-pa audio context and live default devices directly, including quick
+microphone mute; they no longer depend on the custom KumiOS audio service. The old
+service remains installed for legacy compatibility and is not automatically disabled.
+BluezQt supplies adapters and device events. See [0.2.0 verification](verification-0.2.0.md).
 
 ## Read-only preflight
 
@@ -29,13 +31,25 @@ python3 plasma/setup.py --check
 ```
 
 Default invocation is also read-only. Requires a running Plasma session, Python 3,
-`qdbus6`, `kcmshell6`, installed native widgets/settings modules, and the existing
-active `kumi-audio.service`. This is a layout reconciler for an existing KumiOS
+`qdbus6`, `kcmshell6`, `pactl`, Qt's `qtpaths6` runtime tool, installed native
+widgets/settings modules, plasma-pa and BluezQt QML modules, and a reachable audio
+backend. This is a layout reconciler for an existing KumiOS
 installation, not a fresh-machine provisioning tool. It does not install packages,
 change authentication or enable services. Custom widgets also require KDE's
 `org.kde.kcmutils`, `org.kde.kirigami`, session-management and QML D-Bus modules;
 Wi-Fi prerequisites are documented in the root README. Resolve missing dependencies
 before applying; do not restart the desktop as part of preflight.
+
+## Upgrade widget files without reapplying layout
+
+```sh
+python3 plasma/setup.py --install-widgets
+```
+
+This backs up and copies the custom widgets only. It does not change panel layout
+or restart Plasma. QML may remain cached until an explicitly approved shell restart
+or normal login. Current 0.2.0 verification and outstanding manual checks are in
+[verification-0.2.0.md](verification-0.2.0.md).
 
 ## Apply only after session approval
 
@@ -110,17 +124,48 @@ confirmed current-session checks and explicitly accepted releasing before next-l
 layout/pin persistence verification. That check remains unverified under KUM-8;
 see [release notes](../releases/0.1.0.md).
 
-## Tracking
+## Architecture decisions
 
-Workspace/team: Kumina / KUM. Each product has its own project:
+- KDE owns device discovery, audio client reconnection, window management and
+  detailed settings. QML retains KumiOS presentation rather than adding services.
+- `NativeAudio` binds KDE plasma-pa defaults; `AudioEndpoint` observes confirmation
+  and invalidates pending writes when the target disappears/changes. The private
+  KDE audio API is a compatibility risk checked against the installed version.
+- `BluetoothControl` consumes BluezQt adapter/device signals; `WiFiStatus` consumes
+  PlasmaNM wireless rows and decoded SSIDs instead of global wired/VPN state.
+- `ControlRequest` and `BackendChange` bound waits and reject stale replies. D-Bus
+  acceptance alone is not success: observed state must agree. Timeout does not undo
+  an operation. Wi-Fi connection/cancel/forget state remains in `WiFiConnection`.
+- Layout reconciliation preserves panel/task-manager identity and pins. Widget-only
+  upgrades copy files with backups and do not reapply layout. Cached code requires
+  explicit activation; restarting Plasma is not a login/persistence test.
+- Native secrets agents keep credentials out of widget arguments/state. The old
+  audio service/Hyprland utilities remain for compatibility, not new expansion.
 
-- KumiOS: https://linear.app/kumina/project/kumios-83beb6551c62
-- Tempo: https://linear.app/kumina/project/tempo-f51377d8898a
-- TaisteluTanner: https://linear.app/kumina/project/taistelutanner-e7488b5d3e90
-- Creator Alerts: https://linear.app/kumina/project/creator-alerts-a883cd12e695
+## Additional validation tools
 
-KumiOS release work: KUM-5 reproducibility, KUM-6 launcher, KUM-7 native settings,
-KUM-8 live acceptance. Source changes and automated checks can be ready for review
-while deployment and hands-on verification remain outstanding.
+Use the standard suites above for implementation checkpoints. Optional probes are
+separate: never run the entire probes directory because DBusRoundTrip needs its
+private service. With the same Qt 6/offscreen flags, invoke one file at a time:
+
+- `tests/probes/tst_NativeAudio.qml`: reads defaults and reconnects only its test
+  client; no audio-daemon restart, recording or routing writes.
+- `tests/probes/tst_NativeDevices.qml`: reads adapters/wireless rows without scans.
+- `tests/probes/tst_ControlCenter.qml`: offscreen construction/geometry, not visual acceptance.
+- `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
+  service to check typed roundtrips and errors; needs system PyGObject.
+
+Use Qt 6 `qmllint` on changed QML and interpret opaque native/dynamic-model warnings
+alongside compile/runtime evidence. Run `git diff --check` before staging, then
+`git diff --cached --check` and inspect the staged diff before committing. Shell
+pipelines that report test results must enable `set -o pipefail`.
+
+## Engineering state
+
+Read `../AGENTS.md` for conventions and approval boundaries and
+`../SESSION_HANDOFF.md` for the current resume snapshot. The roadmap owns future
+scope; `verification-0.2.0.md` owns this milestone's evidence/manual gaps. Linear
+Kumina / KUM / KumiOS owns issue status; each other product uses its own project.
+Avoid repeating that state in this runbook.
 
 API reference: https://develop.kde.org/docs/plasma/scripting/api/

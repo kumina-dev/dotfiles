@@ -1,35 +1,32 @@
-# KumiOS first-release roadmap
+# KumiOS roadmap
 
-Target: a cohesive KDE Plasma Wayland daily driver with minimal tinkering.
-Keep the top bar, centered dock, unified launcher and custom quick-control
-presentation. Prefer maintained KDE components and native detailed settings.
+Goal: a cohesive KDE Plasma Wayland daily driver with minimal tinkering. Preserve
+the top bar, centered dock, unified launcher and cohesive controls; integrate
+maintained KDE components before building custom backends.
 
-## Current release
+## Release scope
 
-- [x] Inspect source and active desktop; record functional gaps.
-- [x] Create separate product projects in Linear; prioritize KumiOS.
-- [x] Implement in-place layout reconciliation with dock-pin/panel retention.
-- [x] Add read-only preflight and explicit application with private backups.
-- [x] Prepare maintained KDE Dashboard and unified launcher shortcut/helper.
-- [x] Connect custom Bluetooth, audio/microphone and About controls to KDE settings.
-- [x] Test reconciliation and failure boundaries without touching live panels.
-- [x] Apply prepared changes with user approval, preserving live panel and task-manager identities.
-- [x] User confirmed current-session desktop acceptance after approved Plasma restart.
-- [ ] Verify persistence at the next voluntary login; investigate login warnings
-      only if they affect actual use.
-- [x] Prepare local 0.1.0 release commit and annotated v0.1.0 tag; no external publication.
+- **v0.1.0:** created locally and accepted for current-session use. The user accepted
+  release before the separate persistence check. Historical scope/limits:
+  [release notes](releases/0.1.0.md). Keep this tag local.
+- **v0.2.0 — dependable everyday controls:** audio defaults/microphone/recovery,
+  Bluetooth adapter/device state, truthful network/task labels and recoverable
+  quick-control feedback. Implemented and activated; acceptance pending. Current
+  evidence/gates: [verification](plasma/verification-0.2.0.md); authoritative issue
+  state is in Linear KUM-9–12, not duplicated as checkboxes here.
+- **KUM-8:** remains separately pending the user's voluntary login/reboot layout
+  and pinned-app persistence check. Never trigger or silently waive that check.
 
-## Deferred
+Do not start another feature milestone before resolving the current checkpoint
+with the user. No v0.2.0 release action before acceptance and authorization.
 
-- Broader redesigns, a replacement login stack, cloud calendar integration,
-  custom device-management backends and legacy Hyprland utility expansion.
-- Bluetooth adapter discovery beyond the current hardcoded hci0 quick toggle;
-  native device settings remain the intended detailed-management surface.
-- Fresh-machine package/service provisioning: this release's setup utility
-  reconciles the existing desktop and requires its audio service to be available.
+## Deferred scope
 
-KUM-5 through KUM-8 track the release. Automated success does not substitute for
-live checks. Reversible live updates are authorized. No logout, Plasma restart or disruption of active work without user approval.
+Fresh-machine provisioning, broader visual redesign, login-stack replacement,
+cloud calendars, custom device backends and legacy Hyprland utility expansion are
+outside current scope. Login warnings warrant investigation only for real symptoms.
 
-Release decision: user accepts releasing before next-login layout/pin persistence
-verification. KUM-5–7 accepted; KUM-8 tracks only the deferred persistence check.
+Start engineering work from [AGENTS.md](AGENTS.md) and the current
+[handoff](SESSION_HANDOFF.md). Architecture/commands belong in the Plasma runbook;
+completed behavior in the changelog/release notes; issue status and acceptance in
+Linear. Revisit this roadmap when scope changes, not after each implementation command.

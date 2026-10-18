@@ -7,6 +7,8 @@ launcher and cohesive controls, using maintained KDE components wherever they fi
 See [Plasma setup and acceptance](plasma/README.md) for the supported layout,
 read-only preflight, explicit application, backups, recovery and release checklist.
 The older Hyprland/GTK implementation remains available as legacy configuration.
+For engineering work, start with [AGENTS.md](AGENTS.md) and
+[SESSION_HANDOFF.md](SESSION_HANDOFF.md); Git and Linear own current state.
 
 ## Plasma appearance defaults
 
@@ -90,21 +92,9 @@ QML D-Bus encoder currently marshals nested settings dictionaries as `a{sv}` ins
 of NetworkManager's required `a{sa{sv}}`. Device and access-point arguments are shell
 quoted. Saved-profile activation, cancellation, and deletion use the QML D-Bus API directly.
 
-The installed widget is a separate copy. Apply repository changes and reload Plasma:
-
-```sh
-cp -a ~/dotfiles/plasma/plasmoids/org.kumios.controlcenter/. \
-  ~/.local/share/plasma/plasmoids/org.kumios.controlcenter/
-systemctl --user restart plasma-plasmashell.service
-```
-
-Run connection/filter regression tests with the Qt **6** runner (the unqualified
-`qmltestrunner` may launch Qt 5 on systems with both installed):
-
-```sh
-QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software \
-  /usr/lib/qt6/bin/qmltestrunner -input tests/qml -o -,txt
-```
+The installed widget is a separate copy. Use the backed-up widget-only upgrade and
+validation commands in [the Plasma runbook](plasma/README.md). A Plasma restart
+requires explicit approval; file installation alone does not refresh cached QML.
 
 The tests use mock connection requests and scan handlers. Live desktop check:
 verify only wireless entries appear, connect to a saved network, try a new personal

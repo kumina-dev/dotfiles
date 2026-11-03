@@ -50,6 +50,11 @@ manual checks below.
 Not exercised: an actual KDE release that changes the module. The behavior is
 simulated with fixtures and a replaced `NativeAudio.qml`.
 
+Live load: widget files installed (backed up), then a third explicitly approved
+Plasma restart (consumed) on 2026-11-03: service active with a new InvocationID,
+no KumiOS widget errors (including AudioBackend/NativeAudio) in its journal, and the
+top bar (8) and dock (1) widgets unchanged. User check of normal audio controls pending.
+
 ## Live setup — 2026-11-03 (user approved)
 
 - `python3 plasma/appearance.py --apply current` succeeded and verified itself:

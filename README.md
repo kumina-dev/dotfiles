@@ -1,594 +1,84 @@
 # KumiOS
 
-Personal Arch Linux + Hyprland desktop environment with familiar Windows-style shortcuts and a macOS-inspired interface.
-
-The desktop is built around a small set of custom GTK utilities alongside standard Linux components. The current focus is a reliable daily-driver environment before deeper integrations and visual polish.
-
-## Plasma appearance defaults
-
-The current KumiOS Plasma design uses its custom desktop style with Breeze Dark
-application colors. Apply the same appearance on this desktop or a future Plasma
-6 installation from a terminal in the logged-in desktop session:
-
-```sh
-~/dotfiles/plasma/apply-defaults.sh
-```
-
-Requires Plasma's `plasma-apply-colorscheme`, `plasma-apply-desktoptheme`,
-`kwriteconfig6`, Python 3, and the Breeze Dark color scheme/GTK theme. The command
-installs the repository's KumiOS desktop style, applies Breeze Dark, and sets GTK
-3/4 and (when available) GNOME/libadwaita dark preferences. Reopening an application
-may be necessary. Applications with their own appearance settings may need those
-settings adjusted separately.
-
-Each run prints a backup directory under `~/.config/kumios/appearance-backup-*`
-(or `$XDG_CONFIG_HOME/kumios`). It saves the previous KDE and GTK settings and the
-previous installed KumiOS style. GNOME appearance preferences are recorded there
-when available. Restore the saved config files to their original locations and
-reapply the previous color scheme to revert.
-
-This command preserves the current panels, dock, wallpaper, shortcuts, and display
-configuration. It applies appearance defaults to the user running it; run it once
-for each new user after Plasma is installed. It does not provision a complete
-Plasma desktop or automatically seed system-wide accounts. The existing panel
-layout sources are in `plasma/shell/`; `layout-v2.js` replaces panels when explicitly
-run through Plasma's scripting console.
-
-## Plasma Control Center
-
-The Plasma widget sources are in `plasma/plasmoids/org.kumios.controlcenter`.
-Its Wi-Fi detail page filters out wired, bridge, loopback, and VPN entries before
-layout and sorts wireless networks by signal strength. Active connections have
-a checkmark. Opening the page or pressing Refresh requests a scan; the list is
-hidden when Wi-Fi is off and shows an empty/scanning message when appropriate.
-
-Click an available network to connect. Saved profiles are reused; new open and
-personal Wi-Fi networks are added through NetworkManager. Plasma's native secrets
-agent requests passwords, keeping credentials out of widget state and command
-arguments. Initial enterprise/certificate setup belongs in Plasma Network Settings;
-after a profile is saved it can be selected here.
-
-The page shows connection progress, prevents duplicate requests, and offers Cancel.
-Success follows the active connection's state, rather than just accepting a request.
-Backend request errors and failed/cancelled authentication are shown inline, with
-NetworkManager reasons for missing passwords, authentication timeouts, unreachable
-access points, and address configuration failures. Cancellation waits for the
-active connection to stop before reporting completion. A slow
-request shows a warning after 90 seconds and remains cancellable. NetworkManager
-may save a new profile even if activation fails or is cancelled; use Forget to
-remove an unwanted saved profile. A connected state does not imply Internet reachability.
-
-The active network's disconnect icon disconnects its Wi-Fi adapter without turning
-the radio off or forgetting the saved profile. It waits for the adapter to become
-disconnected and reports errors inline. NetworkManager's device-level Disconnect
-prevents an immediate automatic reconnect; select a network to connect again.
-Concurrent connection, disconnect, and Forget requests are blocked while an operation
-is pending.
-
-Saved wireless rows have a Forget icon, including profiles outside scan range.
-An inline confirmation replaces the list until you choose Cancel or Forget. It
-identifies the selected profile, explains removal of its saved password, and warns
-that an active connection may be interrupted. Cancel, leaving the Wi-Fi page, or
-turning the radio off dismisses the confirmation without deleting anything.
-Forgetting a profile does not hide an access point that is still being broadcast;
-it becomes an available network again. Other profiles for the same SSID are retained.
-
-The confirmation keeps a copy of the selected profile's identity through scan/model
-changes. Before deletion the widget rechecks the UUID and wireless profile type
-using GetSettings, which excludes secrets. Errors, including authorization failures
-and profiles removed elsewhere, are shown inline. A timeout tells you to check the
-current saved state before retrying; it does not claim the deletion was undone.
-
-Requires Plasma Network Management, KDE's `org.kde.kitemmodels` and
-`org.kde.plasma.plasma5support` QML modules, `gdbus` (GLib), and the running Plasma
-NetworkManager secrets agent. New-profile creation uses `gdbus` because Plasma's
-QML D-Bus encoder currently marshals nested settings dictionaries as `a{sv}` instead
-of NetworkManager's required `a{sa{sv}}`. Device and access-point arguments are shell
-quoted. Saved-profile activation, cancellation, and deletion use the QML D-Bus API directly.
-
-The installed widget is a separate copy. Apply repository changes and reload Plasma:
-
-```sh
-cp -a ~/dotfiles/plasma/plasmoids/org.kumios.controlcenter/. \
-  ~/.local/share/plasma/plasmoids/org.kumios.controlcenter/
-systemctl --user restart plasma-plasmashell.service
-```
-
-Run connection/filter regression tests with the Qt **6** runner (the unqualified
-`qmltestrunner` may launch Qt 5 on systems with both installed):
-
-```sh
-QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software \
-  /usr/lib/qt6/bin/qmltestrunner -input tests/qml -o -,txt
-```
-
-The tests use mock connection requests and scan handlers. Live desktop check:
-verify only wireless entries appear, connect to a saved network, try a new personal
-network's password dialog, cancel authentication, and retry after an error. Check
-that progress and the connected checkmark follow the actual NetworkManager state.
-Use the disconnect icon on an active row, confirm the radio stays on, then select
-that saved network to reconnect.
+**A personal Linux desktop project focused on creating a cohesive, reliable, and customizable everyday computing experience.**
 
-Verified in a live Plasma session on 2026-10-18 using the installed Wi-Fi components:
-saved-profile disconnect/reconnect, cancellation of an activation followed by retry,
-native password-dialog cancellation followed by saved-profile recovery, and a
-successful fresh-profile connection after entering the password in Plasma. The
-original saved connection was restored and temporary test profiles were removed.
-An earlier fresh-profile attempt failed association; that failure prompted the
-more specific NetworkManager error messages.
-Forget verification on 2026-10-18 used a disposable profile with autoconnect disabled:
-confirmation cancellation, deletion through the real NetworkManager API, and removal
-from saved settings were checked without deleting an existing user profile. The QML
-suite also checks denied requests, profile identity changes, timeouts, and retries.
+KumiOS explores how familiar desktop interaction patterns can be combined with the flexibility of Linux, with an emphasis on usability, consistency, and practical system integration.
 
-These steps may switch the active network; use a network you can safely test.
-
-## Versioning
+The project runs on Arch Linux and is developed as a personal daily-driver environment.
 
-The development version is stored in [hypr/.config/hypr/VERSION](hypr/.config/hypr/VERSION). Settings reads that same installed file for About and copied system information.
-
-Changes are recorded in [CHANGELOG.md](CHANGELOG.md). Release tags will identify tested desktop snapshots; the current version is a development build.
+## Project Status
 
-## Desktop
-
-- Hyprland
-- Waybar
-- SwayNC
-- Hyprlock
-- Hypridle
-- Hyprpaper
-- Hyprlauncher
-- Fuzzel
-- Kitty
-- Nautilus
+**Status:** Active development
 
-## Custom desktop utilities
+KumiOS has evolved through different desktop architectures.
 
-### Kumina Settings
+The public repository currently contains an earlier **Hyprland-based implementation**. The newer development direction is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary.
 
-GTK 3 settings application with pages for:
+The newer implementation is not yet fully represented by the public repository.
 
-- Wi-Fi
-- Bluetooth
-- Display
-- Appearance
-- Input
-  - Keyboard
-  - Mouse
-- Sound
-- Account
-- Language & Region (English/Finnish interface, date/time, numbers, and currency)
+For details about the earlier implementation, see [Legacy Hyprland Documentation](docs/legacy-hyprland.md).
 
-Open the overview:
+## Design Principles
 
-```sh
-~/.config/hypr/scripts/open-settings.sh
-```
+KumiOS follows five core principles:
 
-Open a specific page:
+- **Consistency:** Components should share predictable appearance and behavior.
+- **Reliability:** Everyday desktop functionality takes priority over visual experimentation.
+- **Integration:** Prefer established Linux and KDE infrastructure where suitable.
+- **Customization:** Allow users to adapt their desktop without unnecessary complexity.
+- **Maintainability:** Minimize duplicated functionality and unnecessary custom infrastructure.
 
-```sh
-~/.config/hypr/scripts/open-settings.sh wifi
-~/.config/hypr/scripts/open-settings.sh bluetooth
-~/.config/hypr/scripts/open-settings.sh display
-~/.config/hypr/scripts/open-settings.sh appearance
-~/.config/hypr/scripts/open-settings.sh input
-~/.config/hypr/scripts/open-settings.sh about
-~/.config/hypr/scripts/open-settings.sh account
-~/.config/hypr/scripts/open-settings.sh sound
-~/.config/hypr/scripts/open-settings.sh region
-```
-
-Display and Input settings persist their generated Hyprland configuration in ignored files under:
-
-```text
-~/.config/hypr/generated/
-```
-
-Hyprland loads these generated settings when available and falls back to the repository defaults otherwise.
-
-### Control Center
-
-The Control Center provides compact daily controls for:
-
-- Wi-Fi
-- Bluetooth
-- Audio output
-- Microphone
-- Media playback
-
-All primary controls are on one page without a scroll container. Wi-Fi and Bluetooth arrows open their Settings pages. The Sound button opens device selection and other sound settings; the Settings button opens the overview. Escape closes the Control Center.
-
-Long network names, device names, media titles, and errors do not expand the quick-controls layout. Full text is available through tooltips. Hover the Output or Microphone heading to identify its current default device.
-
-Open it with:
-
-```sh
-~/.config/hypr/scripts/control-center-toggle.sh
-```
-
-### Account
-
-Account shows the existing Linux account running Settings. It reads the account
-by the process user ID, not environment variables, so launching Settings as a
-different user correctly shows that user's account.
-
-The page provides the username, full name (when set), user ID, primary group,
-active session groups, home directory, and configured login shell. The heading
-falls back to the username when no full name is set. Unknown groups retain their
-numeric IDs. Session groups describe the current process's group membership;
-they may differ from newly edited account group assignments until a new session.
-
-Refresh reloads the data. Copy account information copies the displayed snapshot
-as plain text. Only the name portion of the GECOS field is used; office and phone
-fields are omitted. Both English and Finnish are supported. Long values wrap
-inside a scrollable page; the Settings sidebar also scrolls when necessary.
-
-This first iteration is read-only and uses the existing Linux account. It has
-no separate login, cloud account, account editing, or password-management flow.
-
-Desktop check: open `open-settings.sh account`, compare the details with your
-account, try Refresh and Copy account information, and check the page/sidebar
-at your normal display scale. The copied text should match the displayed values.
-
-### About this PC
-
-The About page reads the current computer's:
-
-- KumiOS version, hostname, distribution, and kernel
-- Processor and PCI graphics devices
-- Usable memory reported by Linux
-- Total, used, and free space for the system filesystem and a separate home filesystem when present
-
-Refresh reloads the information. Copy system information copies the displayed values as plain text. Device names are read using `lspci` from the optional `pciutils` package; if unavailable, the other information still loads. Storage values describe mounted filesystems, not the sum of all physical disks.
-
-### Language & Region
-
-Language & Region provides:
-
-- English/Finnish interface selection for Settings, Control Center, the power menu, and calendar
-- 12/24-hour clock, numeric date format, and Monday/Sunday week start
-- Finnish/English number styles and EUR/USD/GBP currency previews
-- A preview and explicitly applied, per-user preferences
-- System time-zone selection through `timedatectl` and the existing polkit agent
-
-Formats are stored atomically in `$XDG_CONFIG_HOME/kumios/region.json` (normally
-`~/.config/kumios/region.json`). They affect the KumiOS panel clock, its calendar
-tooltip, the calendar window, and memory/storage quantities in About this PC. Defaults remain 24-hour time, day-first dates,
-and Monday-first weeks. The panel and open calendar observe changes within a
-second, including midnight and system time-zone changes. No logout is required.
-Other applications keep their own regional formats.
-
-Number formatting is independent of the interface language: Finnish uses
-`1 234,56` (with non-breaking grouping spaces), while English uses `1,234.56`.
-The default is Finnish numbers and EUR. Existing preference files gain these
-defaults when read without changing their saved clock/date/week choices.
-
-The live currency preview supports EUR, USD, and GBP. Finnish formatting places
-the symbol after the amount; English places it before. Currency is a display
-preference, not conversion. The desktop has no monetary data view yet; currency
-formatting is currently used by the preview and is available through the shared
-`format_currency` helper. Callers with monetary data should pass its actual
-currency explicitly. Display rounding uses decimal half-up rounding.
-
-Choose **Apply formats**, then open or refresh **About this PC** to see the new
-number style in memory/storage values. Copy system information preserves the
-values from that same displayed snapshot. Technical identifiers and editable
-backend values (such as display mode IDs) are not reformatted.
-
-The panel clock now uses a Waybar custom JSON stream. Left-click still toggles
-the calendar; right-click opens Language & Region. Reload Waybar once after
-installing this change (`pkill -SIGUSR2 -x waybar`). Subsequent preference changes
-do not need a reload. Both calendars use month and weekday names from the
-selected KumiOS interface language.
-
-Time-zone changes apply system-wide and may prompt for authentication. Errors
-and cancelled authentication are shown on the page. Format preferences remain
-usable if timedated is unavailable. Invalid preference files fall back to the
-defaults in the clock/calendar and are reported in Settings; applying formats
-replaces the invalid file.
-
-Interface language is stored separately in `$XDG_CONFIG_HOME/kumios/language.json`.
-English is the default. Choose **English** or **Suomi**, then **Apply language**.
-Close and reopen the custom GTK apps to apply it; the panel tooltip updates
-within a second. No logout is needed. Existing windows retain their language
-until reopened, so changing a preference cannot disrupt an in-progress action.
-
-This translates KumiOS-owned labels, actions, status messages, and calendar
-names. Device names, SSIDs, time-zone identifiers, and hardware values are
-preserved. External command errors and GTK-provided standard dialogs still use
-their own language. Hyprland-matched window titles remain stable. Language
-selection does not set system `LANG`/`LC_*`, generate locales, change keyboard
-layouts, or alter saved regional formats. Keyboard layouts stay under Input.
-
-Translations live in `hypr/.config/hypr/scripts/kumina_common/translations/fi.json`.
-Messages use named placeholders; never translate command arguments, device data,
-or internal IDs. Unknown messages fall back to their English source. Invalid
-language preferences fall back to English and are reported on the settings page;
-applying a language replaces the invalid preference file.
-
-Desktop verification:
+## Desktop Direction
 
-1. Open `open-settings.sh region`; apply 12-hour time and an ISO date. Check the
-   preview, panel tooltip, and open calendar agree. Restore your preferred values.
-2. Change the week start; check both calendar headers and day columns move together.
-3. Apply the current time zone; this should not request authentication. A different
-   time zone may prompt through polkit; cancellation must show an error. Restore
-   your original zone after testing an actual change.
-4. Close/reopen Settings and the calendar; saved format choices should remain.
-5. Apply **Suomi**, reopen Settings, Control Center, the power menu, and calendar.
-   Check labels, long Finnish confirmations, and both calendar weekday headers.
-   Check that selected devices and keyboard layouts remain the same.
-6. Apply **English** and reopen the apps to switch back. Verify that the panel
-   calendar tooltip switches without restarting Waybar.
-7. Change the number style and currency. Check both previews before applying;
-   applying must preserve the selected date, clock, week start, and interface language.
-8. Refresh About this PC and copy the system information. Memory/storage values
-   should use the selected decimal separator both on screen and in the copied text.
+The newer KumiOS architecture is centered around KDE Plasma and KWin.
 
-### Login screen
+Its design includes:
 
-The greetd/ReGreet theme is managed separately from user dotfiles. See
-[greeter/README.md](greeter/README.md) for demo preview, installation, and rollback.
-It exports the current wallpaper and palette into system-readable files.
+- A top panel with application-aware functionality
+- A centered application dock
+- A unified application launcher
+- Integrated system controls
+- Notifications and system status
+- Wallpaper-responsive appearance
+- Consistent desktop interactions and keyboard shortcuts
+- Support for multiple monitors and virtual desktops
 
-### Lock screen
+These elements describe the project's design direction and ongoing implementation, not a list of fully released features.
 
-The password input stays visible even when empty and uses Hyprlock's `$PAMPROMPT` variable as its placeholder. It displays the actual input prompt when PAM asks for a password or PIN.
+## Technology
 
-A fingerprint-style icon and "Touch your security key" appear while the locking Hyprlock process holds `pam_u2f`'s default `/var/run/user/$UID/pam-u2f-authpending` file open. The indicator checks every 250 ms and disappears when that descriptor closes. A leftover file alone does not trigger it, and requests from other processes such as sudo are ignored. The icon is a security-key touch indicator, not fingerprint authentication.
+The project uses or explores:
 
-The helper reads process metadata and file-descriptor metadata only. It does not read key registrations or credentials, and this configuration does not change the PAM stack. If the pending state cannot be inspected, the icon stays hidden; password input remains available. A custom `authpending_file` path would need a corresponding helper change.
+- Arch Linux
+- KDE Plasma 6
+- KWin and Wayland
+- Qt and QML
+- PipeWire and WirePlumber
+- BlueZ
+- NetworkManager
+- Shell scripting and Linux system services
 
-Hyprlock 0.9.6 cannot conditionally hide its input field based on this signal through configuration. That part remains pending; the field is visible during both security-key and password authentication.
+The public legacy implementation uses Hyprland, GTK utilities, Waybar, SwayNC, and related components.
 
-### Power menu
+## Documentation
 
-The custom power menu provides:
+- [Legacy Hyprland Implementation](docs/legacy-hyprland.md)
+- [Architecture](docs/architecture.md)
+- [Roadmap](docs/roadmap.md)
+- [Changelog](CHANGELOG.md)
 
-- Lock
-- Sleep
-- Log Out
-- Restart
-- Shut Down
-
-Destructive session and power actions require confirmation.
-
-Open it with:
-
-```sh
-~/.config/hypr/scripts/power-menu-toggle.sh
-```
-
-The configured Hyprland shortcut is:
-
-```text
-Super + Shift + L
-```
-
-### Calendar
-
-The calendar combines a fixed six-week month grid with a selected-day event list.
-Click a day to select it, then **Add event**. Events have a title, an all-day date,
-and optional notes. **Edit** can change the title, notes, or date; moving an event
-opens its destination day. **Delete** requires confirmation. Dots mark days with
-events in the calendar window. The month arrows select the first day of the
-previous/next month, and Today returns to the current date.
-
-The calendar can be toggled with:
-
-```sh
-~/.config/hypr/scripts/calendar-toggle.sh
-```
-
-Events are stored in `$XDG_DATA_HOME/kumios/calendar.sqlite3`, normally
-`~/.local/share/kumios/calendar.sqlite3`. This is user data outside the dotfiles
-repository. Closing/reopening the calendar preserves events. To back up the data,
-close the calendar and copy that file. No external service or extra Python
-package is required.
-
-Titles are limited to 160 characters and notes to 2000. Reads and writes run in
-background workers; database errors appear in the UI. Invalid edits preserve
-existing events. Refresh reloads the selected day's events and visible markers.
-The calendar uses the existing interface language, date format, and week-start
-preference. The 740×480 floating window provides space for both panes.
-
-This iteration supports local all-day events only. Timed events, reminders,
-recurrence, imports/exports, and external calendar sync are not implemented.
-The panel's hover calendar remains a date overview; event markers appear in the
-opened calendar window.
-
-Desktop check: add an event with notes, close/reopen the calendar, edit it onto
-another day, cancel one deletion, then confirm a deletion. Check marker updates,
-month navigation, both week-start settings, and English/Finnish dialogs.
-
-## Sound
-
-Sound controls use PipeWire and WirePlumber.
-
-Settings provides default output and microphone selection. Both Settings and Control Center provide:
-
-- Separate output and microphone volume
-- Mute controls
-- Automatic updates while visible
-- Device hotplug handling
-- Visible backend errors
-
-Default device selection is handled through WirePlumber's `wpctl` policy.
-
-Applications with explicitly selected audio devices may continue using their own selection.
-
-The current UI does not manage:
-
-- device profiles
-- ports
-- per-application routing
-
-Existing amplification above 100% is displayed without modifying it. Moving a Kumina volume slider writes a value in the 0–100% range.
-
-## Wi-Fi
-
-Wi-Fi management uses NetworkManager through `nmcli`.
-
-Settings supports:
-
-- adapter on/off
-- network discovery
-- saved networks
-- secured network connection
-- disconnect
-- forget network
-
-The Control Center provides a smaller view intended for normal daily use.
-
-## Bluetooth
-
-Bluetooth management uses BlueZ through `bluetoothctl`.
-
-Settings supports:
-
-- adapter on/off
-- scanning
-- pairing
-- connecting
-- disconnecting
-- forgetting paired devices
-
-The Control Center provides an adapter toggle and a shortcut to Bluetooth settings for device management.
-
-## Notifications
-
-SwayNC popup width is 420 pixels, and its popup area has a maximum height of 240 pixels. This bounds the visible notification stack, including long messages. SwayNC may scroll overflow inside that area; this is not a fixed height for each individual notification card. Fixed-size cards remain a separate roadmap item.
-
-The notification center remains available with `Super + N`.
-
-## Workspace shortcuts
-
-`Super + Alt + 1–9` moves the focused window to the selected workspace without following it. The existing `Super + Shift + 1–9` bindings remain available.
-
-## Appearance
-
-Wallpaper-based dynamic theming uses Matugen.
-
-The canonical command is:
-
-```sh
-~/.local/bin/set-wallpaper <image> [dark|light]
-```
-
-It:
-
-1. stores the active wallpaper at `~/Pictures/Wallpapers/main.png`
-2. stores the selected color mode
-3. regenerates Matugen colors
-4. applies the wallpaper to active monitors
-5. reloads supported desktop components
-
-Generated theme files are intentionally not tracked by Git.
-
-## Runtime dependencies
-
-The custom desktop utilities rely on standard command-line tools from the desktop stack, including:
-
-- `hyprctl`
-- `nmcli`
-- `bluetoothctl`
-- `wpctl`
-- `playerctl`
-- `matugen`
-
-GTK utilities require Python, PyGObject, and GTK 3.
+Documentation is being reorganized as the newer desktop architecture develops.
 
 ## Installation
 
-Configurations are managed using GNU Stow.
+KumiOS is currently a personal development project, not a finished Linux distribution or supported desktop installer.
 
-```sh
-git clone https://github.com/kumina-dev/dotfiles ~/dotfiles
-cd ~/dotfiles
+The repository should not be treated as a ready-to-install KDE-based desktop until the implementation, installation instructions, and verification process have been published.
 
-stow hypr waybar swaync kitty fuzzel matugen gtk scripts
-```
+## License
 
-Re-stow Hyprland configuration after repository changes when necessary:
+See the repository's license information, if provided. No additional license rights are implied by this README.
 
-```sh
-stow -R hypr
-```
+## Author
 
-## Generated and runtime files
-
-Repository configuration is kept separate from generated machine state.
-
-Examples of ignored generated files include:
-
-```text
-hypr/.config/hypr/generated/
-kitty/.config/kitty/colors.conf
-fuzzel/.config/fuzzel/colors.ini
-gtk/.config/gtk-3.0/matugen.css
-gtk/.config/gtk-4.0/matugen.css
-theme/.config/theme/colors.css
-```
-
-Python bytecode and cache directories are also ignored.
-
-## Development
-
-The project prioritizes:
-
-1. basic functionality
-2. reliability and error recovery
-3. tests and cleanup
-4. visual/UX polish
-5. larger integrations
-
-See [ROADMAP.md](ROADMAP.md).
-
-### Tests
-
-Run the full suite without generating Python bytecode:
-
-```sh
-PYTHONDONTWRITEBYTECODE=1 \
-python3 -m unittest discover -s tests -v
-```
-
-Some widget tests require GTK 3 and an active display. They skip when those are unavailable.
-
-They can also be run under Xvfb:
-
-```sh
-xvfb-run -a \
-env PYTHONDONTWRITEBYTECODE=1 \
-python3 -m unittest discover -s tests -v
-```
-
-### Syntax check
-
-```sh
-python3 - <<'PY'
-from pathlib import Path
-
-root = Path(
-    "hypr/.config/hypr/scripts"
-)
-
-files = sorted(
-    root.rglob("*.py")
-)
-
-for path in files:
-    compile(
-        path.read_text(
-            encoding="utf-8"
-        ),
-        str(path),
-        "exec",
-    )
-
-print(
-    f"Syntax OK: {len(files)} Python files"
-)
-PY
-```
+Developed by [Ville Syrjälä](https://github.com/kumina-dev).

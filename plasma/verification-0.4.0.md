@@ -4,8 +4,8 @@ Canonical repository evidence record for **v0.4.0**. Git identifies the tested
 implementation; Linear (milestone "v0.4.0 — Plasma-only main, Hyprland preserved on a
 branch", KUM-26–29) owns issue status and acceptance. Resume from `../SESSION_HANDOFF.md`.
 
-Status 2026-11-03: implemented on `kumios/plasma-only` and accepted by the user
-(login greeter and kitty Light/Dark). KUM-26–29 Done. Not merged into `main`.
+Status 2026-11-03: accepted by the user (login greeter and kitty Light/Dark).
+KUM-26–29 Done. Merged into `main`, versioned 0.4.0 and tagged `v0.4.0`.
 
 ## Scope and decisions
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 0.4.0-dev
+## 0.4.0 — 2026-11-03
 
 - `main` is Plasma-only. The Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel,
   matugen, the GTK utilities and their tests) is preserved, unmaintained, on the

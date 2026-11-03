@@ -1,28 +1,29 @@
 # KumiOS session handoff
 
-Snapshot: 2026-11-03 (v0.3.0 in progress). Read this index, then reconstruct live state from Git and
+Snapshot: 2026-11-03 (v0.4.0 released as a tag). Read this index, then reconstruct live state from Git and
 Linear; do not treat a previous conversation or this snapshot as a live database.
 
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.4.0 — Plasma-only main, Hyprland preserved on a branch**,
-  authorized by the user on 2026-11-03. v0.3.0 is accepted and tagged.
-- Active branch: `kumios/plasma-only` (from `main` at `v0.3.0`). `legacy/hyprland`
-  preserves the Hyprland-era tree. v0.3.0's branch was merged (`7d5ad50`) and deleted.
-- Implementation commits: `aed52c5` (KUM-20), `bc0b565` (KUM-21), `04b66fa` and
-  `bd0b97d`/`ba53a02` (KUM-22), `fe09274` (KUM-23), `03c00ef` (KUM-24).
+- Milestone: **v0.4.0 — Plasma-only main, Hyprland preserved on a branch**, accepted
+  by the user, merged and tagged on 2026-11-03. No next milestone is authorized.
+- Active branch: `main`. `kumios/plasma-only` was merged (`f9ff574`) and deleted.
+  `legacy/hyprland` preserves the Hyprland-era tree (keep it; not maintained).
+- v0.4.0 commits: `86b2e9c` (KUM-26), `dbcbea4` (KUM-27), `5d1c958`/`dd3f4a4`
+  (KUM-28, KUM-29). v0.3.0: `aed52c5`, `bc0b565`, `04b66fa`, `bd0b97d`, `ba53a02`,
+  `fe09274`, `03c00ef`.
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
   with `git log -1 --format='%H %s' -- SESSION_HANDOFF.md`. Obtain actual latest
   HEAD with `git log -1 --oneline`; compare before resuming rather than recording
   an impossible self-referential commit hash inside its own file.
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
-- Release tags: `v0.1.0` at `b197802`, `v0.2.0` and `v0.3.0` (both 2026-11-03), all
-  published on GitHub. Source version is `0.4.0-dev` (root `VERSION`). No GitHub releases exist; creating
+- Release tags: `v0.1.0` at `b197802`, then `v0.2.0`, `v0.3.0` and `v0.4.0` (all
+  2026-11-03), all published on GitHub. Source version is `0.4.0` (root `VERSION`). No GitHub releases exist; creating
   one or a new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `kumios/plasma-only`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -92,8 +93,8 @@ Automated mocks and test-client reconnect do not prove those behaviors.
 
 ## v0.4.0 state
 
-Branch `kumios/plasma-only` (from `main` at `v0.3.0`). `legacy/hyprland` (pushed)
-preserves the complete Hyprland-era tree at v0.3.0 with history.
+Merged into `main` and tagged `v0.4.0`. `legacy/hyprland` (pushed) preserves the
+complete Hyprland-era tree at v0.3.0 with history.
 
 | Issue | State | Notes |
 | --- | --- | --- |
@@ -108,8 +109,10 @@ API change) remain as recorded in `plasma/verification-0.3.0.md`.
 
 ## Next authorized action
 
-Continue v0.4.0: finish KUM-26 docs/tests, then KUM-27, KUM-28 and KUM-29 in that
-order. The greeter switch (KUM-29) needs a nested KWin pre-check, a backup of
-`/etc/greetd`, the user's own sudo, documented TTY recovery and a logout/login test.
+v0.4.0 is released as a tag (no GitHub release). No next feature milestone is
+authorized; KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
+when observed: the V030-AUTO dusk/dawn switch, and the audio API check after a KDE
+upgrade (`python3 plasma/audio_api.py`). After wallpaper or Light/Dark changes, the
+login theme updates only when `python3 plasma/greeter/setup.py install` is rerun.
 Never change greetd/PAM authentication. No GitHub release, version tag or Plasma
 restart without the user's instruction.

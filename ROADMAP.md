@@ -20,7 +20,7 @@ maintained KDE components before building custom backends.
   private audio API (KUM-23) and retiring the legacy audio service (KUM-24). Merged
   into `main`, versioned 0.3.0 and tagged `v0.3.0` on 2026-11-03. Evidence:
   [verification](plasma/verification-0.3.0.md).
-- **v0.4.0 — Plasma-only main (in progress, authorized 2026-11-03):** Hyprland-era
+- **v0.4.0 — Plasma-only main (accepted, merged and tagged `v0.4.0` 2026-11-03):** Hyprland-era
   code moves to the `legacy/hyprland` branch (KUM-26). The pieces Plasma still uses
   get Plasma-native sources: kitty follows Light/Dark (KUM-27), the ReGreet login theme
   takes KDE colors and wallpaper (KUM-28), and the login greeter runs on KWin instead

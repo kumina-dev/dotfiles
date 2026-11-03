@@ -242,8 +242,10 @@ def install(stage):
         restore(backup)
         raise
     print('Installed. greetd will start ReGreet on KWin with this theme at the next logout or reboot.')
-    print('If the login screen does not appear, switch to a text console (Ctrl+Alt+F2), log in there and run:')
-    print(f'Rollback: python3 plasma/greeter/setup.py restore {backup}')
+    print('Keep the backup path. If the login screen does not appear, switch to a text console')
+    print('(Ctrl+Alt+F2), log in, and from the repository run:')
+    print(f'  python3 plasma/greeter/setup.py restore {backup}')
+    print('  sudo systemctl restart greetd')
 
 
 def main():

@@ -13,11 +13,11 @@ maintained KDE components before building custom backends.
   quick-control feedback. Accepted 2026-10-18 with explicit unverified limitations;
   tagged `v0.2.0` on 2026-11-03. Evidence: [verification](plasma/verification-0.2.0.md).
 - **KUM-8:** layout and pinned-app persistence across login confirmed 2026-10-18.
-- **v0.3.0 — wallpaper accent and light/dark appearance (in progress, authorized
-  2026-11-03):** the accent follows the wallpaper and the user chooses Light, Dark or
-  Automatic, replacing the hardcoded dark style. KUM-20–22 implemented on
-  `kumios/adaptive-appearance`; live setup and manual acceptance pending. Evidence
-  and checks: [verification](plasma/verification-0.3.0.md).
+- **v0.3.0 — wallpaper accent and light/dark appearance:** the accent follows the
+  wallpaper and the user chooses Light, Dark or Automatic, replacing the hardcoded
+  dark style. Accepted by the user 2026-11-03 in the live session; the Automatic
+  schedule transition is not yet observed. On `kumios/adaptive-appearance`, not yet
+  merged or tagged. Evidence: [verification](plasma/verification-0.3.0.md).
 
 No GitHub release, new version tag or deployment is authorized. Ordinary validated
 development-branch synchronization is authorized; follow AGENTS.md and report the

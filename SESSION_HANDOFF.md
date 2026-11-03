@@ -90,24 +90,24 @@ Automated mocks and test-client reconnect do not prove those behaviors.
 
 ## v0.3.0 state
 
-| Issues | State | Remaining outcome |
+| Issues | State | Notes |
 | --- | --- | --- |
-| KUM-20 | In Review | Live visual check of the adaptive Plasma style |
-| KUM-21 | In Review | Live `appearance.py --apply`; accent and GTK checks |
-| KUM-22 | In Review | Live Control Center mode switching |
+| KUM-20 | Done | Adaptive Plasma style; user passed V030-STYLE |
+| KUM-21 | Done | appearance.py, KumiOS Light/Dark themes, accent, KDE-owned GTK; user passed V030-ACCENT/GTK/PRESERVED |
+| KUM-22 | Done | Control Center modes; button highlight fixed in `bd0b97d`; user passed V030-MODES/EXTERNAL |
 
-Decisions: KDE services provide the accent (`accentColorFromWallpaper`) and the
-light/dark switch (look-and-feel auto-switcher). KumiOS ships appearance-only
-Light/Dark global themes because Breeze's replace the wallpaper and Plasma style.
-KDE owns `~/.config/gtk-3.0`/`gtk-4.0` (user decision 2026-11-03); the legacy `gtk/`
-package stays unchanged. Evidence and manual checks: `plasma/verification-0.3.0.md`.
+User accepted the live result on 2026-11-03. V030-AUTO's schedule transition is
+unverified (Automatic selection passed). Decisions: KDE services provide the accent
+and the light/dark switch; KumiOS ships appearance-only Light/Dark global themes
+because Breeze's replace the wallpaper and Plasma style; KDE owns
+`~/.config/gtk-3.0`/`gtk-4.0` (user decision); the legacy `gtk/` package is
+unchanged. Evidence: `plasma/verification-0.3.0.md`.
 
 ## Next authorized action
 
-Live setup ran with user approval on 2026-11-03 (`appearance.py --apply current`,
-`setup.py --install-widgets`; see the verification report). The new Control Center
-section needs a later login or an explicitly approved Plasma restart. Run the V030
-manual checks with the user and record results in the
-verification report and Linear. No GitHub release, version tag, deployment or
-Plasma restart is authorized without separate approval. v0.2.0's three unverified
-limitations remain as recorded; do not run disruptive tests to close them.
+v0.3.0 is accepted but not merged, versioned, tagged or released: `main` does not
+contain `kumios/adaptive-appearance`, and the source version is `0.3.0-dev`. Merging
+into `main`, bumping to 0.3.0, tagging and any GitHub release each need the user's
+instruction. Both approved Plasma restarts are consumed. Record the V030-AUTO
+transition when the user observes one. v0.2.0's three unverified limitations
+remain as recorded.

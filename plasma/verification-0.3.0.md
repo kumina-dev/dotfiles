@@ -5,8 +5,8 @@ implementation; Linear (milestone "v0.3.0 — wallpaper accent and light/dark
 appearance", KUM-20–22) owns issue status and acceptance. Commands live in
 [README.md](README.md#appearance). Resume from `../SESSION_HANDOFF.md`.
 
-Status 2026-11-03: **implemented; automated evidence passes; applied to the live
-session with user approval; manual acceptance pending.** Nothing below is a user acceptance.
+Status 2026-11-03: **accepted by the user in the live session**, with one check
+not yet observed (V030-AUTO schedule transition; see below). KUM-20–22 Done.
 
 ## Scope
 
@@ -59,16 +59,18 @@ manual checks below.
   (consumed) loaded it: service active with a new InvocationID, no KumiOS widget
   errors, top bar 8 and dock 1 widgets as before.
 
-## Manual acceptance (pending)
+## Manual acceptance — 2026-11-03
 
-Live setup and the approved restart are done (above); all checks can now run.
+The user tested the live session after the second restart and reported: "The
+button stay as selected now, everything works!" (earlier: "Everything seems to
+work except the button doesn't seem to stay visibly as selected", since fixed).
 
-| Reference | Check |
-| --- | --- |
-| V030-STYLE | Top bar and dock follow Light and Dark, keeping their translucency and shape. |
-| V030-ACCENT | Changing the wallpaper changes the accent (selection, focus, highlights) in Plasma and Qt apps. |
-| V030-MODES | Control Center Light, Dark and Automatic each apply, show the applying state, and end with the chosen button selected. |
-| V030-AUTO | Automatic matches the current day/night state; a schedule transition switches it (may be observed later). |
-| V030-EXTERNAL | A change in System Settings → Global Theme shows correctly when the popup reopens. |
-| V030-GTK | A GTK app (and a libadwaita app, if installed) follows Light/Dark and the accent. |
-| V030-PRESERVED | Wallpaper, panels, dock pins and shortcuts are unchanged after setup and each mode change. |
+| Reference | Check | Result |
+| --- | --- | --- |
+| V030-STYLE | Top bar and dock follow Light and Dark, keeping their translucency and shape | Passed (user) |
+| V030-ACCENT | Changing the wallpaper changes the accent in Plasma and Qt apps | Passed (user) |
+| V030-MODES | Control Center Light, Dark and Automatic apply, show the applying state and end with the chosen button selected | Passed after `bd0b97d` (user) |
+| V030-EXTERNAL | A System Settings Global Theme change shows when the popup reopens | Passed (user) |
+| V030-GTK | GTK apps follow Light/Dark and the accent | Passed (user) |
+| V030-PRESERVED | Wallpaper, panels, dock pins and shortcuts unchanged | Passed (user); panel widget counts unchanged after both restarts |
+| V030-AUTO | Automatic starts in the right variant; a Night Light schedule transition switches it | Selecting Automatic passed (user). **The transition itself is unverified**: no dusk/dawn switch has been observed. Record the result when it happens; do not force a transition to close it. |

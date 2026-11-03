@@ -96,6 +96,7 @@ Automated mocks and test-client reconnect do not prove those behaviors.
 | KUM-20 | Done | Adaptive Plasma style; user passed V030-STYLE |
 | KUM-21 | Done | appearance.py, KumiOS Light/Dark themes, accent, KDE-owned GTK; user passed V030-ACCENT/GTK/PRESERVED |
 | KUM-22 | Done | Control Center modes; button highlight fixed in `bd0b97d`; user passed V030-MODES/EXTERNAL |
+| KUM-23 | In Review | Private KDE audio API isolation and upgrade check (`fe09274`); widget files installed; needs the new code loaded and a user check that audio controls still work |
 
 User accepted the live result on 2026-11-03. V030-AUTO's schedule transition is
 unverified (Automatic selection passed). Decisions: KDE services provide the accent

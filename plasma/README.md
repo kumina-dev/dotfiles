@@ -127,6 +127,25 @@ that cache colors may need reopening. The Plasma style and themes apply to the
 running shell immediately; the accent updates the next time KDE evaluates the
 wallpaper (for example after a wallpaper change).
 
+### Lock screen
+
+The lock screen is KDE's own (kscreenlocker); its UI comes from Plasma's shell and
+is not replaced. It follows Light/Dark and the wallpaper accent through the KumiOS
+Plasma style and color scheme. Its wallpaper is set to the desktop's and kept in sync:
+
+```sh
+python3 plasma/lockscreen.py                # read-only status
+python3 plasma/lockscreen.py install-sync   # back up kscreenlockerrc, sync, keep in sync
+python3 plasma/lockscreen.py remove-sync    # stop syncing (current wallpaper stays)
+```
+
+`install-sync` adds the user units `kumios-lockscreen-sync.path` and `.service`,
+which re-run `lockscreen.py sync` when `plasma-org.kde.plasma.desktop-appletsrc`
+(wallpaper) or `kdeglobals` (Light/Dark, which selects a wallpaper package's dark
+image) changes. Syncing only writes when the wallpaper differs. The backup is in
+`~/.config/kumios/lockscreen-backup-*`. It never locks the session; check the
+result by locking (Meta+L).
+
 ### Login greeter
 
 The login screen is greetd + ReGreet, started on KWin and themed from KDE (colors,

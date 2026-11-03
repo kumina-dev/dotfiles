@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 0.5.0-dev
+
+- The lock screen shows the desktop's wallpaper and keeps it in sync
+  (`plasma/lockscreen.py`, user path unit). It follows Light/Dark and the accent
+  through the KumiOS style. Wallpaper and color resolution is shared with the
+  login greeter (`plasma/desktop_appearance.py`).
+
 ## 0.4.0 — 2026-11-03
 
 - `main` is Plasma-only. The Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel,

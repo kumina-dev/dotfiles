@@ -1,6 +1,7 @@
 """ReGreet login theme: KDE colors/wallpaper, snapshot portability and rollback
 boundaries (KUM-28). Nothing here touches /etc/greetd or runs sudo."""
 import importlib.util
+import sys
 from pathlib import Path
 import tempfile
 import tomllib
@@ -121,7 +122,7 @@ class WallpaperTests(unittest.TestCase):
     def test_missing_image_is_none(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            with patch.object(greeter, 'package_image', return_value=None):
+            with patch.object(sys.modules['desktop_appearance'], 'package_image', return_value=None):
                 self.assertIsNone(greeter.plasma_wallpaper(self.appletsrc(root, root / 'gone.png'), True))
 
 

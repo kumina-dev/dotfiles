@@ -1,16 +1,16 @@
 # KumiOS session handoff
 
-Snapshot: 2026-10-18; Git checkpoint updated 2026-11-03. Read this index, then reconstruct live state from Git and
+Snapshot: 2026-11-03 (v0.3.0 in progress). Read this index, then reconstruct live state from Git and
 Linear; do not treat a previous conversation or this snapshot as a live database.
 
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.2.0 — dependable everyday controls**, accepted with documented
-  unverified limitations on 2026-10-18; no next feature milestone authorized.
-- Active branch: `main`. `kumios/dependable-controls` (and the earlier
-  `kumios/plasma-first-release`) was merged into `main` on 2026-11-03 and deleted.
-- Implementation commit: `c937bc10d74f39579adbc1226f7a98dbb9a2a181`.
+- Milestone: **v0.3.0 — wallpaper accent and light/dark appearance**, authorized by
+  the user on 2026-11-03. v0.2.0 is accepted (2026-10-18) and tagged.
+- Active branch: `kumios/adaptive-appearance` (from `main` at `e4a34e3`), tracking
+  `origin/kumios/adaptive-appearance`. Not merged into `main`.
+- Implementation commits: `aed52c5` (KUM-20), `bc0b565` (KUM-21), `04b66fa` (KUM-22).
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
   with `git log -1 --format='%H %s' -- SESSION_HANDOFF.md`. Obtain actual latest
   HEAD with `git log -1 --oneline`; compare before resuming rather than recording
@@ -18,10 +18,10 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
 - Release tags: `v0.1.0` at `b197802` and `v0.2.0` (2026-11-03), both published
-  on GitHub. Source version is `0.2.0`. No GitHub releases exist; creating one or a
+  on GitHub. Source version is `0.3.0-dev`. No GitHub releases exist; creating one or a
   new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `kumios/adaptive-appearance`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -88,18 +88,26 @@ KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.
 
+## v0.3.0 state
+
+| Issues | State | Remaining outcome |
+| --- | --- | --- |
+| KUM-20 | In Review | Live visual check of the adaptive Plasma style |
+| KUM-21 | In Review | Live `appearance.py --apply`; accent and GTK checks |
+| KUM-22 | In Review | Live Control Center mode switching |
+
+Decisions: KDE services provide the accent (`accentColorFromWallpaper`) and the
+light/dark switch (look-and-feel auto-switcher). KumiOS ships appearance-only
+Light/Dark global themes because Breeze's replace the wallpaper and Plasma style.
+KDE owns `~/.config/gtk-3.0`/`gtk-4.0` (user decision 2026-11-03); the legacy `gtk/`
+package stays unchanged. Evidence and manual checks: `plasma/verification-0.3.0.md`.
+
 ## Next authorized action
 
-Final v0.2.0 acceptance was explicitly given by the user on 2026-10-18 using
-successful automated tests, simulated failures and normal operation as sufficient.
-KUM-9/10/12 are Done with the three unverified scenario references in the canonical
-report; KUM-11 remains Done. KUM-8 remains separately Done on its existing criteria.
-Preserve these limitations; do not run disruptive tests merely to close them.
-Await separately authorized work. No Git release tag, GitHub release, deployment
-or v0.3.0 work is authorized. The legacy-service restart approval is consumed.
-
-Approval boundaries and resume procedure are in `AGENTS.md`. No further desktop/
-audio restart, logout, disruptive device test, release tag or GitHub release is
-authorized by this handoff. Routine reversible source/docs work and validated
-ordinary development pushes are authorized under AGENTS.md. Record actual push
-failures as sync debt; never treat a local commit alone as a completed checkpoint.
+Ask the user to approve the live setup: `python3 plasma/appearance.py --apply current`
+and `python3 plasma/setup.py --install-widgets` (backed up; no restart). The new
+Control Center section needs a later login or an explicitly approved Plasma restart.
+Then run the V030 manual checks with the user and record results in the
+verification report and Linear. No GitHub release, version tag, deployment or
+Plasma restart is authorized without separate approval. v0.2.0's three unverified
+limitations remain as recorded; do not run disruptive tests to close them.

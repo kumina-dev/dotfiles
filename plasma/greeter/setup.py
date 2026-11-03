@@ -33,6 +33,9 @@ INSTALL_ORDER = ('kumios-wallpaper.png', 'regreet.css', 'regreet.toml', 'config.
 GREETER_COMMAND = ('dbus-run-session -- kwin_wayland --drm --no-lockscreen --no-global-shortcuts'
                    ' --locale1 --exit-with-session /usr/bin/regreet')
 COMMAND_TOOLS = ('dbus-run-session', 'kwin_wayland', 'regreet')
+# Large time over the date, like KDE's lock screen. Any `%` here is a chrono
+# format code; a stray one panics ReGreet's clock (see tests).
+CLOCK_FORMAT = "<span font='Noto Sans 54'>%H:%M</span>\\n%A, %-d %B %Y"
 
 def run(*args):
     return subprocess.run([str(a) for a in args], check=True)
@@ -90,7 +93,7 @@ cursor_theme_name = "Adwaita"
 greeting_msg = "Welcome to KumiOS"
 
 [widget.clock]
-format = "%a %d %b  •  %H:%M"
+format = "{CLOCK_FORMAT}"
 resolution = "1s"
 
 [commands]

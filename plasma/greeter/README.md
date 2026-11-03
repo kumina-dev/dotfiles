@@ -20,9 +20,33 @@ The theme is a snapshot. After changing the wallpaper or Light/Dark, run preview
 and install again to update the login screen. The snapshot makes the wallpaper
 readable by the greeter account even when your home directory is not.
 
-User/session selection, password visibility, authentication prompts, cancellation
-and power controls remain ReGreet's own UI. The font is Noto Sans with the normal
-system fallback; the clock and greeting are fixed.
+## Look: mirrors the lock screen
+
+`style.css` styles ReGreet like KDE's lock screen, so the login screen, lock
+screen and desktop look like one system: the desktop wallpaper blurred and
+dimmed, a large Noto Sans clock with the date below, the controls floating on the
+wallpaper instead of a card, Breeze-like fields with the KDE accent as focus
+ring, the accent Login button, and flat Reboot/Power Off buttons.
+`tests/probes/run_lock_login_look_probe.py` renders both screens offscreen for
+a side-by-side comparison.
+
+ReGreet's layout itself cannot be changed: it shows a greeting and user/session
+selectors instead of the lock screen's avatar. User/session selection, password
+visibility, authentication prompts, cancellation and power controls remain
+ReGreet's own UI. The clock format (`CLOCK_FORMAT` in `setup.py`) uses Pango
+markup; any `%` in it is a clock code, and an unknown one crashes ReGreet's clock,
+which the tests guard against.
+
+## Security key
+
+greetd's PAM stack (`/etc/pam.d/greetd`, not managed by this repository) has
+`pam_u2f` (touch only) as `sufficient` before the password. At the login screen,
+pick the user and session, choose Login, and ReGreet shows the key's touch
+prompt; a touch logs in. With the key unplugged, or if it is not touched, the
+password prompt follows. Touch only means possession of the key logs in. A
+key-only login does not unlock password-based keyrings (gnome-keyring/KWallet),
+which may then ask for the password once. The lock screen's key unlock is
+configured separately: see `../security_key.py` and the runbook.
 
 ## Preview
 

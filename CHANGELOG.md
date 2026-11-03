@@ -8,6 +8,10 @@
   login greeter (`plasma/desktop_appearance.py`).
 - A security key touch unlocks the lock screen; the password still works
   (`plasma/security_key.py`, overriding only the `kde-smartcard` PAM service).
+- The login screen mirrors the lock screen: blurred desktop wallpaper, a large
+  clock with the date, controls floating on the wallpaper, Breeze-like fields
+  with the accent, and flat power buttons. The security-key login (already in
+  greetd's PAM) is documented.
 
 ## 0.4.0 — 2026-11-03
 

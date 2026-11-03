@@ -658,27 +658,27 @@ PlasmoidItem {
 
                     spacing: Kirigami.Units.smallSpacing
 
-                    Repeater {
-                        model: [
-                            {mode: "light", text: "Light", icon: "weather-clear"},
-                            {mode: "dark", text: "Dark", icon: "weather-clear-night"},
-                            {mode: "auto", text: "Automatic", icon: "chronometer"}
-                        ]
-
-                        Controls.ToolButton {
-                            required property var modelData
-
-                            Layout.fillWidth: true
-                            text: modelData.text
-                            icon.name: modelData.icon
-                            checked: appearance.mode === modelData.mode
-                            enabled: !appearance.busy
-                            Accessible.name: modelData.text + " appearance"
-                            Controls.ToolTip.visible: hovered && modelData.mode === "auto"
-                            Controls.ToolTip.text: "Switch between Light and Dark with the Night Light schedule"
-
-                            onClicked: appearance.set(modelData.mode)
-                        }
+                    AppearanceModeButton {
+                        Layout.fillWidth: true
+                        control: appearance
+                        mode: "light"
+                        text: "Light"
+                        icon.name: "weather-clear"
+                    }
+                    AppearanceModeButton {
+                        Layout.fillWidth: true
+                        control: appearance
+                        mode: "dark"
+                        text: "Dark"
+                        icon.name: "weather-clear-night"
+                    }
+                    AppearanceModeButton {
+                        Layout.fillWidth: true
+                        control: appearance
+                        mode: "auto"
+                        text: "Automatic"
+                        icon.name: "chronometer"
+                        tooltip: "Switch between Light and Dark with the Night Light schedule"
                     }
                 }
 

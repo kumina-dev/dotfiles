@@ -14,6 +14,7 @@
 - kitty's config lives in `plasma/kitty/` and follows Light/Dark: its colors come
   from KDE's Breeze Light/Dark schemes (`plasma/kitty_theme.py`) instead of frozen
   matugen output.
+- Verification: [verification-0.4.0](plasma/verification-0.4.0.md).
 
 ## 0.3.0 — 2026-11-03
 

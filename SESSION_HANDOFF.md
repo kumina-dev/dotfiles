@@ -97,10 +97,10 @@ preserves the complete Hyprland-era tree at v0.3.0 with history.
 
 | Issue | State | Notes |
 | --- | --- | --- |
-| KUM-26 | In Progress | Hyprland-era code removed from this branch; `VERSION` at root; the 6 Hyprland session links were retired with a backup (`~/.config/kumios/hyprland-links-backup-*`, including ignored generated files such as monitors.lua) |
-| KUM-27 | In Review | kitty config in `plasma/kitty/` with Breeze-generated Light/Dark themes; `~/.config/kitty` repointed (old target and matugen colors.conf in the backup) |
-| KUM-28 | In Review | ReGreet theme in `plasma/greeter/` with KDE colors/accent/wallpaper and Light/Dark; restored `test_greeter_setup.py` (wrongly removed with the legacy tests, then adapted) |
-| KUM-29 | In Review | Installed by the user 2026-11-03 (greetd now starts ReGreet on KWin; verified read-only). Backup: `/etc/greetd/kumios-backup.xsQDDA`. Pending: the user's logout/login test |
+| KUM-26 | Done | Hyprland-era code removed from this branch; `VERSION` at root; the 6 Hyprland session links were retired with a backup (`~/.config/kumios/hyprland-links-backup-*`, including ignored generated files such as monitors.lua) |
+| KUM-27 | In Review (user check pending) | kitty config in `plasma/kitty/` with Breeze-generated Light/Dark themes; `~/.config/kitty` repointed (old target and matugen colors.conf in the backup) |
+| KUM-28 | Done | ReGreet theme in `plasma/greeter/` with KDE colors/accent/wallpaper and Light/Dark; restored `test_greeter_setup.py` (wrongly removed with the legacy tests, then adapted) |
+| KUM-29 | Done | Installed by the user 2026-11-03; logout/login test passed (power buttons present). Backup: `/etc/greetd/kumios-backup.xsQDDA` |
 | KUM-25 | Backlog (optional) | Multi-monitor layout; needs a second monitor |
 
 v0.3.0 is tagged and accepted; its open items (V030-AUTO transition, real KDE audio

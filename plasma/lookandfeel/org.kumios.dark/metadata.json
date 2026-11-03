@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Ville Syrjälä"
+            }
+        ],
+        "Description": "KumiOS Dark appearance. Changes colors, icons and Plasma style only; keeps wallpaper and layout.",
+        "Id": "org.kumios.dark",
+        "License": "GPL-3.0-or-later",
+        "Name": "KumiOS Dark",
+        "Version": "0.3.0"
+    }
+}

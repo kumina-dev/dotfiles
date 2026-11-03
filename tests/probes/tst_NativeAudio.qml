@@ -9,6 +9,16 @@ TestCase {
     name: "NativeAudioProbe"
     Kumi.NativeAudio { id: audio }
     SignalSpy { id: readySpy; target: audio; signalName: "readyChanged" }
+    Kumi.AudioBackend { id: guarded }
+    // KUM-23: the installed KDE module satisfies the runtime contract, and the
+    // runtime-loaded backend used by the Control Center is compatible.
+    function test_installedModuleMeetsContract() {
+        compare(audio.apiProblems(), [])
+        verify(guarded.compatible, guarded.incompatibility)
+        tryCompare(guarded, "ready", true, 5000)
+        compare(guarded.output.missingMembers, [])
+        compare(guarded.input.missingMembers, [])
+    }
     function test_backendReadOnly() {
         tryCompare(audio, "ready", true, 5000)
         verify(audio.output.available, "No default output is present on this machine")

@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased — 0.3.0-dev
+
+- The accent color follows the wallpaper (KDE's accent service), and the user
+  chooses Light, Dark or Automatic appearance from the Control Center. Automatic
+  follows KDE's day/night schedule (sunrise/sunset, KNightTime) and does not need
+  Night Light enabled.
+- The KumiOS Plasma style no longer hardcodes a dark palette: the top bar and dock
+  draw with the active color scheme at their existing translucency.
+- `plasma/appearance.py` replaces `apply-defaults.sh`: appearance-only KumiOS
+  Light/Dark global themes keep the wallpaper and Plasma style, with backups and
+  verification of the applied state. KDE now manages the GTK settings directories.
+- Upgrade safety for KDE's private audio API: it is loaded at runtime, so a KDE
+  release that changes it disables only the audio controls (with a pointer to
+  Sound settings) instead of the whole Control Center. Missing members are
+  detected before use. `plasma/audio_api.py` checks the installed module against
+  a recorded contract after KDE upgrades and in setup preflight.
+- Retired the legacy KumiOS audio service (`kumi-audio.service`, D-Bus
+  `org.kumios.Audio`): nothing used it since 0.2.0. It is stopped, disabled and
+  removed, together with its legacy-only continuity probe.
+- A deliberate multi-monitor panel layout is optional and deferred: it needs a
+  second monitor to test. Other screens keep Plasma's defaults.
+- Verification and manual acceptance: [verification-0.3.0](plasma/verification-0.3.0.md).
+
 ## 0.2.0 — 2026-11-03 (accepted 2026-10-18)
 
 - Control Center uses KDE audio defaults and reconnect handling, with quick

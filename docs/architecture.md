@@ -57,7 +57,7 @@ The intended desktop design emphasizes:
 - Light and dark appearance
 - Subtle animations
 - Predictable layouts
-- Multi-monitor usability
+- Multi-monitor usability (optional: needs a second monitor to test; see the roadmap)
 
 ## Engineering Approach
 

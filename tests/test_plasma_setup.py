@@ -13,6 +13,7 @@ spec.loader.exec_module(setup)
 class PlasmaSetupTests(unittest.TestCase):
     def test_default_check_never_installs_or_backs_up(self):
         with patch.object(setup, 'preflight', return_value={}), \
+             patch.object(setup.audio_api, 'report', return_value=(True, ['compatible'])), \
              patch.object(setup, 'backup') as backup, \
              patch.object(setup.shutil, 'copytree') as copy, \
              patch('sys.argv', ['setup.py']):
@@ -38,6 +39,21 @@ class PlasmaSetupTests(unittest.TestCase):
             self.assertIn('plasmashellrc', json.loads((target / 'absent.json').read_text()))
             self.assertIn('plasmoids/org.kumios.controlcenter', json.loads((target / 'absent.json').read_text()))
 
+    def test_incompatible_audio_api_warns_without_blocking(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with patch.object(setup, 'preflight', return_value={}), \
+                 patch.object(setup.audio_api, 'report', return_value=(False, ['KDE audio API INCOMPATIBLE'])), \
+                 patch.object(setup, 'backup', return_value=root / 'backup') as backup, \
+                 patch.object(setup, 'SOURCE', root / 'source'), \
+                 patch.dict(setup.os.environ, {'XDG_CONFIG_HOME': str(root / 'config'), 'XDG_DATA_HOME': str(root / 'data')}), \
+                 patch('sys.argv', ['setup.py', '--install-widgets']), \
+                 patch('builtins.print') as printed:
+                (root / 'source/plasmoids').mkdir(parents=True)
+                setup.main()
+            backup.assert_called_once()
+            self.assertIn('WARNING: KDE audio API INCOMPATIBLE', [c.args[0] for c in printed.call_args_list])
+
     def test_preflight_failure_cannot_start_installation(self):
         with patch.object(setup, 'preflight', side_effect=RuntimeError('missing module')), \
              patch.object(setup, 'backup') as backup, \
@@ -55,6 +71,7 @@ class PlasmaSetupTests(unittest.TestCase):
             (widget / 'metadata.json').write_text('{}')
             with patch.object(setup, 'SOURCE', source), \
                  patch.object(setup, 'preflight', return_value={}), \
+                 patch.object(setup.audio_api, 'report', return_value=(True, ['compatible'])), \
                  patch.object(setup, 'backup', return_value=root / 'backup'), \
                  patch.object(setup, 'plasma') as plasma, \
                  patch.dict(setup.os.environ, {'XDG_CONFIG_HOME':str(root / 'config'), 'XDG_DATA_HOME':str(root / 'data')}), \

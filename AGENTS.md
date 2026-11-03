@@ -8,7 +8,8 @@ KDE backends; retain custom presentation where useful. No new feature milestone
 until the current acceptance checkpoint is resolved.
 
 - `plasma/`: supported QML widgets, layout reconciliation and backed-up setup.
-- `services/kumi-audio/`: legacy Python bridge; current controls use KDE audio.
+- Audio uses KDE's native backend only; the legacy `kumi-audio` service was retired
+  in 0.3.0. After KDE upgrades, run `python3 plasma/audio_api.py`.
 - `hypr/`, GTK utilities and `greeter/`: legacy configuration; do not migrate,
   remove or change authentication just because those files exist.
 - `tests/qml/`: mocked component/state tests; `tests/probes/`: explicit native or

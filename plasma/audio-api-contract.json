@@ -1,0 +1,33 @@
+{
+    "description": "The part of KDE's private plasma-pa QML API the KumiOS Control Center uses. Checked by plasma/audio_api.py; the runtime guard in NativeAudio.qml/AudioEndpoint.qml must list the same members (tests/test_audio_api.py enforces this).",
+    "module": "org.kde.plasma.private.volume",
+    "verified_with": {
+        "package": "plasma-pa",
+        "version": "6.8.2"
+    },
+    "types": {
+        "Context": {
+            "singleton": true,
+            "properties": ["state", "autoConnecting"],
+            "methods": ["reconnectDaemon"],
+            "enums": {
+                "State": ["Ready", "Connecting", "Authorizing", "SettingName"]
+            }
+        },
+        "Server": {
+            "singleton": true,
+            "properties": ["defaultSink", "defaultSource"]
+        },
+        "SinkModel": {
+            "creatable": true
+        },
+        "SourceModel": {
+            "creatable": true
+        }
+    },
+    "devices": {
+        "via": ["Server.defaultSink", "Server.defaultSource"],
+        "properties": ["volume", "muted", "volumeWritable", "description", "name"],
+        "writable": ["volume", "muted"]
+    }
+}

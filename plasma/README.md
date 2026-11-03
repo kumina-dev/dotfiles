@@ -18,9 +18,11 @@ The custom presentation delegates Bluetooth devices to `kcm_bluetooth`, audio
 output/input selection and microphone controls to `kcm_pulseaudio`, and About This
 PC to `kcm_about-distro`, using KDE's KCMLauncher API. The 0.2.0 controls
 use KDE's plasma-pa audio context and live default devices directly, including quick
-microphone mute; they no longer depend on the custom KumiOS audio service. The old
-service remains installed for legacy compatibility and is not automatically disabled.
+microphone mute; they no longer depend on the custom KumiOS audio service, which was
+retired in 0.3.0 (KUM-24: stopped, disabled and removed from the repository).
 BluezQt supplies adapters and device events. See [0.2.0 verification](verification-0.2.0.md).
+The 0.3.0 Control Center adds Light / Dark / Automatic appearance and links to
+`kcm_lookandfeel`; the accent follows the wallpaper. See [Appearance](#appearance).
 
 ## Read-only preflight
 
@@ -61,7 +63,7 @@ This is a visible live desktop change. Respect the session's authorization; the
 user has authorized reversible live updates, while Plasma restarts, logout and
 disruption of active work still require approval. It installs repository custom widgets and reconciles
 panels through Plasma's supported scripting API; it does not restart Plasma,
-log out, or run the appearance script. Existing widget instances can retain cached
+log out, or change appearance (see [Appearance](#appearance)). Existing widget instances can retain cached
 code until a later voluntary login; do not claim new settings actions are live
 merely because installation succeeded.
 
@@ -93,6 +95,69 @@ only after reviewing for subsequent valuable changes. Log in normally afterwards
 `layout.js` also captures the live layout for investigation; do not blindly run it
 on top of a running layout, which could duplicate panels. No automatic rollback,
 logout or restart is performed.
+
+## Appearance
+
+The accent follows the wallpaper, and the user chooses Light, Dark or Automatic.
+Background and design: [docs/plasma-controls.md](../docs/plasma-controls.md#appearance-wallpaper-accent-and-lightdark).
+
+```sh
+python3 plasma/appearance.py                 # read-only check and current state
+python3 plasma/appearance.py --apply current # set up, keeping the current light/dark
+python3 plasma/appearance.py --apply light   # or dark, or auto
+```
+
+`--apply` changes the live appearance, so obtain session approval first. It
+requires the running KDE accent, look-and-feel switcher and GTK sync services
+(the check verifies them), then:
+
+1. Saves a private backup under `$XDG_CONFIG_HOME/kumios/appearance-backup-*`:
+   `kdeglobals`, `plasmarc`, their `kdedefaults/` copies, real GTK directories,
+   `gtk-links.json` (previous GTK symlink targets), the previously installed KumiOS
+   style and themes, and `absent.json`.
+2. Installs the KumiOS Plasma style and `org.kumios.light`/`org.kumios.dark`,
+   replacing the installed copies (so files removed from the source do not linger).
+3. Replaces `~/.config/gtk-3.0`/`gtk-4.0` symlinks with KDE-managed directories,
+   carrying over KDE's generated `settings.ini`/`colors.css`. Link targets are not modified.
+4. Enables the wallpaper accent, registers the KumiOS light/dark pair and applies the mode.
+5. Reads the result back; a mismatch is reported as a failure, not success.
+
+It never changes the wallpaper or panels and never restarts Plasma. Applications
+that cache colors may need reopening. The Plasma style and themes apply to the
+running shell immediately; the accent updates the next time KDE evaluates the
+wallpaper (for example after a wallpaper change).
+
+### Appearance recovery
+
+Copy the backed-up `kdeglobals`/`plasmarc` (and `kdedefaults/` files) back into
+`$XDG_CONFIG_HOME`; restore a GTK link with `ln -sfn <target> ~/.config/gtk-3.0`
+after moving the new directory aside, using `gtk-links.json`. Then reapply the
+previous scheme, for example `plasma-apply-colorscheme BreezeDark`, or choose a
+global theme in System Settings. The previous KumiOS style is in the backup's
+`plasma/desktoptheme/KumiOS`.
+
+## After a KDE upgrade
+
+The Control Center's audio controls depend on KDE's private
+`org.kde.plasma.private.volume` module (plasma-pa). After upgrading KDE, run:
+
+```sh
+python3 plasma/audio_api.py
+```
+
+It reads the installed module's type description (read-only) and checks every
+type, property, method and enum value in `plasma/audio-api-contract.json`.
+`setup.py` runs the same check during preflight and prints a warning, without
+blocking, when it fails. Results:
+
+- **Compatible, same version:** nothing to do.
+- **Compatible, newer version:** it asks for a recheck. Confirm volume, output
+  mute, microphone mute and device names in the Control Center, then update
+  `verified_with` in the contract.
+- **Incompatible:** it lists each removed or renamed member. The Control Center
+  still loads; its audio section explains the problem and links to Devices &
+  Microphone (`kcm_pulseaudio`). Adapt `NativeAudio.qml`/`AudioEndpoint.qml` and
+  the contract together, then rerun the tests and this check.
 
 ## Verification
 
@@ -130,7 +195,10 @@ KUM-8 is Done; see [release notes](../releases/0.1.0.md).
   detailed settings. QML retains KumiOS presentation rather than adding services.
 - `NativeAudio` binds KDE plasma-pa defaults; `AudioEndpoint` observes confirmation
   and invalidates pending writes when the target disappears/changes. The private
-  KDE audio API is a compatibility risk checked against the installed version.
+  KDE audio API can change in any KDE release, so only `NativeAudio.qml` imports it
+  and `AudioBackend` loads it at runtime: an incompatible module disables the audio
+  controls (pointing to Sound settings) instead of the whole Control Center. A
+  runtime member check and `audio_api.py` both use `audio-api-contract.json`.
 - `BluetoothControl` consumes BluezQt adapter/device signals; `WiFiStatus` consumes
   PlasmaNM wireless rows and decoded SSIDs instead of global wired/VPN state.
 - `ControlRequest` and `BackendChange` bound waits and reject stale replies. D-Bus
@@ -139,8 +207,12 @@ KUM-8 is Done; see [release notes](../releases/0.1.0.md).
 - Layout reconciliation preserves panel/task-manager identity and pins. Widget-only
   upgrades copy files with backups and do not reapply layout. Cached code requires
   explicit activation; restarting Plasma is not a login/persistence test.
-- Native secrets agents keep credentials out of widget arguments/state. The old
-  audio service/Hyprland utilities remain for compatibility, not new expansion.
+- Appearance uses KDE's wallpaper accent service and look-and-feel switcher.
+  KumiOS ships appearance-only Light/Dark global themes because Breeze's replace the
+  wallpaper and Plasma style. The Plasma style has no palette; KDE owns GTK settings.
+- Native secrets agents keep credentials out of widget arguments/state. The legacy
+  Hyprland utilities remain for compatibility, not new expansion. The legacy audio
+  service was retired in 0.3.0.
 
 ## Additional validation tools
 
@@ -158,13 +230,22 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   actual popup pending/error labels, full tooltip text and retry clearing. No
   installed-widget changes, service restarts or device writes. Run via the Python
   wrapper only; the QML file needs the disposable `ui/` copy.
-- `tests/probes/tst_LegacyAudioContinuity.qml`: passive four-second native audio
-  observer. It performs no restart. An authorized external legacy-service restart
-  must occur during its `RESTART_WINDOW_READY` window to claim continuity across
-  that restart; a standalone pass proves only four-second continuity. Compare
-  systemd InvocationIDs before/after to distinguish restarted and untouched units.
-  Restarting `kumi-audio.service` tests legacy-bridge independence, because current
-  controls use KDE's native backend. It cannot prove PipeWire/WirePlumber recovery.
+- `python3 tests/probes/run_panel_render_probe.py`: renders the KumiOS panel SVG
+  offscreen with KDE's SVG engine under Breeze Light and Breeze Dark, in private
+  D-Bus sessions with temporary config. It checks the panel takes each scheme's window
+  background at its designed translucency; it does not read or change live appearance.
+- `python3 tests/probes/run_appearance_probe.py`: runs `appearance.py`'s backup,
+  install, GTK handover and every `--apply` mode with the real KDE tools in a private
+  D-Bus session with temporary HOME/XDG directories. Checks colors, automatic mode,
+  accent, wallpaper/layout file, Plasma style and the legacy GTK package. Skips the
+  kded preflight, which needs the live session; does not read or change live appearance.
+- `python3 tests/probes/run_audio_isolation_probe.py`: copies the production widget,
+  replaces `NativeAudio.qml` with one importing a missing module, and constructs the
+  real popup offscreen. It must load with audio reported unavailable and other
+  controls present. As a control, the same break with the old direct `NativeAudio`
+  instantiation must fail to load. Touches no installed files or devices.
+- `tests/probes/tst_NativeAudio.qml` also checks that the installed KDE module meets
+  the runtime contract (`test_installedModuleMeetsContract`, read-only).
 - `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
   service to check typed roundtrips and errors; needs system PyGObject.
 

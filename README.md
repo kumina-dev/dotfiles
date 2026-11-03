@@ -41,7 +41,7 @@ Its design includes:
 - Notifications and system status
 - Wallpaper-responsive appearance
 - Consistent desktop interactions and keyboard shortcuts
-- Support for multiple monitors and virtual desktops
+- Virtual desktops (a deliberate multi-monitor layout is optional; see the [roadmap](ROADMAP.md))
 
 These elements describe the project's design direction and ongoing implementation, not a list of fully released features.
 

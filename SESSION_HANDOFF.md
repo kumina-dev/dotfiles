@@ -1,16 +1,16 @@
 # KumiOS session handoff
 
-Snapshot: 2026-10-18; Git checkpoint updated 2026-11-03. Read this index, then reconstruct live state from Git and
+Snapshot: 2026-11-03 (v0.3.0 in progress). Read this index, then reconstruct live state from Git and
 Linear; do not treat a previous conversation or this snapshot as a live database.
 
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.2.0 — dependable everyday controls**, accepted with documented
-  unverified limitations on 2026-10-18; no next feature milestone authorized.
-- Active branch: `main`. `kumios/dependable-controls` (and the earlier
-  `kumios/plasma-first-release`) was merged into `main` on 2026-11-03 and deleted.
-- Implementation commit: `c937bc10d74f39579adbc1226f7a98dbb9a2a181`.
+- Milestone: **v0.3.0 — wallpaper accent and light/dark appearance**, authorized by
+  the user on 2026-11-03. v0.2.0 is accepted (2026-10-18) and tagged.
+- Active branch: `kumios/adaptive-appearance` (from `main` at `e4a34e3`), tracking
+  `origin/kumios/adaptive-appearance`. Not merged into `main`.
+- Implementation commits: `aed52c5` (KUM-20), `bc0b565` (KUM-21), `04b66fa` (KUM-22).
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
   with `git log -1 --format='%H %s' -- SESSION_HANDOFF.md`. Obtain actual latest
   HEAD with `git log -1 --oneline`; compare before resuming rather than recording
@@ -18,10 +18,10 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
 - Release tags: `v0.1.0` at `b197802` and `v0.2.0` (2026-11-03), both published
-  on GitHub. Source version is `0.2.0`. No GitHub releases exist; creating one or a
+  on GitHub. Source version is `0.3.0-dev`. No GitHub releases exist; creating one or a
   new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `kumios/adaptive-appearance`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -50,7 +50,8 @@ inspection; never guess issue completion or request pasted credentials.
 See `plasma/README.md` for decision rationale and commands. KDE supplies audio
 Context/default devices, BluezQt events, PlasmaNM wireless state and native settings;
 custom QML supplies the agreed presentation and confirmed-request/error behavior.
-The private KDE audio API needs compatibility checks after KDE upgrades. Layout
+The private KDE audio API is isolated and checked (KUM-23): after KDE upgrades run
+`python3 plasma/audio_api.py` (see the runbook). Layout
 source is unchanged by v0.2.0. Legacy services/configuration remain for compatibility.
 No new architecture, authentication migration or provisioning work is approved here.
 
@@ -88,18 +89,29 @@ KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.
 
+## v0.3.0 state
+
+| Issues | State | Notes |
+| --- | --- | --- |
+| KUM-20 | Done | Adaptive Plasma style; user passed V030-STYLE |
+| KUM-21 | Done | appearance.py, KumiOS Light/Dark themes, accent, KDE-owned GTK; user passed V030-ACCENT/GTK/PRESERVED |
+| KUM-22 | Done | Control Center modes; button highlight fixed in `bd0b97d`; user passed V030-MODES/EXTERNAL |
+| KUM-23 | Done | Private KDE audio API isolation and upgrade check (`fe09274`); loaded after an approved restart; user confirmed audio controls work |
+| KUM-24 | Done | Legacy `kumi-audio.service` retired: stopped, disabled, unlinked and removed from the repo; KDE audio verified unaffected; its venv deleted at the user's request |
+| KUM-25 | Backlog (optional) | Deliberate multi-monitor layout; needs a second monitor; not a release gate |
+
+User accepted the live result on 2026-11-03. V030-AUTO's schedule transition is
+unverified (Automatic selection passed). Decisions: KDE services provide the accent
+and the light/dark switch; KumiOS ships appearance-only Light/Dark global themes
+because Breeze's replace the wallpaper and Plasma style; KDE owns
+`~/.config/gtk-3.0`/`gtk-4.0` (user decision); the legacy `gtk/` package is
+unchanged. Evidence: `plasma/verification-0.3.0.md`.
+
 ## Next authorized action
 
-Final v0.2.0 acceptance was explicitly given by the user on 2026-10-18 using
-successful automated tests, simulated failures and normal operation as sufficient.
-KUM-9/10/12 are Done with the three unverified scenario references in the canonical
-report; KUM-11 remains Done. KUM-8 remains separately Done on its existing criteria.
-Preserve these limitations; do not run disruptive tests merely to close them.
-Await separately authorized work. No Git release tag, GitHub release, deployment
-or v0.3.0 work is authorized. The legacy-service restart approval is consumed.
-
-Approval boundaries and resume procedure are in `AGENTS.md`. No further desktop/
-audio restart, logout, disruptive device test, release tag or GitHub release is
-authorized by this handoff. Routine reversible source/docs work and validated
-ordinary development pushes are authorized under AGENTS.md. Record actual push
-failures as sync debt; never treat a local commit alone as a completed checkpoint.
+v0.3.0 is accepted but not merged, versioned, tagged or released: `main` does not
+contain `kumios/adaptive-appearance`, and the source version is `0.3.0-dev`. Merging
+into `main`, bumping to 0.3.0, tagging and any GitHub release each need the user's
+instruction. All four approved Plasma restarts are consumed. Record the V030-AUTO
+transition when the user observes one. v0.2.0's three unverified limitations
+remain as recorded.

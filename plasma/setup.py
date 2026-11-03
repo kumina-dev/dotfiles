@@ -10,6 +10,8 @@ import sys
 import tempfile
 
 SOURCE = Path(__file__).resolve().parent
+sys.path.insert(0, str(SOURCE))
+import audio_api  # noqa: E402  (sibling module: KDE private audio API check)
 NATIVE = ["org.kde.plasma.kickerdash", "org.kde.plasma.appmenu",
           "org.kde.plasma.panelspacer", "org.kde.plasma.digitalclock",
           "org.kde.plasma.notifications", "org.kde.plasma.icontasks"]
@@ -38,14 +40,16 @@ def preflight():
     if missing:
         raise RuntimeError("Missing KDE widgets: " + ", ".join(sorted(missing)))
     modules = {line.split()[0] for line in run("kcmshell6", "--list").splitlines() if line.split()}
-    for module in ("kcm_bluetooth", "kcm_pulseaudio", "kcm_about-distro", "kcm_kscreen"):
+    for module in ("kcm_bluetooth", "kcm_pulseaudio", "kcm_about-distro", "kcm_kscreen", "kcm_lookandfeel"):
         if module not in modules:
             raise RuntimeError("Missing KDE settings module: " + module)
     # Discover Qt's module root from its own runtime, including Arch's sibling
     # binaries when qtpaths6 is not on PATH. No custom audio service is needed.
     qtpaths = shutil.which("qtpaths6") or str(Path(shutil.which("qdbus6")).resolve().with_name("qtpaths6"))
     modules_root = Path(run(qtpaths, "--query", "QT_INSTALL_QML"))
-    for module in ("org/kde/plasma/private/volume", "org/kde/bluezqt", "org/kde/kcmutils"):
+    # The private audio module is checked separately by audio_api: an incompatible
+    # version disables only the audio controls, so it warns instead of blocking.
+    for module in ("org/kde/bluezqt", "org/kde/kcmutils"):
         if not (modules_root / module / "qmldir").is_file():
             raise RuntimeError("Missing KDE QML module: " + module)
     # Read-only connection check; never changes volume or enables services.
@@ -99,6 +103,8 @@ def main():
     args = parser.parse_args()
     inventory = preflight()
     print("Preflight passed: KDE dashboard, settings/audio/Bluetooth modules and audio backend are available.")
+    compatible, lines = audio_api.report()
+    print(("" if compatible else "WARNING: ") + "\n".join(lines))
     print("Top bar + centered dock; existing panels and dock pins will be retained.")
     if not args.apply_layout and not args.install_widgets:
         print("Read-only check: no files or panels changed.")

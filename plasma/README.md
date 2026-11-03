@@ -146,6 +146,27 @@ image) changes. Syncing only writes when the wallpaper differs. The backup is in
 `~/.config/kumios/lockscreen-backup-*`. It never locks the session; check the
 result by locking (Meta+L).
 
+### Security key unlock
+
+A touch of the registered security key unlocks the lock screen; the password
+always works too. kscreenlocker runs the PAM service `kde-smartcard` in parallel
+with the password service `kde`. KumiOS overrides only that service with
+`plasma/pam/kde-smartcard` (touch-only `pam_u2f`, the same options as sudo and
+greetd use here):
+
+```sh
+python3 plasma/security_key.py           # read-only status and readiness
+python3 plasma/security_key.py install   # back up and install (your sudo)
+python3 plasma/security_key.py remove    # KDE's vendor kde-smartcard applies again
+```
+
+The stack accepts only a key touch (no password module), keeps `faillock preauth`
+so a password-locked account stays locked, and has no `authfail`, so a missing or
+untouched key never counts towards a lockout. The lock screen's own hint reads
+"(or scan your smartcard)". Touch only means possession of the key unlocks.
+`tests/probes/run_lockscreen_unlock_probe.py` checks a key touch in kscreenlocker's
+testing greeter under a virtual KWin, without locking the session.
+
 ### Login greeter
 
 The login screen is greetd + ReGreet, started on KWin and themed from KDE (colors,

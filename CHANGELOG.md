@@ -6,6 +6,8 @@
   (`plasma/lockscreen.py`, user path unit). It follows Light/Dark and the accent
   through the KumiOS style. Wallpaper and color resolution is shared with the
   login greeter (`plasma/desktop_appearance.py`).
+- A security key touch unlocks the lock screen; the password still works
+  (`plasma/security_key.py`, overriding only the `kde-smartcard` PAM service).
 
 ## 0.4.0 — 2026-11-03
 

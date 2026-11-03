@@ -1,0 +1,17 @@
+#%PAM-1.0
+# KumiOS: unlock the KDE lock screen by touching the security key (KUM-31).
+#
+# Installed as /etc/pam.d/kde-smartcard by plasma/security_key.py, overriding KDE's
+# /usr/lib/pam.d/kde-smartcard. kscreenlocker runs this service in parallel with
+# the password service `kde`, which is not changed: the password always works.
+# Touch only (no PIN), the same pam_u2f options as sudo and greetd on this system.
+# faillock preauth keeps a password-locked account locked; there is deliberately
+# no faillock authfail here, so key timeouts or absence never lock the account.
+auth       requisite    pam_nologin.so
+auth       requisite    pam_faillock.so preauth
+auth       required     pam_u2f.so cue authfile=/etc/Yubico/u2f_keys origin=pam://arch appid=pam://arch
+auth       required     pam_shells.so
+auth       required     pam_env.so
+account    include      system-local-login
+password   required     pam_deny.so
+session    include      system-local-login

@@ -5,8 +5,8 @@ implementation; Linear (milestone "v0.3.0 — wallpaper accent and light/dark
 appearance", KUM-20–22) owns issue status and acceptance. Commands live in
 [README.md](README.md#appearance). Resume from `../SESSION_HANDOFF.md`.
 
-Status 2026-11-03: **implemented; automated evidence passes; not yet applied to
-the live session; manual acceptance pending.** Nothing below is a user acceptance.
+Status 2026-11-03: **implemented; automated evidence passes; applied to the live
+session with user approval; manual acceptance pending.** Nothing below is a user acceptance.
 
 ## Scope
 
@@ -36,12 +36,24 @@ switcher acting at a schedule transition, or GTK regeneration. The QML tests use
 fake runner, so they cannot prove the live popup's commands. Those belong to the
 manual checks below.
 
+## Live setup — 2026-11-03 (user approved)
+
+- `python3 plasma/appearance.py --apply current` succeeded and verified itself:
+  `org.kumios.dark`, automatic off, wallpaper accent on. Independent read-back:
+  KDE computed `AccentColor=129,95,175`; Plasma style KumiOS; installed style has
+  no `colors` file; `~/.config/gtk-3.0`/`gtk-4.0` are KDE-managed directories with
+  regenerated files; the repository (legacy `gtk/`) stayed clean; the wallpaper/layout
+  file was not modified (last change predates the run). Backup kept privately
+  under `~/.config/kumios/appearance-backup-*`.
+- `python3 plasma/setup.py --install-widgets` succeeded; all three installed widgets
+  match source. No layout change or Plasma restart. The running shell keeps cached
+  Control Center code until a later login or an approved restart, so the Appearance
+  section is not yet visible.
+
 ## Manual acceptance (pending)
 
-Requires the user's approval to run `python3 plasma/appearance.py --apply current`
-and `python3 plasma/setup.py --install-widgets` in the live session. Cached widget
-code needs a later login or an approved Plasma restart before the new Control
-Center section appears.
+Live setup is done (above). V030-MODES, V030-AUTO and V030-EXTERNAL need the new
+Control Center code loaded: a later login or an approved Plasma restart.
 
 | Reference | Check |
 | --- | --- |

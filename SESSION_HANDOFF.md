@@ -104,10 +104,10 @@ package stays unchanged. Evidence and manual checks: `plasma/verification-0.3.0.
 
 ## Next authorized action
 
-Ask the user to approve the live setup: `python3 plasma/appearance.py --apply current`
-and `python3 plasma/setup.py --install-widgets` (backed up; no restart). The new
-Control Center section needs a later login or an explicitly approved Plasma restart.
-Then run the V030 manual checks with the user and record results in the
+Live setup ran with user approval on 2026-11-03 (`appearance.py --apply current`,
+`setup.py --install-widgets`; see the verification report). The new Control Center
+section needs a later login or an explicitly approved Plasma restart. Run the V030
+manual checks with the user and record results in the
 verification report and Linear. No GitHub release, version tag, deployment or
 Plasma restart is authorized without separate approval. v0.2.0's three unverified
 limitations remain as recorded; do not run disruptive tests to close them.

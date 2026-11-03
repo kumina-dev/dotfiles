@@ -16,7 +16,7 @@ launcher. KRunner remains independently available through Alt+F2.
 
 The custom presentation delegates Bluetooth devices to `kcm_bluetooth`, audio
 output/input selection and microphone controls to `kcm_pulseaudio`, and About This
-PC to `kcm_about-distro`, using KDE's KCMLauncher API. Unreleased 0.2.0 controls
+PC to `kcm_about-distro`, using KDE's KCMLauncher API. The 0.2.0 controls
 use KDE's plasma-pa audio context and live default devices directly, including quick
 microphone mute; they no longer depend on the custom KumiOS audio service. The old
 service remains installed for legacy compatibility and is not automatically disabled.
@@ -48,7 +48,7 @@ python3 plasma/setup.py --install-widgets
 
 This backs up and copies the custom widgets only. It does not change panel layout
 or restart Plasma. QML may remain cached until an explicitly approved shell restart
-or normal login. Current 0.2.0 verification and outstanding manual checks are in
+or normal login. 0.2.0 verification evidence and accepted limitations are in
 [verification-0.2.0.md](verification-0.2.0.md).
 
 ## Apply only after session approval
@@ -121,8 +121,8 @@ Before a release tag, check on the desktop after an approved apply:
 Do not investigate login keyring warnings unless they correspond to a real prompt,
 lost secret, failed connection or another user-visible problem. For 0.1.0, the user
 confirmed current-session checks and explicitly accepted releasing before next-login
-layout/pin persistence verification. That check remains unverified under KUM-8;
-see [release notes](../releases/0.1.0.md).
+layout/pin persistence verification. The user later reported that check passed and
+KUM-8 is Done; see [release notes](../releases/0.1.0.md).
 
 ## Architecture decisions
 

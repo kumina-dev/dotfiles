@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 0.2.0-dev
+## 0.2.0 — accepted 2026-10-18 (not tagged)
 
 - Control Center uses KDE audio defaults and reconnect handling, with quick
   microphone mute, actual device labels and optional client-only Retry audio.
@@ -10,8 +10,10 @@
 - Audio, radio and brightness changes show pending state and actionable errors;
   completion follows observed state, with bounded waits and late-reply protection.
 - Native/read-only and isolated-bus probes complement mock recovery tests.
-- Activated through a user-approved Plasma restart; user acceptance and physical-
-  device checks remain pending. No 0.2.0 tag/publication. KUM-8 remains pending.
+- Activated through a user-approved Plasma restart and accepted by the user on
+  2026-10-18 with documented unverified limitations (physical Bluetooth removal,
+  native audio-backend restart, live-shell error display); see
+  [verification](plasma/verification-0.2.0.md). No 0.2.0 tag or GitHub release.
 
 ## 0.1.0 — 2026-10-18
 
@@ -38,6 +40,7 @@ First Plasma daily-driver release. See [release notes](releases/0.1.0.md).
   Plasma restart. Automated checks: 33 Qt/QML, five layout and three setup checks.
 - **Unverified:** layout and pinned-app persistence across the next voluntary
   login/reboot. KUM-8 remains open; user explicitly accepts release before this check.
+  *Update 2026-10-18:* the user reported the login/reboot check passed; KUM-8 is Done.
 - Setup targets the existing installation, requires the KumiOS audio service, and
   does not provision a fresh machine. Bluetooth quick toggle assumes hci0.
 - Installed widget code may require an approved Plasma restart or next normal login.

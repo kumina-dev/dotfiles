@@ -1,6 +1,6 @@
 # KumiOS session handoff
 
-Snapshot: 2026-10-18. Read this index, then reconstruct live state from Git and
+Snapshot: 2026-10-18; Git checkpoint updated 2026-11-03. Read this index, then reconstruct live state from Git and
 Linear; do not treat a previous conversation or this snapshot as a live database.
 
 ## Git checkpoint
@@ -8,7 +8,8 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
 - Milestone: **v0.2.0 — dependable everyday controls**, accepted with documented
   unverified limitations on 2026-10-18; no next feature milestone authorized.
-- Active branch: `kumios/dependable-controls`.
+- Active branch: `main`. `kumios/dependable-controls` (and the earlier
+  `kumios/plasma-first-release`) was merged into `main` on 2026-11-03 and deleted.
 - Implementation commit: `c937bc10d74f39579adbc1226f7a98dbb9a2a181`.
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
   with `git log -1 --format='%H %s' -- SESSION_HANDOFF.md`. Obtain actual latest
@@ -16,20 +17,14 @@ Linear; do not treat a previous conversation or this snapshot as a live database
   an impossible self-referential commit hash inside its own file.
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
-- Only release tag: local `v0.1.0` at `b197802`. Source version is `0.2.0-dev`.
-  Neither checkpoint is a release approval. The tag remains local; source commits
-  may be pushed as ordinary development work.
+- Only release tag: `v0.1.0` at `b197802`, published on GitHub. Source version is
+  `0.2.0` (bumped 2026-11-03); v0.2.0 is accepted but has no tag or GitHub
+  release, which still require explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `kumios/dependable-controls`. This checkpoint establishes upstream tracking.
-  Verify synchronization after pushing: `git fetch --no-tags origin`, then
-  `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0` and
-  `git ls-remote origin refs/heads/kumios/dependable-controls` must match local HEAD.
-  A clean worktree is insufficient. The final response/shared Linear index records
-  the exact verified tip; rerun these commands rather than trusting a stale snapshot.
-- Remote audit before this update: origin/main at `63b82c6`; current branch absent
-  remotely. Ten existing local commits were missing (seven earlier Wi-Fi/appearance
-  commits plus b197802, c937bc1 and 680c9cf). Synchronize their ancestry through the
-  development branch; do not merge pending v0.2.0 into main merely to catch up.
+  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
+  A clean worktree is insufficient; rerun these commands rather than trusting a
+  stale snapshot.
 
 ## Linear and acceptance
 

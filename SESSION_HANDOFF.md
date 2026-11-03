@@ -97,7 +97,7 @@ Automated mocks and test-client reconnect do not prove those behaviors.
 | KUM-21 | Done | appearance.py, KumiOS Light/Dark themes, accent, KDE-owned GTK; user passed V030-ACCENT/GTK/PRESERVED |
 | KUM-22 | Done | Control Center modes; button highlight fixed in `bd0b97d`; user passed V030-MODES/EXTERNAL |
 | KUM-23 | Done | Private KDE audio API isolation and upgrade check (`fe09274`); loaded after an approved restart; user confirmed audio controls work |
-| KUM-24 | Done | Legacy `kumi-audio.service` retired: stopped, disabled, unlinked and removed from the repo; KDE audio verified unaffected; venv left in place |
+| KUM-24 | Done | Legacy `kumi-audio.service` retired: stopped, disabled, unlinked and removed from the repo; KDE audio verified unaffected; its venv deleted at the user's request |
 | KUM-25 | Backlog (optional) | Deliberate multi-monitor layout; needs a second monitor; not a release gate |
 
 User accepted the live result on 2026-11-03. V030-AUTO's schedule transition is

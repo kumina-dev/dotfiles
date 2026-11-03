@@ -93,8 +93,9 @@ with no incompatibility message. KUM-23 Done.
   `test_installedModuleMeetsContract`) pass.
 - Repo: `services/kumi-audio/` and the legacy-only `tst_LegacyAudioContinuity.qml`
   removed. Historical v0.1.0/v0.2.0 records unchanged.
-- Left in place: `~/.local/share/kumios/venv`, which was used only by this service
-  (not deleted without the user's say-so).
+- `~/.local/share/kumios/venv` (pip and pulsectl only, 14 MB), used only by this
+  service, was deleted at the user's request after confirming no process or file
+  used it. The rest of `~/.local/share/kumios` (legacy calendar data) is untouched.
 
 KUM-25: a deliberate multi-monitor layout is optional (user, 2026-11-03), in Linear
 Backlog outside this milestone. It needs a second monitor to test.

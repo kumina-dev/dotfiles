@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — 0.4.0-dev
+
+- `main` is Plasma-only. The Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel,
+  matugen, the GTK utilities and their tests) is preserved, unmaintained, on the
+  `legacy/hyprland` branch with full history. The project version moved to the root
+  `VERSION` file.
+- The login greeter lives in `plasma/greeter/`. Its colors come from KDE's color
+  scheme and wallpaper accent, and its wallpaper from Plasma's current wallpaper,
+  replacing the missing matugen palette. Its GTK dark preference follows Light/Dark.
+  greetd now starts ReGreet on KWin instead of Hyprland; only greetd's
+  `[default_session]` command changes, with a backup and restore.
+- kitty's config lives in `plasma/kitty/` and follows Light/Dark: its colors come
+  from KDE's Breeze Light/Dark schemes (`plasma/kitty_theme.py`) instead of frozen
+  matugen output.
+- Verification: [verification-0.4.0](plasma/verification-0.4.0.md).
+
 ## 0.3.0 — 2026-11-03
 
 - The accent color follows the wallpaper (KDE's accent service), and the user

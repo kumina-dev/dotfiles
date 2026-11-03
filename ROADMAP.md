@@ -20,6 +20,11 @@ maintained KDE components before building custom backends.
   private audio API (KUM-23) and retiring the legacy audio service (KUM-24). Merged
   into `main`, versioned 0.3.0 and tagged `v0.3.0` on 2026-11-03. Evidence:
   [verification](plasma/verification-0.3.0.md).
+- **v0.4.0 — Plasma-only main (in progress, authorized 2026-11-03):** Hyprland-era
+  code moves to the `legacy/hyprland` branch (KUM-26). The pieces Plasma still uses
+  get Plasma-native sources: kitty follows Light/Dark (KUM-27), the ReGreet login theme
+  takes KDE colors and wallpaper (KUM-28), and the login greeter runs on KWin instead
+  of Hyprland (KUM-29, user decision).
 
 No GitHub release, new version tag or deployment is authorized. Ordinary validated
 development-branch synchronization is authorized; follow AGENTS.md and report the
@@ -27,8 +32,8 @@ verified remote commit. Issue state and acceptance live in Linear.
 
 ## Deferred scope
 
-Fresh-machine provisioning, broader visual redesign, login-stack replacement,
-cloud calendars, custom device backends and legacy Hyprland utility expansion are
+Fresh-machine provisioning, broader visual redesign, replacing greetd/ReGreet or PAM,
+cloud calendars, custom device backends and Hyprland-era development (`legacy/hyprland`) are
 outside current scope. Login warnings warrant investigation only for real symptoms.
 
 Optional, not a release gate: a deliberate multi-monitor panel layout (KUM-25).

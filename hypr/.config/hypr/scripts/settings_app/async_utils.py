@@ -1,8 +1,0 @@
-from kumina_common.async_utils import (
-    run_async,
-)
-
-
-__all__ = (
-    "run_async",
-)

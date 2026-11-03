@@ -30,16 +30,21 @@ they also replace the wallpaper (and with it the accent) and the Plasma style; t
 KumiOS themes contain no wallpaper, layout, cursor, decoration or splash settings.
 
 GTK and libadwaita applications follow through KDE's GTK settings synchronization
-and the desktop portal. KDE must own `~/.config/gtk-3.0` and `gtk-4.0`; setup
-replaces links into the legacy `gtk/` package (whose fixed matugen colors would
-otherwise override GTK) with ordinary directories. The legacy package itself is
-not changed.
+and the desktop portal. KDE must own `~/.config/gtk-3.0` and `gtk-4.0`; if either
+is a link to another configuration (as with the former Hyprland-era `gtk/` package,
+whose fixed matugen colors overrode GTK), setup replaces it with an ordinary
+directory and leaves the link target unchanged.
 
 Change the mode from the Control Center's Appearance section (Light, Dark,
 Automatic). It shows the applying state, confirms the change only when KDE's
 settings report the chosen mode, and shows an inline error otherwise. If another
 global theme is active, no mode is selected until one is chosen. It reads the
 current state each time the popup opens, so changes made elsewhere appear there.
+
+The kitty terminal follows the same Light/Dark choice. kitty switches between
+`light-theme.auto.conf` and `dark-theme.auto.conf` (in `plasma/kitty/`) when the
+desktop portal reports a light/dark change. Those files are generated from KDE's
+Breeze Light/Dark schemes; kitty does not follow the wallpaper accent.
 
 Set up the themes, or change the mode from a terminal, with `plasma/appearance.py`; see
 [the runbook](../plasma/README.md#appearance). The mode can also be changed in

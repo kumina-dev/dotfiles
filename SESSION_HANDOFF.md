@@ -110,6 +110,6 @@ unchanged. Evidence: `plasma/verification-0.3.0.md`.
 v0.3.0 is accepted but not merged, versioned, tagged or released: `main` does not
 contain `kumios/adaptive-appearance`, and the source version is `0.3.0-dev`. Merging
 into `main`, bumping to 0.3.0, tagging and any GitHub release each need the user's
-instruction. All three approved Plasma restarts are consumed. Record the V030-AUTO
+instruction. All four approved Plasma restarts are consumed. Record the V030-AUTO
 transition when the user observes one. v0.2.0's three unverified limitations
 remain as recorded.

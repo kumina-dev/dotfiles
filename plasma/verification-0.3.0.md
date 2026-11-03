@@ -56,6 +56,8 @@ Node agree; single subscribe/unsubscribe; unavailable service gives unknown);
 schedule, late schedule reply ignored). A live read-only Subscribe/Unsubscribe
 returned a 7–8 day dynamic schedule that agreed with Night Light (both day). Not
 tested: behavior with Night Light disabled (would change the live session).
+Loaded by a fourth explicitly approved Plasma restart (consumed): service active
+with a new InvocationID, no KumiOS widget errors, top bar 8 and dock 1 widgets.
 
 ## KUM-23 automated evidence
 

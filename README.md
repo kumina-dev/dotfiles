@@ -12,7 +12,7 @@ The project runs on Arch Linux and is developed as a personal daily-driver envir
 
 KumiOS has evolved through different desktop architectures.
 
-The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. The first Plasma release is `v0.1.0` (see [release notes](releases/0.1.0.md)). `v0.2.0` — dependable everyday controls — was accepted on 2026-10-18 with documented limitations (see [verification](plasma/verification-0.2.0.md)); it has not been tagged. Layout and pinned-app persistence across login (KUM-8) has been confirmed.
+The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. The first Plasma release is `v0.1.0` (see [release notes](releases/0.1.0.md)). `v0.2.0` — dependable everyday controls — was accepted on 2026-10-18 with documented limitations (see [verification](plasma/verification-0.2.0.md)) and is tagged `v0.2.0`. Layout and pinned-app persistence across login (KUM-8) has been confirmed.
 
 The repository also keeps the earlier **Hyprland-based implementation** as legacy configuration. For details, see [Legacy Hyprland Documentation](docs/legacy-hyprland.md).
 

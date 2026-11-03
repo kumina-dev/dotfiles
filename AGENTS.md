@@ -97,8 +97,8 @@ Ask before major scope/architecture changes, spending/recurring costs, productio
 changes, GitHub releases, production deployments, deleting valuable resources,
 irreversible changes, Plasma/audio-service restarts, logout or disrupting active work. A one-time
 restart approval is consumed by that action, not authorization for future restarts.
-The v0.1.0 tag is published on GitHub. v0.2.0 is accepted, but no v0.2.0 tag or
-GitHub release without explicit release authorization. Ordinary validated branch
+The v0.1.0 and v0.2.0 tags are published on GitHub. No GitHub release or new
+version tag without explicit release authorization. Ordinary validated branch
 pushes do not require another approval. KUM-8 is Done.
 
 Automated, isolated, read-only native, physical-device and user acceptance evidence

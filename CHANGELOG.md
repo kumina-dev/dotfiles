@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — accepted 2026-10-18 (not tagged)
+## 0.2.0 — 2026-11-03 (accepted 2026-10-18)
 
 - Control Center uses KDE audio defaults and reconnect handling, with quick
   microphone mute, actual device labels and optional client-only Retry audio.
@@ -13,7 +13,7 @@
 - Activated through a user-approved Plasma restart and accepted by the user on
   2026-10-18 with documented unverified limitations (physical Bluetooth removal,
   native audio-backend restart, live-shell error display); see
-  [verification](plasma/verification-0.2.0.md). No 0.2.0 tag or GitHub release.
+  [verification](plasma/verification-0.2.0.md). Tagged `v0.2.0` on 2026-11-03; no GitHub release.
 
 ## 0.1.0 — 2026-10-18
 

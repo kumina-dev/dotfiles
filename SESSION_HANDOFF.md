@@ -17,9 +17,9 @@ Linear; do not treat a previous conversation or this snapshot as a live database
   an impossible self-referential commit hash inside its own file.
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
-- Only release tag: `v0.1.0` at `b197802`, published on GitHub. Source version is
-  `0.2.0` (bumped 2026-11-03); v0.2.0 is accepted but has no tag or GitHub
-  release, which still require explicit release authorization.
+- Release tags: `v0.1.0` at `b197802` and `v0.2.0` (2026-11-03), both published
+  on GitHub. Source version is `0.2.0`. No GitHub releases exist; creating one or a
+  new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
   `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.

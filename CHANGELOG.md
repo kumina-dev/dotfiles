@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 — 2026-11-03 (not tagged)
+## 0.3.0 — 2026-11-03
 
 - The accent color follows the wallpaper (KDE's accent service), and the user
   chooses Light, Dark or Automatic appearance from the Control Center. Automatic

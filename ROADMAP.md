@@ -18,7 +18,7 @@ maintained KDE components before building custom backends.
   dark style. Accepted by the user 2026-11-03 in the live session; the Automatic
   schedule transition is not yet observed. Also in v0.3.0: upgrade safety for KDE's
   private audio API (KUM-23) and retiring the legacy audio service (KUM-24). Merged
-  into `main` and versioned 0.3.0 on 2026-11-03; not tagged. Evidence:
+  into `main`, versioned 0.3.0 and tagged `v0.3.0` on 2026-11-03. Evidence:
   [verification](plasma/verification-0.3.0.md).
 
 No GitHub release, new version tag or deployment is authorized. Ordinary validated

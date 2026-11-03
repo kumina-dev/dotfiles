@@ -18,9 +18,9 @@ Linear; do not treat a previous conversation or this snapshot as a live database
   an impossible self-referential commit hash inside its own file.
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
-- Release tags: `v0.1.0` at `b197802` and `v0.2.0` (2026-11-03), both published
-  on GitHub. Source version is `0.3.0` (not tagged). No GitHub releases exist;
-  creating one or a new version tag requires explicit release authorization.
+- Release tags: `v0.1.0` at `b197802`, `v0.2.0` and `v0.3.0` (both 2026-11-03), all
+  published on GitHub. Source version is `0.3.0`. No GitHub releases exist; creating
+  one or a new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
   `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
@@ -110,9 +110,9 @@ unchanged. Evidence: `plasma/verification-0.3.0.md`.
 
 ## Next authorized action
 
-v0.3.0 is accepted, merged into `main` and versioned 0.3.0 (2026-11-03), but not
-tagged or released. A `v0.3.0` tag and any GitHub release each need the user's
-instruction. The merged `kumios/adaptive-appearance` branch still exists locally and
-on GitHub. All four approved Plasma restarts are consumed. Record the V030-AUTO
+v0.3.0 is accepted, merged into `main`, versioned and tagged `v0.3.0` (2026-11-03).
+The merged `kumios/adaptive-appearance` branch was deleted locally and on GitHub.
+No GitHub release exists; one needs the user's instruction. No next feature
+milestone is authorized; KUM-25 (multi-monitor layout) is optional Backlog. All four approved Plasma restarts are consumed. Record the V030-AUTO
 transition when the user observes one. v0.2.0's three unverified limitations
 remain as recorded.

@@ -49,11 +49,14 @@ manual checks below.
   match source. No layout change or Plasma restart. The running shell keeps cached
   Control Center code until a later login or an approved restart, so the Appearance
   section is not yet visible.
+- Plasma restart, explicitly approved by the user 2026-11-03 (approval consumed):
+  `plasma-plasmashell.service` returned active with a new InvocationID; no KumiOS
+  widget errors in its journal since the restart; top bar and dock kept all their
+  widgets. The new Control Center code is loaded for the manual checks.
 
 ## Manual acceptance (pending)
 
-Live setup is done (above). V030-MODES, V030-AUTO and V030-EXTERNAL need the new
-Control Center code loaded: a later login or an approved Plasma restart.
+Live setup and the approved restart are done (above); all checks can now run.
 
 | Reference | Check |
 | --- | --- |

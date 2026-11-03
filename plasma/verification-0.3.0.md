@@ -54,8 +54,9 @@ Evidence: `tests/test_nighttime_rule.py` (11 cases, Python and the JS rule under
 Node agree; single subscribe/unsubscribe; unavailable service gives unknown);
 `tst_Appearance.qml` 12 (schedule read before apply, day/night/unavailable
 schedule, late schedule reply ignored). A live read-only Subscribe/Unsubscribe
-returned a 7–8 day dynamic schedule that agreed with Night Light (both day). Not
-tested: behavior with Night Light disabled (would change the live session).
+returned a 7–8 day dynamic schedule that agreed with Night Light (both day). User
+check 2026-11-03 after loading the fix: "Automatic works, even with Night Light
+off" (the user turned Night Light off themselves).
 Loaded by a fourth explicitly approved Plasma restart (consumed): service active
 with a new InvocationID, no KumiOS widget errors, top bar 8 and dock 1 widgets.
 
@@ -116,4 +117,4 @@ work except the button doesn't seem to stay visibly as selected", since fixed).
 | V030-EXTERNAL | A System Settings Global Theme change shows when the popup reopens | Passed (user) |
 | V030-GTK | GTK apps follow Light/Dark and the accent | Passed (user) |
 | V030-PRESERVED | Wallpaper, panels, dock pins and shortcuts unchanged | Passed (user); panel widget counts unchanged after both restarts |
-| V030-AUTO | Automatic starts in the right variant; a day/night schedule transition switches it | Selecting Automatic passed (user). **The transition itself is unverified**: no dusk/dawn switch has been observed. Record the result when it happens; do not force a transition to close it. |
+| V030-AUTO | Automatic starts in the right variant; a day/night schedule transition switches it | Selecting Automatic passed (user), including with Night Light off after `ba53a02`. **The transition itself is unverified**: no dusk/dawn switch has been observed. Record the result when it happens; do not force a transition to close it. |

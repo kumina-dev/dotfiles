@@ -31,7 +31,13 @@ replaces links into the legacy `gtk/` package (whose fixed matugen colors would
 otherwise override GTK) with ordinary directories. The legacy package itself is
 not changed.
 
-Set up or change the mode with `plasma/appearance.py`; see
+Change the mode from the Control Center's Appearance section (Light, Dark,
+Automatic). It shows the applying state, confirms the change only when KDE's
+settings report the chosen mode, and shows an inline error otherwise. If another
+global theme is active, no mode is selected until one is chosen. It reads the
+current state each time the popup opens, so changes made elsewhere appear there.
+
+Set up the themes, or change the mode from a terminal, with `plasma/appearance.py`; see
 [the runbook](../plasma/README.md#appearance). The mode can also be changed in
 System Settings → Colors & Themes → Global Theme.
 

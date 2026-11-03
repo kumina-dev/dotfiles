@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased — 0.3.0-dev
+
+- The accent color follows the wallpaper (KDE's accent service), and the user
+  chooses Light, Dark or Automatic appearance from the Control Center. Automatic
+  follows the Night Light day/night schedule.
+- The KumiOS Plasma style no longer hardcodes a dark palette: the top bar and dock
+  draw with the active color scheme at their existing translucency.
+- `plasma/appearance.py` replaces `apply-defaults.sh`: appearance-only KumiOS
+  Light/Dark global themes keep the wallpaper and Plasma style, with backups and
+  verification of the applied state. KDE now manages the GTK settings directories.
+- Verification and manual acceptance: [verification-0.3.0](plasma/verification-0.3.0.md).
+
 ## 0.2.0 — 2026-11-03 (accepted 2026-10-18)
 
 - Control Center uses KDE audio defaults and reconnect handling, with quick

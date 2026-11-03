@@ -21,6 +21,8 @@ use KDE's plasma-pa audio context and live default devices directly, including q
 microphone mute; they no longer depend on the custom KumiOS audio service. The old
 service remains installed for legacy compatibility and is not automatically disabled.
 BluezQt supplies adapters and device events. See [0.2.0 verification](verification-0.2.0.md).
+The 0.3.0 Control Center adds Light / Dark / Automatic appearance and links to
+`kcm_lookandfeel`; the accent follows the wallpaper. See [Appearance](#appearance).
 
 ## Read-only preflight
 

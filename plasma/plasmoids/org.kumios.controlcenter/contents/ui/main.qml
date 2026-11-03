@@ -33,6 +33,26 @@ PlasmoidItem {
     readonly property string connectedSsid: wifiStatus.ssid
 
     BluetoothControl { id: bluetooth }
+
+    CommandRunner { id: commands }
+    AppearanceControl {
+        id: appearance
+        run: commands.run
+        daylight: nightLightProperties.properties.daylight
+    }
+    DBus.Properties {
+        id: nightLightProperties
+        busType: DBus.BusType.Session
+        service: "org.kde.KWin"
+        path: "/org/kde/KWin/NightLight"
+        iface: "org.kde.KWin.NightLight"
+    }
+    readonly property string appearanceStatus:
+        appearance.busy ? "Applying appearance…"
+        : appearance.error.length > 0 ? appearance.error
+        : appearance.known && appearance.mode === "other"
+            ? "Another global theme is active. Choose Light, Dark or Automatic to use KumiOS."
+        : ""
     readonly property bool bluetoothAvailable: bluetooth.available
     readonly property string bluetoothTitle: bluetooth.connectedName || "Bluetooth"
     readonly property string bluetoothSubtitle: bluetooth.subtitle
@@ -50,6 +70,9 @@ PlasmoidItem {
     onExpandedChanged: {
         if (!root.expanded) {
             goHome()
+        } else {
+            // Pick up changes made elsewhere, such as in System Settings.
+            appearance.refresh()
         }
     }
 
@@ -602,6 +625,82 @@ PlasmoidItem {
                     onClicked: { root.expanded = false; KCM.KCMLauncher.open("kcm_kscreen") }
                 }
 
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+
+                spacing: Kirigami.Units.smallSpacing
+
+                visible: root.currentPage === "home"
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Controls.Label {
+                        text: "Appearance"
+                        font.weight: Font.DemiBold
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
+                    Controls.Label {
+                        visible: appearance.known
+                        text: appearance.wallpaperAccent ? "Accent from wallpaper" : "Fixed accent"
+                        opacity: 0.65
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    spacing: Kirigami.Units.smallSpacing
+
+                    Repeater {
+                        model: [
+                            {mode: "light", text: "Light", icon: "weather-clear"},
+                            {mode: "dark", text: "Dark", icon: "weather-clear-night"},
+                            {mode: "auto", text: "Automatic", icon: "chronometer"}
+                        ]
+
+                        Controls.ToolButton {
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            text: modelData.text
+                            icon.name: modelData.icon
+                            checked: appearance.mode === modelData.mode
+                            enabled: !appearance.busy
+                            Accessible.name: modelData.text + " appearance"
+                            Controls.ToolTip.visible: hovered && modelData.mode === "auto"
+                            Controls.ToolTip.text: "Switch between Light and Dark with the Night Light schedule"
+
+                            onClicked: appearance.set(modelData.mode)
+                        }
+                    }
+                }
+
+                Controls.Label {
+                    Layout.fillWidth: true
+                    visible: text.length > 0
+                    text: root.appearanceStatus
+                    Controls.ToolTip.visible: appearanceStatusHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: appearanceStatusHover }
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 3
+                    elide: Text.ElideRight
+                    color: appearance.error.length > 0 ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+                    opacity: appearance.error.length > 0 ? 1 : 0.65
+                }
+
+                Controls.ToolButton {
+                    text: "Appearance settings…"
+                    icon.name: "configure"
+                    onClicked: { root.expanded = false; KCM.KCMLauncher.open("kcm_lookandfeel") }
+                }
             }
 
             WiFiDetails {

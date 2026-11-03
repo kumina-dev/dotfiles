@@ -38,7 +38,7 @@ def preflight():
     if missing:
         raise RuntimeError("Missing KDE widgets: " + ", ".join(sorted(missing)))
     modules = {line.split()[0] for line in run("kcmshell6", "--list").splitlines() if line.split()}
-    for module in ("kcm_bluetooth", "kcm_pulseaudio", "kcm_about-distro", "kcm_kscreen"):
+    for module in ("kcm_bluetooth", "kcm_pulseaudio", "kcm_about-distro", "kcm_kscreen", "kcm_lookandfeel"):
         if module not in modules:
             raise RuntimeError("Missing KDE settings module: " + module)
     # Discover Qt's module root from its own runtime, including Arch's sibling

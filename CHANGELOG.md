@@ -12,6 +12,10 @@
   clock with the date, controls floating on the wallpaper, Breeze-like fields
   with the accent, and flat power buttons. The security-key login (already in
   greetd's PAM) is documented.
+- The login screen follows desktop wallpaper, color and Light/Dark changes
+  automatically (`setup.py install-sync`). A sandboxed root service reads the
+  user's files only as the user, validates what it installs, and runs only
+  root-owned code.
 
 ## 0.4.0 — 2026-11-03
 

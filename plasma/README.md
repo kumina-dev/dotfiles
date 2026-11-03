@@ -171,8 +171,8 @@ testing greeter under a virtual KWin, without locking the session.
 
 The login screen is greetd + ReGreet, started on KWin and themed from KDE (colors,
 wallpaper accent, current wallpaper, Light/Dark). Preview, install, restore and TTY
-recovery: [greeter/README.md](greeter/README.md). The theme is a snapshot; reinstall
-it after changing the wallpaper or Light/Dark. The install uses the user's sudo and
+recovery: [greeter/README.md](greeter/README.md). `install-sync` keeps the theme in sync with the
+desktop through a sandboxed root service that reads your files only as you. The install uses the user's sudo and
 takes effect at the next logout or reboot.
 
 ### kitty terminal

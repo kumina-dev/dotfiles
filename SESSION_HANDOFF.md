@@ -99,8 +99,8 @@ preserves the complete Hyprland-era tree at v0.3.0 with history.
 | --- | --- | --- |
 | KUM-26 | In Progress | Hyprland-era code removed from this branch; `VERSION` at root; the 6 Hyprland session links were retired with a backup (`~/.config/kumios/hyprland-links-backup-*`, including ignored generated files such as monitors.lua) |
 | KUM-27 | In Review | kitty config in `plasma/kitty/` with Breeze-generated Light/Dark themes; `~/.config/kitty` repointed (old target and matugen colors.conf in the backup) |
-| KUM-28 | Todo | ReGreet theme under `plasma/greeter/` with KDE colors/wallpaper |
-| KUM-29 | Todo | greetd greeter on KWin instead of Hyprland: needs the user's sudo and a logout test |
+| KUM-28 | In Review | ReGreet theme in `plasma/greeter/` with KDE colors/accent/wallpaper and Light/Dark; restored `test_greeter_setup.py` (wrongly removed with the legacy tests, then adapted) |
+| KUM-29 | In Review | Setup switches greetd's `[default_session]` command to ReGreet on KWin; nested virtual-KWin pre-check passes; not installed yet: needs the user's sudo, then a logout/login test |
 | KUM-25 | Backlog (optional) | Multi-monitor layout; needs a second monitor |
 
 v0.3.0 is tagged and accepted; its open items (V030-AUTO transition, real KDE audio

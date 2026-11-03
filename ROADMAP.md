@@ -32,7 +32,7 @@ verified remote commit. Issue state and acceptance live in Linear.
 
 ## Deferred scope
 
-Fresh-machine provisioning, broader visual redesign, login-stack replacement,
+Fresh-machine provisioning, broader visual redesign, replacing greetd/ReGreet or PAM,
 cloud calendars, custom device backends and Hyprland-era development (`legacy/hyprland`) are
 outside current scope. Login warnings warrant investigation only for real symptoms.
 

@@ -127,6 +127,14 @@ that cache colors may need reopening. The Plasma style and themes apply to the
 running shell immediately; the accent updates the next time KDE evaluates the
 wallpaper (for example after a wallpaper change).
 
+### Login greeter
+
+The login screen is greetd + ReGreet, started on KWin and themed from KDE (colors,
+wallpaper accent, current wallpaper, Light/Dark). Preview, install, restore and TTY
+recovery: [greeter/README.md](greeter/README.md). The theme is a snapshot; reinstall
+it after changing the wallpaper or Light/Dark. The install uses the user's sudo and
+takes effect at the next logout or reboot.
+
 ### kitty terminal
 
 `~/.config/kitty` links to `plasma/kitty/`. `kitty.conf` holds only font, opacity
@@ -256,6 +264,10 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   instantiation must fail to load. Touches no installed files or devices.
 - `tests/probes/tst_NativeAudio.qml` also checks that the installed KDE module meets
   the runtime contract (`test_installedModuleMeetsContract`, read-only).
+- `python3 tests/probes/run_greeter_kwin_probe.py`: runs ReGreet's demo with the KumiOS
+  theme under a virtual KWin in a private D-Bus session (temporary HOME/XDG) and checks
+  that the window maps, is fullscreen, covers the output and stays up. It does not use
+  greetd, PAM, `/etc` or the live session, and cannot exercise DRM or the greeter account.
 - `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
   service to check typed roundtrips and errors; needs system PyGObject.
 

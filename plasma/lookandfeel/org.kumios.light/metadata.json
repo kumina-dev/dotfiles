@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Ville Syrjälä"
+            }
+        ],
+        "Description": "KumiOS Light appearance. Changes colors, icons and Plasma style only; keeps wallpaper and layout.",
+        "Id": "org.kumios.light",
+        "License": "GPL-3.0-or-later",
+        "Name": "KumiOS Light",
+        "Version": "0.3.0"
+    }
+}

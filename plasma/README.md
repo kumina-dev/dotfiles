@@ -61,7 +61,7 @@ This is a visible live desktop change. Respect the session's authorization; the
 user has authorized reversible live updates, while Plasma restarts, logout and
 disruption of active work still require approval. It installs repository custom widgets and reconciles
 panels through Plasma's supported scripting API; it does not restart Plasma,
-log out, or run the appearance script. Existing widget instances can retain cached
+log out, or change appearance (see [Appearance](#appearance)). Existing widget instances can retain cached
 code until a later voluntary login; do not claim new settings actions are live
 merely because installation succeeded.
 
@@ -93,6 +93,46 @@ only after reviewing for subsequent valuable changes. Log in normally afterwards
 `layout.js` also captures the live layout for investigation; do not blindly run it
 on top of a running layout, which could duplicate panels. No automatic rollback,
 logout or restart is performed.
+
+## Appearance
+
+The accent follows the wallpaper, and the user chooses Light, Dark or Automatic.
+Background and design: [docs/plasma-controls.md](../docs/plasma-controls.md#appearance-wallpaper-accent-and-lightdark).
+
+```sh
+python3 plasma/appearance.py                 # read-only check and current state
+python3 plasma/appearance.py --apply current # set up, keeping the current light/dark
+python3 plasma/appearance.py --apply light   # or dark, or auto
+```
+
+`--apply` changes the live appearance, so obtain session approval first. It
+requires the running KDE accent, look-and-feel switcher and GTK sync services
+(the check verifies them), then:
+
+1. Saves a private backup under `$XDG_CONFIG_HOME/kumios/appearance-backup-*`:
+   `kdeglobals`, `plasmarc`, their `kdedefaults/` copies, real GTK directories,
+   `gtk-links.json` (previous GTK symlink targets), the previously installed KumiOS
+   style and themes, and `absent.json`.
+2. Installs the KumiOS Plasma style and `org.kumios.light`/`org.kumios.dark`,
+   replacing the installed copies (so files removed from the source do not linger).
+3. Replaces `~/.config/gtk-3.0`/`gtk-4.0` symlinks with KDE-managed directories,
+   carrying over KDE's generated `settings.ini`/`colors.css`. Link targets are not modified.
+4. Enables the wallpaper accent, registers the KumiOS light/dark pair and applies the mode.
+5. Reads the result back; a mismatch is reported as a failure, not success.
+
+It never changes the wallpaper or panels and never restarts Plasma. Applications
+that cache colors may need reopening. The Plasma style and themes apply to the
+running shell immediately; the accent updates the next time KDE evaluates the
+wallpaper (for example after a wallpaper change).
+
+### Appearance recovery
+
+Copy the backed-up `kdeglobals`/`plasmarc` (and `kdedefaults/` files) back into
+`$XDG_CONFIG_HOME`; restore a GTK link with `ln -sfn <target> ~/.config/gtk-3.0`
+after moving the new directory aside, using `gtk-links.json`. Then reapply the
+previous scheme, for example `plasma-apply-colorscheme BreezeDark`, or choose a
+global theme in System Settings. The previous KumiOS style is in the backup's
+`plasma/desktoptheme/KumiOS`.
 
 ## Verification
 
@@ -139,6 +179,9 @@ KUM-8 is Done; see [release notes](../releases/0.1.0.md).
 - Layout reconciliation preserves panel/task-manager identity and pins. Widget-only
   upgrades copy files with backups and do not reapply layout. Cached code requires
   explicit activation; restarting Plasma is not a login/persistence test.
+- Appearance uses KDE's wallpaper accent service and look-and-feel switcher.
+  KumiOS ships appearance-only Light/Dark global themes because Breeze's replace the
+  wallpaper and Plasma style. The Plasma style has no palette; KDE owns GTK settings.
 - Native secrets agents keep credentials out of widget arguments/state. The old
   audio service/Hyprland utilities remain for compatibility, not new expansion.
 
@@ -169,6 +212,11 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   offscreen with KDE's SVG engine under Breeze Light and Breeze Dark, in private
   D-Bus sessions with temporary config. It checks the panel takes each scheme's window
   background at its designed translucency; it does not read or change live appearance.
+- `python3 tests/probes/run_appearance_probe.py`: runs `appearance.py`'s backup,
+  install, GTK handover and every `--apply` mode with the real KDE tools in a private
+  D-Bus session with temporary HOME/XDG directories. Checks colors, automatic mode,
+  accent, wallpaper/layout file, Plasma style and the legacy GTK package. Skips the
+  kded preflight, which needs the live session; does not read or change live appearance.
 - `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
   service to check typed roundtrips and errors; needs system PyGObject.
 

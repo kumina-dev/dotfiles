@@ -6,11 +6,12 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.3.0 — wallpaper accent and light/dark appearance**, authorized by
-  the user on 2026-11-03. v0.2.0 is accepted (2026-10-18) and tagged.
-- Active branch: `kumios/adaptive-appearance` (from `main` at `e4a34e3`), tracking
-  `origin/kumios/adaptive-appearance`. Not merged into `main`.
-- Implementation commits: `aed52c5` (KUM-20), `bc0b565` (KUM-21), `04b66fa` (KUM-22).
+- Milestone: **v0.3.0 — wallpaper accent and light/dark appearance**, accepted by the
+  user on 2026-11-03. v0.2.0 is accepted (2026-10-18) and tagged.
+- Active branch: `main`. `kumios/adaptive-appearance` was merged into `main` on
+  2026-11-03 (merge `7d5ad50`).
+- Implementation commits: `aed52c5` (KUM-20), `bc0b565` (KUM-21), `04b66fa` and
+  `bd0b97d`/`ba53a02` (KUM-22), `fe09274` (KUM-23), `03c00ef` (KUM-24).
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
   with `git log -1 --format='%H %s' -- SESSION_HANDOFF.md`. Obtain actual latest
   HEAD with `git log -1 --oneline`; compare before resuming rather than recording
@@ -18,10 +19,10 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
 - Release tags: `v0.1.0` at `b197802` and `v0.2.0` (2026-11-03), both published
-  on GitHub. Source version is `0.3.0-dev`. No GitHub releases exist; creating one or a
-  new version tag requires explicit release authorization.
+  on GitHub. Source version is `0.3.0` (not tagged). No GitHub releases exist;
+  creating one or a new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `kumios/adaptive-appearance`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -109,9 +110,9 @@ unchanged. Evidence: `plasma/verification-0.3.0.md`.
 
 ## Next authorized action
 
-v0.3.0 is accepted but not merged, versioned, tagged or released: `main` does not
-contain `kumios/adaptive-appearance`, and the source version is `0.3.0-dev`. Merging
-into `main`, bumping to 0.3.0, tagging and any GitHub release each need the user's
-instruction. All four approved Plasma restarts are consumed. Record the V030-AUTO
+v0.3.0 is accepted, merged into `main` and versioned 0.3.0 (2026-11-03), but not
+tagged or released. A `v0.3.0` tag and any GitHub release each need the user's
+instruction. The merged `kumios/adaptive-appearance` branch still exists locally and
+on GitHub. All four approved Plasma restarts are consumed. Record the V030-AUTO
 transition when the user observes one. v0.2.0's three unverified limitations
 remain as recorded.

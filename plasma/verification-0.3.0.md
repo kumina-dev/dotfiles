@@ -6,7 +6,8 @@ appearance", KUM-20–22) owns issue status and acceptance. Commands live in
 [README.md](README.md#appearance). Resume from `../SESSION_HANDOFF.md`.
 
 Status 2026-11-03: **accepted by the user in the live session**, with one check
-not yet observed (V030-AUTO schedule transition; see below). KUM-20–22 Done.
+not yet observed (V030-AUTO schedule transition; see below). KUM-20–24 Done.
+Merged into `main` and versioned 0.3.0 on 2026-11-03; not tagged.
 
 ## Scope
 

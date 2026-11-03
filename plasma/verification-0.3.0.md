@@ -53,6 +53,11 @@ manual checks below.
   `plasma-plasmashell.service` returned active with a new InvocationID; no KumiOS
   widget errors in its journal since the restart; top bar and dock kept all their
   widgets. The new Control Center code is loaded for the manual checks.
+- User manual check: all worked except the selected mode button not staying visibly
+  selected (KDE's desktop style draws checked only on checkable buttons). Fixed in
+  `bd0b97d`, widget files reinstalled, and a second explicitly approved Plasma restart
+  (consumed) loaded it: service active with a new InvocationID, no KumiOS widget
+  errors, top bar 8 and dock 1 widgets as before.
 
 ## Manual acceptance (pending)
 

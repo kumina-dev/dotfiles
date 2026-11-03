@@ -13,8 +13,9 @@ until the current acceptance checkpoint is resolved.
 - Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel, matugen, GTK utilities) is
   not on `main`; it is preserved, unmaintained, on branch `legacy/hyprland`. Do not
   restore it to `main` or develop it further without the user's instruction.
-- `kitty/` and `greeter/` are still used under Plasma and move under `plasma/` in
-  v0.4.0 (KUM-27, KUM-28). The greeter is the login path: never change greetd or
+- `plasma/kitty/` is the kitty terminal config (`~/.config/kitty` links to it); its
+  Light/Dark themes are generated from KDE's Breeze schemes by `plasma/kitty_theme.py`.
+- `greeter/` is still used under Plasma and moves under `plasma/` in v0.4.0 (KUM-28). The greeter is the login path: never change greetd or
   PAM authentication, and change the greeter only with a backup, the user's sudo
   and a planned logout test.
 - `tests/qml/`: mocked component/state tests; `tests/probes/`: explicit native or

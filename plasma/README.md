@@ -127,6 +127,16 @@ that cache colors may need reopening. The Plasma style and themes apply to the
 running shell immediately; the accent updates the next time KDE evaluates the
 wallpaper (for example after a wallpaper change).
 
+### kitty terminal
+
+`~/.config/kitty` links to `plasma/kitty/`. `kitty.conf` holds only font, opacity
+and padding; colors come from `light-theme.auto.conf`, `dark-theme.auto.conf` and
+`no-preference-theme.auto.conf`, which kitty (0.38 or later) switches between when
+KDE's light/dark preference changes. Install or repair the link with
+`ln -sfn ../dotfiles/plasma/kitty ~/.config/kitty`. After a KDE update that changes
+Breeze, run `python3 plasma/kitty_theme.py --check`, then `python3 plasma/kitty_theme.py`
+to regenerate the themes if they are out of date.
+
 ### Appearance recovery
 
 Copy the backed-up `kdeglobals`/`plasmarc` (and `kdedefaults/` files) back into

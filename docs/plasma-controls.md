@@ -41,6 +41,11 @@ settings report the chosen mode, and shows an inline error otherwise. If another
 global theme is active, no mode is selected until one is chosen. It reads the
 current state each time the popup opens, so changes made elsewhere appear there.
 
+The kitty terminal follows the same Light/Dark choice. kitty switches between
+`light-theme.auto.conf` and `dark-theme.auto.conf` (in `plasma/kitty/`) when the
+desktop portal reports a light/dark change. Those files are generated from KDE's
+Breeze Light/Dark schemes; kitty does not follow the wallpaper accent.
+
 Set up the themes, or change the mode from a terminal, with `plasma/appearance.py`; see
 [the runbook](../plasma/README.md#appearance). The mode can also be changed in
 System Settings → Colors & Themes → Global Theme.

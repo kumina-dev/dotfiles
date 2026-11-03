@@ -1,6 +1,3 @@
-# Legacy matugen output still beside kitty.conf until KUM-27 moves kitty
-kitty/.config/kitty/colors.conf
-
 # Runtime / cache
 *.log
 .DS_Store

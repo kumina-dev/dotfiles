@@ -6,6 +6,9 @@
   matugen, the GTK utilities and their tests) is preserved, unmaintained, on the
   `legacy/hyprland` branch with full history. The project version moved to the root
   `VERSION` file.
+- kitty's config lives in `plasma/kitty/` and follows Light/Dark: its colors come
+  from KDE's Breeze Light/Dark schemes (`plasma/kitty_theme.py`) instead of frozen
+  matugen output.
 
 ## 0.3.0 — 2026-11-03
 

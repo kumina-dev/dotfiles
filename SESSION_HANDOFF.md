@@ -98,7 +98,7 @@ preserves the complete Hyprland-era tree at v0.3.0 with history.
 | Issue | State | Notes |
 | --- | --- | --- |
 | KUM-26 | Done | Hyprland-era code removed from this branch; `VERSION` at root; the 6 Hyprland session links were retired with a backup (`~/.config/kumios/hyprland-links-backup-*`, including ignored generated files such as monitors.lua) |
-| KUM-27 | In Review (user check pending) | kitty config in `plasma/kitty/` with Breeze-generated Light/Dark themes; `~/.config/kitty` repointed (old target and matugen colors.conf in the backup) |
+| KUM-27 | Done (user confirmed switching) | kitty config in `plasma/kitty/` with Breeze-generated Light/Dark themes; `~/.config/kitty` repointed (old target and matugen colors.conf in the backup) |
 | KUM-28 | Done | ReGreet theme in `plasma/greeter/` with KDE colors/accent/wallpaper and Light/Dark; restored `test_greeter_setup.py` (wrongly removed with the legacy tests, then adapted) |
 | KUM-29 | Done | Installed by the user 2026-11-03; logout/login test passed (power buttons present). Backup: `/etc/greetd/kumios-backup.xsQDDA` |
 | KUM-25 | Backlog (optional) | Multi-monitor layout; needs a second monitor |

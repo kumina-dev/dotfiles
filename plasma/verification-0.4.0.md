@@ -4,8 +4,8 @@ Canonical repository evidence record for **v0.4.0**. Git identifies the tested
 implementation; Linear (milestone "v0.4.0 — Plasma-only main, Hyprland preserved on a
 branch", KUM-26–29) owns issue status and acceptance. Resume from `../SESSION_HANDOFF.md`.
 
-Status 2026-11-03: implemented on `kumios/plasma-only`. Login greeter accepted by the
-user; kitty Light/Dark check pending. Not merged into `main`.
+Status 2026-11-03: implemented on `kumios/plasma-only` and accepted by the user
+(login greeter and kitty Light/Dark). KUM-26–29 Done. Not merged into `main`.
 
 ## Scope and decisions
 
@@ -35,11 +35,11 @@ session links after a backup.
 | `tests/probes/run_greeter_kwin_probe.py` | 5/5: ReGreet demo under a virtual KWin maps, is fullscreen, covers the output, stays up, logs no errors |
 | Greeter install (user, own sudo) | Backup `/etc/greetd/kumios-backup.xsQDDA`. Read-only check: only `[default_session].command` changed; dark theme, accent `#7133cf`, wallpaper identical to Plasma's `nebula.png`; files root-owned and world-readable |
 | **User logout/login test** | **Passed** (2026-11-03): "The login screen works, reboot and power buttons are there". Afterwards greetd was active with no errors, Plasma was running on tty1, and Hyprland was no longer running |
+| **User kitty check** | **Passed** (2026-11-03): "kitty switches with Light/Dark" |
 | Docs | Every repository path referenced by the current docs exists; the legacy docs are linked on their branch |
 
 ## Pending
 
-- KUM-27: user check that kitty switches with KumiOS Light/Dark.
 - Not exercised: greeter recovery from a failed start (restore path documented, not
   needed). The greeter theme is a snapshot, so reinstall it after wallpaper or
   Light/Dark changes.

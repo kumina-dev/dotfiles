@@ -136,6 +136,29 @@ previous scheme, for example `plasma-apply-colorscheme BreezeDark`, or choose a
 global theme in System Settings. The previous KumiOS style is in the backup's
 `plasma/desktoptheme/KumiOS`.
 
+## After a KDE upgrade
+
+The Control Center's audio controls depend on KDE's private
+`org.kde.plasma.private.volume` module (plasma-pa). After upgrading KDE, run:
+
+```sh
+python3 plasma/audio_api.py
+```
+
+It reads the installed module's type description (read-only) and checks every
+type, property, method and enum value in `plasma/audio-api-contract.json`.
+`setup.py` runs the same check during preflight and prints a warning, without
+blocking, when it fails. Results:
+
+- **Compatible, same version:** nothing to do.
+- **Compatible, newer version:** it asks for a recheck. Confirm volume, output
+  mute, microphone mute and device names in the Control Center, then update
+  `verified_with` in the contract.
+- **Incompatible:** it lists each removed or renamed member. The Control Center
+  still loads; its audio section explains the problem and links to Devices &
+  Microphone (`kcm_pulseaudio`). Adapt `NativeAudio.qml`/`AudioEndpoint.qml` and
+  the contract together, then rerun the tests and this check.
+
 ## Verification
 
 ```sh
@@ -172,7 +195,10 @@ KUM-8 is Done; see [release notes](../releases/0.1.0.md).
   detailed settings. QML retains KumiOS presentation rather than adding services.
 - `NativeAudio` binds KDE plasma-pa defaults; `AudioEndpoint` observes confirmation
   and invalidates pending writes when the target disappears/changes. The private
-  KDE audio API is a compatibility risk checked against the installed version.
+  KDE audio API can change in any KDE release, so only `NativeAudio.qml` imports it
+  and `AudioBackend` loads it at runtime: an incompatible module disables the audio
+  controls (pointing to Sound settings) instead of the whole Control Center. A
+  runtime member check and `audio_api.py` both use `audio-api-contract.json`.
 - `BluetoothControl` consumes BluezQt adapter/device signals; `WiFiStatus` consumes
   PlasmaNM wireless rows and decoded SSIDs instead of global wired/VPN state.
 - `ControlRequest` and `BackendChange` bound waits and reject stale replies. D-Bus
@@ -219,6 +245,13 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   D-Bus session with temporary HOME/XDG directories. Checks colors, automatic mode,
   accent, wallpaper/layout file, Plasma style and the legacy GTK package. Skips the
   kded preflight, which needs the live session; does not read or change live appearance.
+- `python3 tests/probes/run_audio_isolation_probe.py`: copies the production widget,
+  replaces `NativeAudio.qml` with one importing a missing module, and constructs the
+  real popup offscreen. It must load with audio reported unavailable and other
+  controls present. As a control, the same break with the old direct `NativeAudio`
+  instantiation must fail to load. Touches no installed files or devices.
+- `tests/probes/tst_NativeAudio.qml` also checks that the installed KDE module meets
+  the runtime contract (`test_installedModuleMeetsContract`, read-only).
 - `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
   service to check typed roundtrips and errors; needs system PyGObject.
 

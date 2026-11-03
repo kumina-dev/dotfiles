@@ -30,6 +30,7 @@ TestCase {
     }
     QtObject { id: endpoint
         property string description: "Simulated output"
+        property string name: "simulated.output"
         property bool volumeWritable: true
         property real volume: 32768
         property bool muted: false

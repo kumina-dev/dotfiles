@@ -15,6 +15,7 @@ not yet observed (V030-AUTO schedule transition; see below). KUM-20–22 Done.
   `plasma/appearance.py` setup; KDE owns the GTK settings directories (user
   decision 2026-11-03).
 - KUM-22: Light / Dark / Automatic choice in the Control Center.
+- KUM-23 (added 2026-11-03): upgrade safety for KDE's private audio API.
 
 ## Automated evidence (branch `kumios/adaptive-appearance`)
 
@@ -35,6 +36,19 @@ so it cannot show the accent service recomputing from a wallpaper, the automatic
 switcher acting at a schedule transition, or GTK regeneration. The QML tests use a
 fake runner, so they cannot prove the live popup's commands. Those belong to the
 manual checks below.
+
+## KUM-23 automated evidence
+
+| Check | Scope | Result |
+| --- | --- | --- |
+| `tests/test_audio_api.py` | qmltypes parser and contract check: compatible fixture; removed type, renamed property/method/enum/value, lost singleton, removed inherited device property, read-only device property, changed device type; truncated file; report wording; QML guard lists equal the contract; only `NativeAudio.qml` imports the private module | 10 pass; installed plasma-pa 6.8.2 module passes |
+| `tests/qml/tst_AudioBackend.qml` | Loader with fixtures: missing module, outdated API, compatible pass-through, reload; device with a renamed member is neither read nor written | 7 pass |
+| `tests/probes/run_audio_isolation_probe.py` | Real popup offscreen with NativeAudio replaced by a missing-module import | Loads, audio reported unavailable with KDE's reason, other controls present; control (old direct import) fails to load |
+| `tst_NativeAudio.qml::test_installedModuleMeetsContract` | Installed KDE module against the runtime guard (read-only) | Pass |
+| `python3 plasma/audio_api.py`, `setup.py --check` | Live read-only | "KDE audio API compatible (plasma-pa 6.8.2)" |
+
+Not exercised: an actual KDE release that changes the module. The behavior is
+simulated with fixtures and a replaced `NativeAudio.qml`.
 
 ## Live setup — 2026-11-03 (user approved)
 

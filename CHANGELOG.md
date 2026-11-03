@@ -10,6 +10,11 @@
 - `plasma/appearance.py` replaces `apply-defaults.sh`: appearance-only KumiOS
   Light/Dark global themes keep the wallpaper and Plasma style, with backups and
   verification of the applied state. KDE now manages the GTK settings directories.
+- Upgrade safety for KDE's private audio API: it is loaded at runtime, so a KDE
+  release that changes it disables only the audio controls (with a pointer to
+  Sound settings) instead of the whole Control Center. Missing members are
+  detected before use. `plasma/audio_api.py` checks the installed module against
+  a recorded contract after KDE upgrades and in setup preflight.
 - Verification and manual acceptance: [verification-0.3.0](plasma/verification-0.3.0.md).
 
 ## 0.2.0 — 2026-11-03 (accepted 2026-10-18)

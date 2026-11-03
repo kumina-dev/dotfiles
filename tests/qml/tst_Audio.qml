@@ -13,6 +13,7 @@ TestCase {
         id: mockDevice
         QtObject {
             property string description: "Device"
+            property string name: "device.node"
             property bool volumeWritable: true
             property real volume: 32768
             property bool muted: false

@@ -50,7 +50,8 @@ inspection; never guess issue completion or request pasted credentials.
 See `plasma/README.md` for decision rationale and commands. KDE supplies audio
 Context/default devices, BluezQt events, PlasmaNM wireless state and native settings;
 custom QML supplies the agreed presentation and confirmed-request/error behavior.
-The private KDE audio API needs compatibility checks after KDE upgrades. Layout
+The private KDE audio API is isolated and checked (KUM-23): after KDE upgrades run
+`python3 plasma/audio_api.py` (see the runbook). Layout
 source is unchanged by v0.2.0. Legacy services/configuration remain for compatibility.
 No new architecture, authentication migration or provisioning work is approved here.
 

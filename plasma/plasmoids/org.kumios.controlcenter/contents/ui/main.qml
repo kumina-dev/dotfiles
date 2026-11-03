@@ -10,7 +10,8 @@ import org.kde.plasma.workspace.dbus as DBus
 PlasmoidItem {
     id: root
 
-    NativeAudio { id: audio }
+    // Loads KDE's private audio module at runtime; see AudioBackend.qml.
+    AudioBackend { id: audio }
     readonly property real volume: audio.output.volume
     readonly property bool muted: audio.output.muted
     readonly property string deviceName: audio.output.deviceName
@@ -511,8 +512,22 @@ PlasmoidItem {
                     color: Kirigami.Theme.negativeTextColor
                 }
 
+                Controls.Label {
+                    Layout.fillWidth: true
+                    visible: !audio.compatible
+                    text: audio.unavailableMessage
+                    Controls.ToolTip.visible: audioUnavailableHover.hovered
+                    Controls.ToolTip.text: text
+                    HoverHandler { id: audioUnavailableHover }
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 4
+                    elide: Text.ElideRight
+                    color: Kirigami.Theme.neutralTextColor
+                }
+
                 Controls.Button {
-                    visible: !audio.ready
+                    // Reconnecting cannot fix an incompatible KDE module.
+                    visible: audio.compatible && !audio.ready
                     text: audio.retrying ? "Reconnecting audio…" : "Retry audio"
                     enabled: !audio.retrying
                     onClicked: audio.retry()

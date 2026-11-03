@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 0.4.0-dev
+
+- `main` is Plasma-only. The Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel,
+  matugen, the GTK utilities and their tests) is preserved, unmaintained, on the
+  `legacy/hyprland` branch with full history. The project version moved to the root
+  `VERSION` file.
+
 ## 0.3.0 — 2026-11-03
 
 - The accent color follows the wallpaper (KDE's accent service), and the user

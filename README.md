@@ -12,11 +12,11 @@ The project runs on Arch Linux and is developed as a personal daily-driver envir
 
 KumiOS has evolved through different desktop architectures.
 
-The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. The first Plasma release is `v0.1.0` (see [release notes](releases/0.1.0.md)). `v0.2.0` — dependable everyday controls — was accepted on 2026-10-18 with documented limitations (see [verification](plasma/verification-0.2.0.md)) and is tagged `v0.2.0`. Layout and pinned-app persistence across login (KUM-8) has been confirmed.
+The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. Releases: `v0.1.0`, the first Plasma daily driver ([release notes](releases/0.1.0.md)); `v0.2.0`, dependable everyday controls ([verification](plasma/verification-0.2.0.md)); and `v0.3.0`, wallpaper accent and Light/Dark/Automatic appearance ([verification](plasma/verification-0.3.0.md)). v0.4.0, in progress, makes `main` Plasma-only.
 
-The repository also keeps the earlier **Hyprland-based implementation** as legacy configuration. For details, see [Legacy Hyprland Documentation](docs/legacy-hyprland.md).
+The earlier **Hyprland-based implementation** is no longer on `main`. It is preserved, unmaintained, on the [`legacy/hyprland`](https://github.com/kumina-dev/dotfiles/tree/legacy/hyprland) branch, with its documentation and full history.
 
-For engineering work, start with [AGENTS.md](AGENTS.md) and [SESSION_HANDOFF.md](SESSION_HANDOFF.md).
+The project version is in [VERSION](VERSION); changes are in the [changelog](CHANGELOG.md). For engineering work, start with [AGENTS.md](AGENTS.md) and [SESSION_HANDOFF.md](SESSION_HANDOFF.md).
 
 ## Design Principles
 
@@ -58,14 +58,13 @@ The project uses or explores:
 - NetworkManager
 - Shell scripting and Linux system services
 
-The public legacy implementation uses Hyprland, GTK utilities, Waybar, SwayNC, and related components.
 
 ## Documentation
 
 - [Plasma setup and acceptance](plasma/README.md)
 - [Plasma appearance and Control Center](docs/plasma-controls.md)
 - [Architecture](docs/architecture.md)
-- [Legacy Hyprland Implementation](docs/legacy-hyprland.md)
+- [Legacy Hyprland implementation](https://github.com/kumina-dev/dotfiles/tree/legacy/hyprland) (branch `legacy/hyprland`)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
 

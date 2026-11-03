@@ -6,10 +6,10 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.3.0 — wallpaper accent and light/dark appearance**, accepted by the
-  user on 2026-11-03. v0.2.0 is accepted (2026-10-18) and tagged.
-- Active branch: `main`. `kumios/adaptive-appearance` was merged into `main` on
-  2026-11-03 (merge `7d5ad50`).
+- Milestone: **v0.4.0 — Plasma-only main, Hyprland preserved on a branch**,
+  authorized by the user on 2026-11-03. v0.3.0 is accepted and tagged.
+- Active branch: `kumios/plasma-only` (from `main` at `v0.3.0`). `legacy/hyprland`
+  preserves the Hyprland-era tree. v0.3.0's branch was merged (`7d5ad50`) and deleted.
 - Implementation commits: `aed52c5` (KUM-20), `bc0b565` (KUM-21), `04b66fa` and
   `bd0b97d`/`ba53a02` (KUM-22), `fe09274` (KUM-23), `03c00ef` (KUM-24).
 - Latest documentation checkpoint: the commit containing this handoff; resolve it
@@ -19,10 +19,10 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
 - Release tags: `v0.1.0` at `b197802`, `v0.2.0` and `v0.3.0` (both 2026-11-03), all
-  published on GitHub. Source version is `0.3.0`. No GitHub releases exist; creating
+  published on GitHub. Source version is `0.4.0-dev` (root `VERSION`). No GitHub releases exist; creating
   one or a new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `kumios/plasma-only`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -90,29 +90,26 @@ KUM-8's separate full-session persistence check
 was reported passed by the user on 2026-10-18.
 Automated mocks and test-client reconnect do not prove those behaviors.
 
-## v0.3.0 state
+## v0.4.0 state
 
-| Issues | State | Notes |
+Branch `kumios/plasma-only` (from `main` at `v0.3.0`). `legacy/hyprland` (pushed)
+preserves the complete Hyprland-era tree at v0.3.0 with history.
+
+| Issue | State | Notes |
 | --- | --- | --- |
-| KUM-20 | Done | Adaptive Plasma style; user passed V030-STYLE |
-| KUM-21 | Done | appearance.py, KumiOS Light/Dark themes, accent, KDE-owned GTK; user passed V030-ACCENT/GTK/PRESERVED |
-| KUM-22 | Done | Control Center modes; button highlight fixed in `bd0b97d`; user passed V030-MODES/EXTERNAL |
-| KUM-23 | Done | Private KDE audio API isolation and upgrade check (`fe09274`); loaded after an approved restart; user confirmed audio controls work |
-| KUM-24 | Done | Legacy `kumi-audio.service` retired: stopped, disabled, unlinked and removed from the repo; KDE audio verified unaffected; its venv deleted at the user's request |
-| KUM-25 | Backlog (optional) | Deliberate multi-monitor layout; needs a second monitor; not a release gate |
+| KUM-26 | In Progress | Hyprland-era code removed from this branch; `VERSION` at root; the 6 Hyprland session links were retired with a backup (`~/.config/kumios/hyprland-links-backup-*`, including ignored generated files such as monitors.lua) |
+| KUM-27 | Todo | kitty under `plasma/`, following Light/Dark |
+| KUM-28 | Todo | ReGreet theme under `plasma/greeter/` with KDE colors/wallpaper |
+| KUM-29 | Todo | greetd greeter on KWin instead of Hyprland: needs the user's sudo and a logout test |
+| KUM-25 | Backlog (optional) | Multi-monitor layout; needs a second monitor |
 
-User accepted the live result on 2026-11-03. V030-AUTO's schedule transition is
-unverified (Automatic selection passed). Decisions: KDE services provide the accent
-and the light/dark switch; KumiOS ships appearance-only Light/Dark global themes
-because Breeze's replace the wallpaper and Plasma style; KDE owns
-`~/.config/gtk-3.0`/`gtk-4.0` (user decision); the legacy `gtk/` package is
-unchanged. Evidence: `plasma/verification-0.3.0.md`.
+v0.3.0 is tagged and accepted; its open items (V030-AUTO transition, real KDE audio
+API change) remain as recorded in `plasma/verification-0.3.0.md`.
 
 ## Next authorized action
 
-v0.3.0 is accepted, merged into `main`, versioned and tagged `v0.3.0` (2026-11-03).
-The merged `kumios/adaptive-appearance` branch was deleted locally and on GitHub.
-No GitHub release exists; one needs the user's instruction. No next feature
-milestone is authorized; KUM-25 (multi-monitor layout) is optional Backlog. All four approved Plasma restarts are consumed. Record the V030-AUTO
-transition when the user observes one. v0.2.0's three unverified limitations
-remain as recorded.
+Continue v0.4.0: finish KUM-26 docs/tests, then KUM-27, KUM-28 and KUM-29 in that
+order. The greeter switch (KUM-29) needs a nested KWin pre-check, a backup of
+`/etc/greetd`, the user's own sudo, documented TTY recovery and a logout/login test.
+Never change greetd/PAM authentication. No GitHub release, version tag or Plasma
+restart without the user's instruction.

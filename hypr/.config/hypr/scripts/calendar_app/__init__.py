@@ -1,1 +1,0 @@
-"""Local KumiOS calendar."""

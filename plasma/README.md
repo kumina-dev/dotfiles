@@ -3,8 +3,8 @@
 The supported first-release target is Arch Linux with KDE Plasma on Wayland.
 Preserve the compact top bar, centered dock, one application dashboard and cohesive
 quick controls. Reuse maintained KDE components for launching, window management,
-notifications and detailed settings. The Hyprland/GTK implementation remains in
-this repository as legacy material, not the Plasma release checklist.
+notifications and detailed settings. The Hyprland/GTK implementation is not on
+`main`; it is preserved on the `legacy/hyprland` branch.
 
 ## Layout and components
 
@@ -211,8 +211,8 @@ KUM-8 is Done; see [release notes](../releases/0.1.0.md).
   KumiOS ships appearance-only Light/Dark global themes because Breeze's replace the
   wallpaper and Plasma style. The Plasma style has no palette; KDE owns GTK settings.
 - Native secrets agents keep credentials out of widget arguments/state. The legacy
-  Hyprland utilities remain for compatibility, not new expansion. The legacy audio
-  service was retired in 0.3.0.
+  audio service was retired in 0.3.0, and the Hyprland-era code left `main` in
+  0.4.0 (branch `legacy/hyprland`).
 
 ## Additional validation tools
 
@@ -237,7 +237,7 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
 - `python3 tests/probes/run_appearance_probe.py`: runs `appearance.py`'s backup,
   install, GTK handover and every `--apply` mode with the real KDE tools in a private
   D-Bus session with temporary HOME/XDG directories. Checks colors, automatic mode,
-  accent, wallpaper/layout file, Plasma style and the legacy GTK package. Skips the
+  accent, wallpaper/layout file, Plasma style and the linked GTK target. Skips the
   kded preflight, which needs the live session; does not read or change live appearance.
 - `python3 tests/probes/run_audio_isolation_probe.py`: copies the production widget,
   replaces `NativeAudio.qml` with one importing a missing module, and constructs the

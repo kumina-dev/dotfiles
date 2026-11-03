@@ -10,8 +10,13 @@ until the current acceptance checkpoint is resolved.
 - `plasma/`: supported QML widgets, layout reconciliation and backed-up setup.
 - Audio uses KDE's native backend only; the legacy `kumi-audio` service was retired
   in 0.3.0. After KDE upgrades, run `python3 plasma/audio_api.py`.
-- `hypr/`, GTK utilities and `greeter/`: legacy configuration; do not migrate,
-  remove or change authentication just because those files exist.
+- Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel, matugen, GTK utilities) is
+  not on `main`; it is preserved, unmaintained, on branch `legacy/hyprland`. Do not
+  restore it to `main` or develop it further without the user's instruction.
+- `kitty/` and `greeter/` are still used under Plasma and move under `plasma/` in
+  v0.4.0 (KUM-27, KUM-28). The greeter is the login path: never change greetd or
+  PAM authentication, and change the greeter only with a backup, the user's sudo
+  and a planned logout test.
 - `tests/qml/`: mocked component/state tests; `tests/probes/`: explicit native or
   private-bus probes. Architecture decisions and validation commands: `plasma/README.md`.
 

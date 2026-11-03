@@ -10,11 +10,13 @@ panel layout, and never restarts Plasma.
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 SOURCE = Path(__file__).resolve().parent
 PACKAGES = {"light": "org.kumios.light", "dark": "org.kumios.dark"}
@@ -67,14 +69,51 @@ def automatic_enabled():
     return read_config("kdeglobals", "KDE", "AutomaticLookAndFeel").lower() == "true"
 
 
-def daylight():
-    """KWin Night Light's day/night state, which drives KDE's automatic switch."""
+NIGHT_TIME = ("--session", "--dest", "org.kde.NightTime", "--object-path", "/org/kde/NightTime/Manager",
+              "--method")
+
+
+def schedule_entries(reply):
+    """(noon, morning-start, morning-end, evening-start, evening-end) ms tuples from a
+    KNightTime Subscribe reply as printed by gdbus."""
+    text = reply.replace("int64 ", "")
+    return [tuple(int(v) for v in m) for m in
+            re.findall(r"\((-?\d+), (-?\d+), (-?\d+), (-?\d+), (-?\d+)\)", text)]
+
+
+def is_daytime(reply, now_ms):
+    """True (day), False (night) or None (no usable schedule).
+
+    Day runs from the middle of the morning transition to the middle of the
+    evening transition. Same rule as the Control Center's NightTime.js.
+    """
+    days = schedule_entries(reply)
+    if not days:
+        return None
+    if any((d[1] + d[2]) / 2 <= now_ms < (d[3] + d[4]) / 2 for d in days):
+        return True
+    if days[0][1] <= now_ms < days[-1][4]:
+        return False
+    return None
+
+
+def daytime():
+    """Day or night from KDE's day/night schedule (KNightTime).
+
+    This is the schedule KDE's automatic light/dark switcher follows; it does not
+    depend on Night Light being enabled. Subscribes once and releases it.
+    """
     try:
-        value = run("qdbus6", "org.kde.KWin", "/org/kde/KWin/NightLight",
-                    "org.kde.KWin.NightLight.daylight")
+        reply = run("gdbus", "call", *NIGHT_TIME, "org.kde.NightTime.Manager.Subscribe", "{}")
     except (OSError, subprocess.SubprocessError):
         return None
-    return {"true": True, "false": False}.get(value.lower())
+    cookie = re.search(r"'Cookie': <uint32 (\d+)>", reply)
+    if cookie:
+        try:
+            run("gdbus", "call", *NIGHT_TIME, "org.kde.NightTime.Manager.Unsubscribe", cookie.group(1))
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return is_daytime(reply, time.time() * 1000)
 
 
 def preflight():
@@ -175,7 +214,7 @@ def choose(mode):
     if mode in PACKAGES:
         return PACKAGES[mode], False
     if mode == "auto":
-        day = daylight()
+        day = daytime()
         variant = current_variant() if day is None else ("light" if day else "dark")
         return PACKAGES[variant], True
     return PACKAGES[current_variant()], automatic_enabled()

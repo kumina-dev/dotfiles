@@ -20,7 +20,15 @@ TestCase {
             return automatic + "\n" + theme + "\n" + accent + "\n" + (installed ? "installed" : "missing") + "\n"
         }
         function run(command, callback) { calls.push({command: command, callback: callback}) }
-        function applies() { return calls.filter(c => !c.command.startsWith("kreadconfig6")) }
+        function isRead(c) { return c.command.startsWith("kreadconfig6") }
+        function isSchedule(c) { return c.command.includes("org.kde.NightTime") }
+        function applies() { return calls.filter(c => !isRead(c) && !isSchedule(c)) }
+        function schedules() { return calls.filter(c => isSchedule(c)) }
+        // KNightTime reply (gdbus text): two days, morning 06-07h, evening 18-19h (ms).
+        // As in real replies, only the first tuple carries int64 prefixes.
+        readonly property string scheduleReply: "({'Cookie': <uint32 4>, 'Schedule': <('dynamic', <[(int64 "
+            + [12, 6, 7, 18, 19].map(h => h * 3600000).join(", int64 ") + "), ("
+            + [36, 30, 31, 42, 43].map(h => h * 3600000).join(", ") + ")]>)>},)"
         // Answer every outstanding read with the current simulated state.
         function answerReads() {
             const reads = calls.filter(c => c.command.startsWith("kreadconfig6") && !c.done)
@@ -67,8 +75,13 @@ TestCase {
 
     function test_automaticRegistersPairAndKeepsAutoMode() {
         const c = setup()
-        c.daylight = true
+        c.now = function() { return 12 * 3600000 }      // noon in the schedule
         c.set("auto")
+        // The day/night schedule is read first (KNightTime, not Night Light).
+        compare(fake.schedules().length, 1); compare(fake.applies().length, 0)
+        verify(fake.schedules()[0].command.includes("Manager.Subscribe"))
+        verify(fake.schedules()[0].command.includes("Manager.Unsubscribe"))
+        fake.schedules()[0].callback(0, fake.scheduleReply, "")
         const command = fake.applies()[0].command
         verify(command.includes("DefaultLightLookAndFeel org.kumios.light"))
         verify(command.includes("DefaultDarkLookAndFeel org.kumios.dark"))
@@ -82,10 +95,36 @@ TestCase {
 
     function test_automaticStartingVariant() {
         const c = setup()
-        c.daylight = false; compare(c.command("auto").slice(-15), "org.kumios.dark")
-        c.daylight = undefined; compare(c.startingVariant(), "dark")   // current theme is dark
+        compare(c.command("auto", false).slice(-15), "org.kumios.dark")
+        compare(c.command("auto", true).slice(-16), "org.kumios.light")
+        compare(c.startingVariant(undefined), "dark")   // no schedule: keep current (dark)
         fake.theme = "org.kumios.light"; c.refresh(); fake.answerReads()
-        compare(c.startingVariant(), "light")
+        compare(c.startingVariant(undefined), "light")
+    }
+
+    function test_automaticAtNightStartsDark() {
+        fake.theme = "org.kumios.light"
+        const c = setup()
+        c.now = function() { return 23 * 3600000 }      // after the evening transition
+        c.set("auto")
+        fake.schedules()[0].callback(0, fake.scheduleReply, "")
+        verify(fake.applies()[0].command.endsWith("--keep-auto --apply org.kumios.dark"))
+    }
+
+    function test_unavailableScheduleKeepsCurrentVariantWithoutError() {
+        const c = setup()
+        c.set("auto")
+        fake.schedules()[0].callback(1, "", "The name org.kde.NightTime was not provided")
+        verify(c.busy); compare(c.error, "")
+        verify(fake.applies()[0].command.endsWith("--keep-auto --apply org.kumios.dark"))
+    }
+
+    function test_lateScheduleReplyCannotStartAnotherChange() {
+        const c = setup()
+        c.set("auto")
+        tryVerify(function() { return !c.busy }, 1000)  // times out waiting for the schedule
+        fake.schedules()[0].callback(0, fake.scheduleReply, "")
+        compare(fake.applies().length, 0)
     }
 
     function test_failureTimeoutAndLateReplyCannotAffectRetry() {

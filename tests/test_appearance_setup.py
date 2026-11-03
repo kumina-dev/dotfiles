@@ -44,14 +44,14 @@ class VariantTests(unittest.TestCase):
             self.assertEqual(appearance.choose('light'), ('org.kumios.light', False))
             self.assertEqual(appearance.choose('dark'), ('org.kumios.dark', False))
 
-    def test_choose_auto_follows_night_light(self):
+    def test_choose_auto_follows_day_night_schedule(self):
         fake = FakeConfig(DARK)
         with patch.object(appearance, 'read_config', fake.read):
-            with patch.object(appearance, 'daylight', return_value=True):
+            with patch.object(appearance, 'daytime', return_value=True):
                 self.assertEqual(appearance.choose('auto'), ('org.kumios.light', True))
-            with patch.object(appearance, 'daylight', return_value=False):
+            with patch.object(appearance, 'daytime', return_value=False):
                 self.assertEqual(appearance.choose('auto'), ('org.kumios.dark', True))
-            with patch.object(appearance, 'daylight', return_value=None):
+            with patch.object(appearance, 'daytime', return_value=None):
                 self.assertEqual(appearance.choose('auto'), ('org.kumios.dark', True))
 
     def test_choose_current_keeps_variant_and_automatic_setting(self):
@@ -67,7 +67,7 @@ class ApplyTests(unittest.TestCase):
         fake = FakeConfig(values)
         with patch.object(appearance, 'read_config', fake.read), \
              patch.object(appearance, 'write_config', fake.write), \
-             patch.object(appearance, 'daylight', return_value=None), \
+             patch.object(appearance, 'daytime', return_value=None), \
              patch.object(appearance, 'run') as run:
             result = appearance.apply(mode)
         return result, fake, run

@@ -15,9 +15,13 @@ parts through maintained services:
 - **Light, Dark or Automatic.** Two appearance-only global themes,
   `org.kumios.light` and `org.kumios.dark` (`plasma/lookandfeel/`), select the
   Breeze Light or Breeze Dark color scheme, the matching Breeze icons and the
-  KumiOS Plasma style. Automatic uses KDE's look-and-feel switcher with this pair,
-  following KWin Night Light's day/night schedule. Choosing Light or Dark turns
-  Automatic off.
+  KumiOS Plasma style. Automatic uses KDE's look-and-feel switcher with this pair.
+  It follows KDE's day/night schedule (the KNightTime service, configured on the
+  Day-Night Cycle settings page), which is separate from Night Light: Automatic
+  works with Night Light off. When Automatic is chosen, KumiOS starts in the
+  variant that schedule gives for now, or keeps the current one if no schedule
+  is available. KDE may wait until the session is idle before switching at a
+  transition (Global Theme settings). Choosing Light or Dark turns Automatic off.
 
 The KumiOS Plasma style ships no palette of its own: the panel SVG draws with the
 active color scheme's window background, so the top bar and dock follow light/dark

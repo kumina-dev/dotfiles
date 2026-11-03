@@ -1,4 +1,5 @@
 import QtQuick
+import "NightTime.js" as NightTime
 
 // Light / Dark / Automatic appearance through KDE's global theme settings.
 // A choice is complete only when kdeglobals reports the requested mode; a
@@ -8,9 +9,8 @@ QtObject {
     id: root
     // run(command, callback(exitCode, stdout, stderr)): CommandRunner in production.
     property var run: null
-    // KWin Night Light day/night (true, false, or undefined when unknown); picks the
-    // starting variant for Automatic, as KDE's switcher does.
-    property var daylight: undefined
+    // Clock for the day/night decision; injectable for tests.
+    property var now: function() { return Date.now() }
 
     readonly property var packages: ({light: "org.kumios.light", dark: "org.kumios.dark"})
     // Observed state.
@@ -66,19 +66,22 @@ QtObject {
         })
     }
 
-    function startingVariant() {
-        if (daylight === true) return "light"
-        if (daylight === false) return "dark"
+    // Automatic starts from KDE's day/night schedule (KNightTime), the same one KDE's
+    // switcher follows; it does not depend on Night Light being enabled. Without a
+    // usable schedule, keep the current variant.
+    function startingVariant(daytime) {
+        if (daytime === true) return "light"
+        if (daytime === false) return "dark"
         return globalTheme === packages.light ? "light" : "dark"
     }
 
-    function command(value) {
+    function command(value, daytime) {
         if (value === "auto") {
             const write = "kwriteconfig6 --notify --file kdeglobals --group KDE --key "
             return write + "DefaultLightLookAndFeel " + packages.light
                 + " && " + write + "DefaultDarkLookAndFeel " + packages.dark
                 + " && " + write + "AutomaticLookAndFeel true"
-                + " && plasma-apply-lookandfeel --keep-auto --apply " + packages[startingVariant()]
+                + " && plasma-apply-lookandfeel --keep-auto --apply " + packages[startingVariant(daytime)]
         }
         // Without --keep-auto KDE turns Automatic off: a manual choice wins.
         return "plasma-apply-lookandfeel --apply " + packages[value]
@@ -94,14 +97,22 @@ QtObject {
         if (mode === value) { error = ""; return }
         desired = value
         const token = request.begin()
-        run(command(value), function(exitCode, stdout, stderr) {
+        const apply = function(daytime) {
+            run(command(value, daytime), function(exitCode, stdout, stderr) {
+                if (!request.busy || request.serial !== token) return
+                if (exitCode !== 0) {
+                    const detail = String(stderr).trim() || ("exit code " + exitCode)
+                    request.fail(token, "Appearance: " + detail + ". Open Global Theme settings and retry.")
+                    return
+                }
+                refresh()
+            })
+        }
+        if (value !== "auto") { apply(undefined); return }
+        // An unavailable schedule is not an error: KDE's switcher still takes over.
+        run(NightTime.readCommand, function(exitCode, stdout) {
             if (!request.busy || request.serial !== token) return
-            if (exitCode !== 0) {
-                const detail = String(stderr).trim() || ("exit code " + exitCode)
-                request.fail(token, "Appearance: " + detail + ". Open Global Theme settings and retry.")
-                return
-            }
-            refresh()
+            apply(exitCode === 0 ? NightTime.isDaytime(stdout, now()) : undefined)
         })
     }
 }

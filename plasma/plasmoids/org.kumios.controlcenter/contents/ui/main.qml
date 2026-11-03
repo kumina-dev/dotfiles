@@ -39,14 +39,6 @@ PlasmoidItem {
     AppearanceControl {
         id: appearance
         run: commands.run
-        daylight: nightLightProperties.properties.daylight
-    }
-    DBus.Properties {
-        id: nightLightProperties
-        busType: DBus.BusType.Session
-        service: "org.kde.KWin"
-        path: "/org/kde/KWin/NightLight"
-        iface: "org.kde.KWin.NightLight"
     }
     readonly property string appearanceStatus:
         appearance.busy ? "Applying appearance…"
@@ -693,7 +685,7 @@ PlasmoidItem {
                         mode: "auto"
                         text: "Automatic"
                         icon.name: "chronometer"
-                        tooltip: "Switch between Light and Dark with the Night Light schedule"
+                        tooltip: "Switch between Light and Dark at sunrise and sunset (Day-Night Cycle settings)"
                     }
                 }
 

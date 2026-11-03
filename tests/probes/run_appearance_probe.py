@@ -9,6 +9,7 @@ Preflight is skipped: the private bus has no kded services.
 from pathlib import Path
 import importlib.util
 import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -25,15 +26,20 @@ def outer():
                'XDG_CONFIG_HOME': f'{home}/config', 'XDG_DATA_HOME': f'{home}/data',
                'XDG_CACHE_HOME': f'{home}/cache', 'XDG_STATE_HOME': f'{home}/state',
                'XDG_RUNTIME_DIR': home, 'QT_QPA_PLATFORM': 'offscreen'}
-        # start_new_session + timeout: helpers the private bus activates are
-        # cleaned up with it rather than keeping the probe waiting.
+        # Own process group: services the private bus activates (portals, for
+        # example) are stopped with it, so none outlives the probe or holds its output.
+        process = subprocess.Popen(['dbus-run-session', '--', sys.executable, '-I', __file__],
+                                   env=env, start_new_session=True)
         try:
-            result = subprocess.run(['dbus-run-session', '--', sys.executable, '-I', __file__],
-                                    env=env, timeout=240, start_new_session=True)
+            return process.wait(timeout=240)
         except subprocess.TimeoutExpired:
             print('FAIL: probe timed out')
             return 1
-        return result.returncode
+        finally:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
 
 
 def inner():
@@ -43,6 +49,10 @@ def inner():
     spec = importlib.util.spec_from_file_location('kumios_appearance', ROOT / 'plasma/appearance.py')
     appearance = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(appearance)
+    # Asking the private bus for KDE's day/night schedule would start a private
+    # knighttimed. Use "schedule unavailable" (keep the current variant) instead;
+    # the schedule rule is tested in tests/test_nighttime_rule.py.
+    appearance.daytime = lambda: None
 
     # Starting point resembling v0.2.0: BreezeDark, KumiOS style, an accent already
     # computed from the wallpaper, and GTK linked into a legacy package.

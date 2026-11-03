@@ -4,7 +4,8 @@
 
 - The accent color follows the wallpaper (KDE's accent service), and the user
   chooses Light, Dark or Automatic appearance from the Control Center. Automatic
-  follows the Night Light day/night schedule.
+  follows KDE's day/night schedule (sunrise/sunset, KNightTime) and does not need
+  Night Light enabled.
 - The KumiOS Plasma style no longer hardcodes a dark palette: the top bar and dock
   draw with the active color scheme at their existing translucency.
 - `plasma/appearance.py` replaces `apply-defaults.sh`: appearance-only KumiOS

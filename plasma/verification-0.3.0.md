@@ -37,6 +37,26 @@ switcher acting at a schedule transition, or GTK regeneration. The QML tests use
 fake runner, so they cannot prove the live popup's commands. Those belong to the
 manual checks below.
 
+## Automatic starting variant: KNightTime instead of Night Light (2026-11-03)
+
+User question: does Automatic need Night Light enabled? KDE's switcher
+(`lookandfeelautoswitcher`, plasma-workspace 6.8.2) links `libKNightTime` and reads
+`KDarkLightScheduleProvider`. KWin's Night Light plugin and the Day-Night Cycle
+settings page (`kcm_nighttime`) use the same KNightTime schedule. So KDE's switching
+does not need Night Light. KumiOS, however, chose Automatic's starting variant from
+KWin Night Light's `daylight` property, which need not follow the schedule when
+Night Light is off. Fixed: the Control Center (`NightTime.js`) and `appearance.py`
+read KNightTime's schedule (one Subscribe, immediately Unsubscribed). They use the
+same rule: day from mid-morning to mid-evening transition, otherwise night, or
+unknown outside the schedule, which keeps the current variant.
+
+Evidence: `tests/test_nighttime_rule.py` (11 cases, Python and the JS rule under
+Node agree; single subscribe/unsubscribe; unavailable service gives unknown);
+`tst_Appearance.qml` 12 (schedule read before apply, day/night/unavailable
+schedule, late schedule reply ignored). A live read-only Subscribe/Unsubscribe
+returned a 7–8 day dynamic schedule that agreed with Night Light (both day). Not
+tested: behavior with Night Light disabled (would change the live session).
+
 ## KUM-23 automated evidence
 
 | Check | Scope | Result |
@@ -94,4 +114,4 @@ work except the button doesn't seem to stay visibly as selected", since fixed).
 | V030-EXTERNAL | A System Settings Global Theme change shows when the popup reopens | Passed (user) |
 | V030-GTK | GTK apps follow Light/Dark and the accent | Passed (user) |
 | V030-PRESERVED | Wallpaper, panels, dock pins and shortcuts unchanged | Passed (user); panel widget counts unchanged after both restarts |
-| V030-AUTO | Automatic starts in the right variant; a Night Light schedule transition switches it | Selecting Automatic passed (user). **The transition itself is unverified**: no dusk/dawn switch has been observed. Record the result when it happens; do not force a transition to close it. |
+| V030-AUTO | Automatic starts in the right variant; a day/night schedule transition switches it | Selecting Automatic passed (user). **The transition itself is unverified**: no dusk/dawn switch has been observed. Record the result when it happens; do not force a transition to close it. |

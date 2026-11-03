@@ -165,6 +165,10 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   systemd InvocationIDs before/after to distinguish restarted and untouched units.
   Restarting `kumi-audio.service` tests legacy-bridge independence, because current
   controls use KDE's native backend. It cannot prove PipeWire/WirePlumber recovery.
+- `python3 tests/probes/run_panel_render_probe.py`: renders the KumiOS panel SVG
+  offscreen with KDE's SVG engine under Breeze Light and Breeze Dark, in private
+  D-Bus sessions with temporary config. It checks the panel takes each scheme's window
+  background at its designed translucency; it does not read or change live appearance.
 - `python3 tests/probes/run_dbus_probe.py`: starts a private dbus-run-session fake
   service to check typed roundtrips and errors; needs system PyGObject.
 

@@ -12,11 +12,11 @@ The project runs on Arch Linux and is developed as a personal daily-driver envir
 
 KumiOS has evolved through different desktop architectures.
 
-The public repository currently contains an earlier **Hyprland-based implementation**. The newer development direction is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary.
+The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. The first Plasma release is `v0.1.0` (see [release notes](releases/0.1.0.md)); `0.2.0` is in development. Layout and pinned-app persistence across a later login remains unverified under KUM-8.
 
-The newer implementation is not yet fully represented by the public repository.
+The repository also keeps the earlier **Hyprland-based implementation** as legacy configuration. For details, see [Legacy Hyprland Documentation](docs/legacy-hyprland.md).
 
-For details about the earlier implementation, see [Legacy Hyprland Documentation](docs/legacy-hyprland.md).
+For engineering work, start with [AGENTS.md](AGENTS.md) and [SESSION_HANDOFF.md](SESSION_HANDOFF.md).
 
 ## Design Principles
 
@@ -62,9 +62,11 @@ The public legacy implementation uses Hyprland, GTK utilities, Waybar, SwayNC, a
 
 ## Documentation
 
-- [Legacy Hyprland Implementation](docs/legacy-hyprland.md)
+- [Plasma setup and acceptance](plasma/README.md)
+- [Plasma appearance and Control Center](docs/plasma-controls.md)
 - [Architecture](docs/architecture.md)
-- [Roadmap](docs/roadmap.md)
+- [Legacy Hyprland Implementation](docs/legacy-hyprland.md)
+- [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
 
 Documentation is being reorganized as the newer desktop architecture develops.
@@ -73,7 +75,7 @@ Documentation is being reorganized as the newer desktop architecture develops.
 
 KumiOS is currently a personal development project, not a finished Linux distribution or supported desktop installer.
 
-The repository should not be treated as a ready-to-install KDE-based desktop until the implementation, installation instructions, and verification process have been published.
+The [Plasma runbook](plasma/README.md) covers read-only preflight, explicit layout application, backups and recovery for an existing KumiOS installation. It is not a fresh-machine provisioning tool.
 
 ## License
 

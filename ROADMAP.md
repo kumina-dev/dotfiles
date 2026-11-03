@@ -1,86 +1,35 @@
-# Roadmap
+# KumiOS roadmap
 
-The priority is a simple, reliable daily-driver desktop first. Essential functionality is implemented before deeper integrations and advanced polish.
+Goal: a cohesive KDE Plasma Wayland daily driver with minimal tinkering. Preserve
+the top bar, centered dock, unified launcher and cohesive controls; integrate
+maintained KDE components before building custom backends.
 
-## First iterations
+## Release scope
 
-### Settings and Control Center
+- **v0.1.0:** created locally and accepted for current-session use. The user accepted
+  release before the separate persistence check. Historical scope/limits:
+  [release notes](releases/0.1.0.md). Keep this tag local.
+- **v0.2.0 — dependable everyday controls:** audio defaults/microphone/recovery,
+  Bluetooth adapter/device state, truthful network/task labels and recoverable
+  quick-control feedback. Accepted with explicit unverified limitations on 2026-10-18.
+  No tag/publication/deployment authorized. Evidence and scenario references:
+  [verification](plasma/verification-0.2.0.md); authoritative issue state is in
+  Linear KUM-9–12, not duplicated as checkboxes here.
+- **KUM-8:** user reported the voluntary login/reboot layout and pinned-app
+  persistence check passed on 2026-10-18; acceptance is recorded in Linear.
 
-- [x] Wi-Fi settings
-- [x] Bluetooth settings
-- [x] Display settings
-- [x] Appearance settings
-- [x] Input settings
-  - Keyboard
-  - Mouse
-- [x] Sound settings
-- [x] Basic About page
-- [x] Complete the basic Control Center
+The v0.2.0 acceptance checkpoint is resolved. v0.3.0 work remains explicitly
+unauthorized; await a new instruction. No v0.2.0 release action is authorized.
+Ordinary validated development-branch synchronization is authorized independently
+of release acceptance; follow AGENTS.md and report the verified remote commit.
 
-### Power
+## Deferred scope
 
-- [x] macOS-inspired dropdown power menu
+Fresh-machine provisioning, broader visual redesign, login-stack replacement,
+cloud calendars, custom device backends and legacy Hyprland utility expansion are
+outside current scope. Login warnings warrant investigation only for real symptoms.
 
-## Stabilization
-
-- [x] Remove tracked runtime and Python cache files
-- [x] Prevent duplicate Kumina utility instances
-- [x] Share process and async helpers
-- [x] Harden Settings and Control Center error recovery
-- [x] Add backend regression coverage
-- [x] Refresh project documentation
-- [ ] Complete the visual and UX polish pass
-
-## After first iterations
-
-### KumiOS 1.0
-
-- [ ] Adopt the KumiOS identity and versioned releases
-  - [x] KumiOS identity, one version source, About display, and changelog
-  - [ ] Tag the first tested release
-- [x] Add Super + Alt + 1–9 to move windows without following them
-  - Preserve existing keybindings
-- [x] Make Control Center a single page of quick controls without scrolling
-  - Wi-Fi and Bluetooth toggles, output and microphone volume/mute, media controls
-  - Open Settings for device selection and detailed management
-  - Bound long labels and errors; expose full text in tooltips
-- [ ] Verify the compact Control Center on the desktop at the intended display scales
-- [x] Bound the SwayNC popup area height and repair notification CSS
-- [ ] Give individual notification cards consistent dimensions
-  - The popup-area cap does not enforce per-card height
-  - Truncate overflowing titles/messages and constrain images
-- [ ] Enhance the lock screen using the actual PAM authentication state
-  - [x] Keep the empty password field visible and display Hyprlock's exposed PAM prompt
-  - [x] Show a fingerprint-style icon while this Hyprlock process holds pam_u2f's pending file open
-  - [x] Hide the icon after the pending descriptor closes, including failure and retry transitions
-  - [ ] Verify the live security-key and password fallback behavior on the desktop
-  - [ ] Hide password input during FIDO and restore it for password authentication
-    - Hyprlock 0.9.6 has no configuration option for conditional input-field visibility
-- [x] Turn About into an About this PC screen
-  - KumiOS version, distribution, kernel, hostname, CPU, GPU, RAM, storage
-  - Copy system information
-- [ ] Verify About values and clipboard behavior on the desktop
-- [x] Add Language & Region settings
-  - [x] First iteration: shared clock/date formats, week start, and system time-zone selection
-  - [ ] Verify the new Settings page, live clock/calendar updates, and polkit flow on the desktop
-  - [x] English/Finnish translations for Settings, Control Center, the power menu, and calendar
-  - [x] Desktop verification of the English/Finnish language update (user confirmed)
-  - [x] Regional date/time formats, Finnish/English number styles, and EUR/USD/GBP currency previews
-  - [x] Shared number formatting in About this PC and copied system information
-  - [ ] Verify number/currency controls and About formatting on the desktop
-  - [x] Time zone and 12/24-hour clock
-  - [x] Keep keyboard layouts under Input
-  - [x] Apply preferences consistently and explain refresh/reopen requirements (no logout needed)
-
-### Further integrations
-
-- [ ] Calendar integrations and events
-  - [x] Local all-day events with title/notes, date selection, editing, and confirmed deletion
-  - [x] Persistent SQLite storage and month-grid event markers
-  - [ ] Desktop verification of event dialogs, persistence, and two-pane calendar layout
-  - [ ] Timed events, reminders, recurrence, and external calendar integrations
-- [x] Add a read-only Account section to Settings using the current Linux system account
-  - [ ] Verify account values, copy/refresh, and sidebar scrolling on the desktop
-  - No separate Kumina account system
-  - No cloud account requirement
-  - System username and local account information are the source of truth
+Start engineering work from [AGENTS.md](AGENTS.md) and the current
+[handoff](SESSION_HANDOFF.md). Architecture/commands belong in the Plasma runbook;
+completed behavior in the changelog/release notes; issue status and acceptance in
+Linear. Revisit this roadmap when scope changes, not after each implementation command.

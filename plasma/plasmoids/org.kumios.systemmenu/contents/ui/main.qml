@@ -4,6 +4,7 @@ import QtQuick.Controls as Controls
 
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
+import org.kde.kcmutils as KCM
 import org.kde.plasma.private.sessions 2.0 as Sessions
 
 PlasmoidItem {
@@ -62,6 +63,7 @@ PlasmoidItem {
 
                 onClicked: {
                     root.expanded = false
+                    KCM.KCMLauncher.open("kcm_about-distro")
                 }
             }
 
@@ -104,7 +106,7 @@ PlasmoidItem {
             Separator {}
 
             MenuButton {
-                text: "Log Out Kumina…"
+                text: "Log Out…"
                 icon.name: "system-log-out"
 
                 enabled: session.canLogout

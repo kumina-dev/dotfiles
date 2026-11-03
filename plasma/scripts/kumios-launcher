@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-qdbus6 org.kde.krunner /App \
-    org.kde.krunner.App.display
+# Use the same launcher as the panel and Meta+Space.
+qdbus6 org.kde.plasmashell /PlasmaShell \
+    org.kde.PlasmaShell.activateLauncherMenu

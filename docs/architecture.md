@@ -71,4 +71,4 @@ The intended desktop design emphasizes:
 
 `main` contains only the KDE Plasma implementation (since v0.4.0). Its source is in `plasma/`; setup, verification and architecture decisions are in [the Plasma runbook](../plasma/README.md), and release evidence is in the `plasma/verification-*.md` reports.
 
-The earlier Hyprland-based architecture is preserved, unmaintained, on the `legacy/hyprland` branch, including its own documentation (`docs/legacy-hyprland.md` there).
+The earlier Hyprland-based architecture is preserved, unmaintained, on the `legacy/hyprland` branch, including its own documentation ([legacy-hyprland.md on that branch](https://github.com/kumina-dev/dotfiles/blob/legacy/hyprland/docs/legacy-hyprland.md)).

@@ -1,5 +1,14 @@
 # KumiOS
 
+> **Legacy branch — preserved, not maintained.** This branch keeps the complete
+> Hyprland-era KumiOS (Hyprland, Waybar, SwayNC, fuzzel, matugen, the GTK Settings,
+> Calendar and Control Center utilities, and their tests) exactly as it was at
+> `v0.3.0`, with full history. `main` became Plasma-only in v0.4.0 and no longer
+> contains this code. Details: [docs/legacy-hyprland.md](docs/legacy-hyprland.md).
+> To use it, check this branch out in a separate worktree, for example
+> `git worktree add ~/dotfiles-legacy legacy/hyprland`, and link the packages you
+> need from there. Fixes are not planned.
+
 **A personal Linux desktop project focused on creating a cohesive, reliable, and customizable everyday computing experience.**
 
 KumiOS explores how familiar desktop interaction patterns can be combined with the flexibility of Linux, with an emphasis on usability, consistency, and practical system integration.

@@ -16,7 +16,8 @@ maintained KDE components before building custom backends.
 - **v0.3.0 — wallpaper accent and light/dark appearance:** the accent follows the
   wallpaper and the user chooses Light, Dark or Automatic, replacing the hardcoded
   dark style. Accepted by the user 2026-11-03 in the live session; the Automatic
-  schedule transition is not yet observed. On `kumios/adaptive-appearance`, not yet
+  schedule transition is not yet observed. Also in v0.3.0: upgrade safety for KDE's
+  private audio API (KUM-23) and retiring the legacy audio service (KUM-24). On `kumios/adaptive-appearance`, not yet
   merged or tagged. Evidence: [verification](plasma/verification-0.3.0.md).
 
 No GitHub release, new version tag or deployment is authorized. Ordinary validated
@@ -28,6 +29,10 @@ verified remote commit. Issue state and acceptance live in Linear.
 Fresh-machine provisioning, broader visual redesign, login-stack replacement,
 cloud calendars, custom device backends and legacy Hyprland utility expansion are
 outside current scope. Login warnings warrant investigation only for real symptoms.
+
+Optional, not a release gate: a deliberate multi-monitor panel layout (KUM-25).
+It needs a second physical monitor to test, which is not available. Until then the
+top bar and dock stay on their current screen and other screens use Plasma's defaults.
 
 Start engineering work from [AGENTS.md](AGENTS.md) and the current
 [handoff](SESSION_HANDOFF.md). Architecture/commands belong in the Plasma runbook;

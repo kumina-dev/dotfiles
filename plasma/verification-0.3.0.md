@@ -80,6 +80,25 @@ top bar (8) and dock (1) widgets unchanged. User check 2026-11-03 ("Everything
 checks out"): volume, output mute, microphone mute and device names work as before,
 with no incompatibility message. KUM-23 Done.
 
+## KUM-24: legacy audio service retired — 2026-11-03 (user requested)
+
+- Before: `kumi-audio.service` enabled and running since 2026-10-28, owning
+  `org.kumios.Audio`. No repository code used the interface. A 20-second read-only
+  `busctl monitor` of the service saw no method calls from any client (2 signals
+  only). The bus does not support match-rule statistics, so that check was not used.
+- Live: stopped and disabled. Both unit symlinks removed, user manager reloaded.
+  Afterwards the unit is unknown to systemd, the bus name is gone, and PipeWire,
+  pipewire-pulse, WirePlumber and Plasma are active with both default devices
+  present. `tst_NativeAudio` read-only checks (`test_backendReadOnly`,
+  `test_installedModuleMeetsContract`) pass.
+- Repo: `services/kumi-audio/` and the legacy-only `tst_LegacyAudioContinuity.qml`
+  removed. Historical v0.1.0/v0.2.0 records unchanged.
+- Left in place: `~/.local/share/kumios/venv`, which was used only by this service
+  (not deleted without the user's say-so).
+
+KUM-25: a deliberate multi-monitor layout is optional (user, 2026-11-03), in Linear
+Backlog outside this milestone. It needs a second monitor to test.
+
 ## Live setup — 2026-11-03 (user approved)
 
 - `python3 plasma/appearance.py --apply current` succeeded and verified itself:

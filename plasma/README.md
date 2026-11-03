@@ -18,8 +18,8 @@ The custom presentation delegates Bluetooth devices to `kcm_bluetooth`, audio
 output/input selection and microphone controls to `kcm_pulseaudio`, and About This
 PC to `kcm_about-distro`, using KDE's KCMLauncher API. The 0.2.0 controls
 use KDE's plasma-pa audio context and live default devices directly, including quick
-microphone mute; they no longer depend on the custom KumiOS audio service. The old
-service remains installed for legacy compatibility and is not automatically disabled.
+microphone mute; they no longer depend on the custom KumiOS audio service, which was
+retired in 0.3.0 (KUM-24: stopped, disabled and removed from the repository).
 BluezQt supplies adapters and device events. See [0.2.0 verification](verification-0.2.0.md).
 The 0.3.0 Control Center adds Light / Dark / Automatic appearance and links to
 `kcm_lookandfeel`; the accent follows the wallpaper. See [Appearance](#appearance).
@@ -210,8 +210,9 @@ KUM-8 is Done; see [release notes](../releases/0.1.0.md).
 - Appearance uses KDE's wallpaper accent service and look-and-feel switcher.
   KumiOS ships appearance-only Light/Dark global themes because Breeze's replace the
   wallpaper and Plasma style. The Plasma style has no palette; KDE owns GTK settings.
-- Native secrets agents keep credentials out of widget arguments/state. The old
-  audio service/Hyprland utilities remain for compatibility, not new expansion.
+- Native secrets agents keep credentials out of widget arguments/state. The legacy
+  Hyprland utilities remain for compatibility, not new expansion. The legacy audio
+  service was retired in 0.3.0.
 
 ## Additional validation tools
 
@@ -229,13 +230,6 @@ private service. With the same Qt 6/offscreen flags, invoke one file at a time:
   actual popup pending/error labels, full tooltip text and retry clearing. No
   installed-widget changes, service restarts or device writes. Run via the Python
   wrapper only; the QML file needs the disposable `ui/` copy.
-- `tests/probes/tst_LegacyAudioContinuity.qml`: passive four-second native audio
-  observer. It performs no restart. An authorized external legacy-service restart
-  must occur during its `RESTART_WINDOW_READY` window to claim continuity across
-  that restart; a standalone pass proves only four-second continuity. Compare
-  systemd InvocationIDs before/after to distinguish restarted and untouched units.
-  Restarting `kumi-audio.service` tests legacy-bridge independence, because current
-  controls use KDE's native backend. It cannot prove PipeWire/WirePlumber recovery.
 - `python3 tests/probes/run_panel_render_probe.py`: renders the KumiOS panel SVG
   offscreen with KDE's SVG engine under Breeze Light and Breeze Dark, in private
   D-Bus sessions with temporary config. It checks the panel takes each scheme's window

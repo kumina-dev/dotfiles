@@ -16,6 +16,11 @@
   Sound settings) instead of the whole Control Center. Missing members are
   detected before use. `plasma/audio_api.py` checks the installed module against
   a recorded contract after KDE upgrades and in setup preflight.
+- Retired the legacy KumiOS audio service (`kumi-audio.service`, D-Bus
+  `org.kumios.Audio`): nothing used it since 0.2.0. It is stopped, disabled and
+  removed, together with its legacy-only continuity probe.
+- A deliberate multi-monitor panel layout is optional and deferred: it needs a
+  second monitor to test. Other screens keep Plasma's defaults.
 - Verification and manual acceptance: [verification-0.3.0](plasma/verification-0.3.0.md).
 
 ## 0.2.0 — 2026-11-03 (accepted 2026-10-18)

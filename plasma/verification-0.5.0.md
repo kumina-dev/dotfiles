@@ -5,8 +5,8 @@ implementation (branch `kumios/lock-and-login`); Linear (milestone "v0.5.0 — U
 lock screen and login with security key", KUM-30–33) owns issue status and
 acceptance. Resume from `../SESSION_HANDOFF.md`.
 
-Status 2026-11-04: KUM-31 and KUM-33 Done; KUM-30 and KUM-32 In Review (two user
-checks left, see Pending). Not merged, versioned or tagged.
+Status 2026-11-04: accepted by the user. KUM-30–33 Done. Not yet merged, versioned
+or tagged (awaits the user's instruction).
 
 ## Scope and decisions
 
@@ -44,10 +44,11 @@ the lock screen, login screen and desktop looking unified. User decisions:
 | Login sync live | Light→Dark switch: automatic runs 13:42:20/13:42:24. Wallpaper change: `kumios-wallpaper.png` updated 13:46:14 and the accent followed (`#815eaf`). No sudo |
 | **User login screen check** | **Passed** 2026-11-04: "The login screen works with the new look" |
 
+| **User password login, key unplugged** (KUM-32) | **Passed** 2026-11-04: "Password login works" |
+| **User lock screen look** (KUM-30) | **Passed** 2026-11-04: "the lock screen looks right" |
+
 ## Pending
 
-- KUM-32: log in by password with the key unplugged (only key/normal login seen so far).
-- KUM-30: user confirmation that the real lock screen shows the desktop wallpaper and
-  looks unified (automated screenshots and live config only so far).
-- Known cosmetic: while the key is plugged in, KDE's hint under the name reads
-  "(or scan your fingerprint on the reader)"; that is the key, and KDE's text is fixed.
+- None for acceptance. Known cosmetic: while the key is plugged in, KDE's hint under
+  the name reads "(or scan your fingerprint on the reader)"; that is the key, and
+  KDE's text is fixed.

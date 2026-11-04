@@ -7,7 +7,7 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
 - Milestone: **v0.5.0 — Unified lock screen and login with security key** (KUM-30–33),
-  started 2026-11-04 on the user's instruction; two user checks left. v0.4.0 was
+  started and accepted by the user 2026-11-04; awaiting merge/bump/tag instruction. v0.4.0 was
   accepted, merged and tagged on 2026-11-03.
 - Active branch: `kumios/lock-and-login` (pushed, tracks `origin`), from `main` at
   v0.4.0. Version `0.5.0-dev`. `kumios/plasma-only` was merged (`f9ff574`) and deleted.
@@ -115,9 +115,9 @@ Branch `kumios/lock-and-login`; evidence in `plasma/verification-0.5.0.md`.
 
 | Issue | State | Notes |
 | --- | --- | --- |
-| KUM-30 | In Review | Lock screen wallpaper sync live (user path unit); awaiting user confirmation of the real lock screen's look |
+| KUM-30 | Done | Lock screen wallpaper sync live (user path unit); user confirmed the real lock screen's look |
 | KUM-31 | Done | Key touch via `/etc/pam.d/kde-fingerprint` (kscreenlocker 6.8 runs only that beside the password); user passed touch and unplugged-password unlock |
-| KUM-32 | In Review | User passed the new login look; still needs a password login with the key unplugged |
+| KUM-32 | Done | User passed the new login look and a password login with the key unplugged |
 | KUM-33 | Done | Root sync service live; Light/Dark and wallpaper changes update `/etc/greetd` without sudo |
 
 Live system changes made with the user's sudo: `/etc/pam.d/kde-fingerprint` (undo:
@@ -126,9 +126,8 @@ Live system changes made with the user's sudo: `/etc/pam.d/kde-fingerprint` (und
 
 ## Next authorized action
 
-Finish v0.5.0: record the user's two remaining checks (KUM-32 password login with the
-key unplugged; KUM-30 lock screen look), then merge/bump/tag only on the user's
-instruction. KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
+v0.5.0 is accepted (KUM-30–33 Done). Merge to `main`, bump to 0.5.0 and tag only on
+the user's instruction. KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
 when observed: the V030-AUTO dusk/dawn switch, and the audio API check after a KDE
 upgrade (`python3 plasma/audio_api.py`). The login theme now follows wallpaper and
 Light/Dark automatically (KUM-33). Change greetd/PAM only with backup, the user's

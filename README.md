@@ -12,7 +12,7 @@ The project runs on Arch Linux and is developed as a personal daily-driver envir
 
 KumiOS has evolved through different desktop architectures.
 
-The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. Releases: `v0.1.0`, the first Plasma daily driver ([release notes](releases/0.1.0.md)); `v0.2.0`, dependable everyday controls ([verification](plasma/verification-0.2.0.md)); and `v0.3.0`, wallpaper accent and Light/Dark/Automatic appearance ([verification](plasma/verification-0.3.0.md)). `v0.4.0` makes `main` Plasma-only, with kitty and the KWin-based login greeter themed from KDE ([verification](plasma/verification-0.4.0.md)).
+The current implementation is based on **KDE Plasma 6 and KWin**, using existing KDE infrastructure where practical and introducing custom components where necessary. Releases: `v0.1.0`, the first Plasma daily driver ([release notes](releases/0.1.0.md)); `v0.2.0`, dependable everyday controls ([verification](plasma/verification-0.2.0.md)); `v0.3.0`, wallpaper accent and Light/Dark/Automatic appearance ([verification](plasma/verification-0.3.0.md)). `v0.4.0` makes `main` Plasma-only, with kitty and the KWin-based login greeter themed from KDE ([verification](plasma/verification-0.4.0.md)); and `v0.5.0` unifies the lock screen, login screen and desktop, with security-key unlock ([verification](plasma/verification-0.5.0.md)).
 
 The earlier **Hyprland-based implementation** is no longer on `main`. It is preserved, unmaintained, on the [`legacy/hyprland`](https://github.com/kumina-dev/dotfiles/tree/legacy/hyprland) branch, with its documentation and full history.
 

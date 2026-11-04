@@ -5,8 +5,8 @@ implementation (branch `kumios/lock-and-login`); Linear (milestone "v0.5.0 — U
 lock screen and login with security key", KUM-30–33) owns issue status and
 acceptance. Resume from `../SESSION_HANDOFF.md`.
 
-Status 2026-11-04: accepted by the user. KUM-30–33 Done. Not yet merged, versioned
-or tagged (awaits the user's instruction).
+Status 2026-11-04: accepted by the user. KUM-30–33 Done. Merged into `main`,
+versioned 0.5.0 and tagged `v0.5.0`; the merged `kumios/lock-and-login` branch is deleted.
 
 ## Scope and decisions
 

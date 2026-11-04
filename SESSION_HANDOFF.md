@@ -1,17 +1,18 @@
 # KumiOS session handoff
 
-Snapshot: 2026-11-04 (v0.5.0 in progress on `kumios/lock-and-login`; v0.4.0 is the latest tag). Read this index, then reconstruct live state from Git and
+Snapshot: 2026-11-04 (v0.5.0 released as a tag). Read this index, then reconstruct live state from Git and
 Linear; do not treat a previous conversation or this snapshot as a live database.
 
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
 - Milestone: **v0.5.0 — Unified lock screen and login with security key** (KUM-30–33),
-  started and accepted by the user 2026-11-04; awaiting merge/bump/tag instruction. v0.4.0 was
-  accepted, merged and tagged on 2026-11-03.
-- Active branch: `kumios/lock-and-login` (pushed, tracks `origin`), from `main` at
-  v0.4.0. Version `0.5.0-dev`. `kumios/plasma-only` was merged (`f9ff574`) and deleted.
+  accepted by the user, merged and tagged on 2026-11-04. No next milestone is authorized.
+- Active branch: `main`. `kumios/lock-and-login` was merged (`a510ee5`) and deleted;
+  `kumios/plasma-only` (v0.4.0) was merged (`f9ff574`) and deleted.
   `legacy/hyprland` preserves the Hyprland-era tree (keep it; not maintained).
+- v0.5.0 commits: `1f61c03` (KUM-30), `86ce263`/`404d745` (KUM-31), `9aca7ef`
+  (KUM-32), `ce050d6` (KUM-33).
 - v0.4.0 commits: `86b2e9c` (KUM-26), `dbcbea4` (KUM-27), `5d1c958`/`dd3f4a4`
   (KUM-28, KUM-29). v0.3.0: `aed52c5`, `bc0b565`, `04b66fa`, `bd0b97d`, `ba53a02`,
   `fe09274`, `03c00ef`.
@@ -22,10 +23,11 @@ Linear; do not treat a previous conversation or this snapshot as a live database
 - Working tree: clean at completion of this checkpoint. Always recheck
   `git status --short --branch`; later local edits take precedence over this snapshot.
 - Release tags: `v0.1.0` at `b197802`, then `v0.2.0`, `v0.3.0` and `v0.4.0` (all
-  2026-11-03), all published on GitHub. Source version is `0.4.0` (root `VERSION`). No GitHub releases exist; creating
+  2026-11-03) and `v0.5.0` (2026-11-04), all published on GitHub. Source version is
+  `0.5.0` (root `VERSION`). No GitHub releases exist; creating
   one or a new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `main`, and `kumios/lock-and-login` for v0.5.0 work. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -111,7 +113,7 @@ API change) remain as recorded in `plasma/verification-0.3.0.md`.
 
 ## v0.5.0 state
 
-Branch `kumios/lock-and-login`; evidence in `plasma/verification-0.5.0.md`.
+Merged into `main` and tagged `v0.5.0`; evidence in `plasma/verification-0.5.0.md`.
 
 | Issue | State | Notes |
 | --- | --- | --- |
@@ -126,8 +128,8 @@ Live system changes made with the user's sudo: `/etc/pam.d/kde-fingerprint` (und
 
 ## Next authorized action
 
-v0.5.0 is accepted (KUM-30–33 Done). Merge to `main`, bump to 0.5.0 and tag only on
-the user's instruction. KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
+v0.5.0 is released as a tag (no GitHub release). No next feature milestone is
+authorized. KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
 when observed: the V030-AUTO dusk/dawn switch, and the audio API check after a KDE
 upgrade (`python3 plasma/audio_api.py`). The login theme now follows wallpaper and
 Light/Dark automatically (KUM-33). Change greetd/PAM only with backup, the user's

@@ -19,6 +19,10 @@ until the current acceptance checkpoint is resolved.
   on KWin). It is the login path: never change greetd or PAM authentication, and
   change the greeter only with its backup, the user's own sudo and a planned
   logout test.
+- Lock screen (`plasma/lockscreen.py`, `plasma/security_key.py`): wallpaper sync and
+  the security-key unlock through `/etc/pam.d/kde-fingerprint`; the login greeter
+  follows the desktop through `kumios-greeter-sync` (root-owned code in
+  `/usr/local/lib/kumios`). Same rule as the greeter for any PAM change.
 - `tests/qml/`: mocked component/state tests; `tests/probes/`: explicit native or
   private-bus probes. Architecture decisions and validation commands: `plasma/README.md`.
 
@@ -105,7 +109,7 @@ Ask before major scope/architecture changes, spending/recurring costs, productio
 changes, GitHub releases, production deployments, deleting valuable resources,
 irreversible changes, Plasma/audio-service restarts, logout or disrupting active work. A one-time
 restart approval is consumed by that action, not authorization for future restarts.
-The v0.1.0 to v0.4.0 tags are published on GitHub. No GitHub release or new
+The v0.1.0 to v0.5.0 tags are published on GitHub. No GitHub release or new
 version tag without explicit release authorization. Ordinary validated branch
 pushes do not require another approval. KUM-8 is Done.
 

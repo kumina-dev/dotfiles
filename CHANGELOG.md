@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 0.5.0-dev
+## 0.5.0 — 2026-11-04
 
 - The lock screen shows the desktop's wallpaper and keeps it in sync
   (`plasma/lockscreen.py`, user path unit). It follows Light/Dark and the accent

@@ -43,7 +43,6 @@ the lock screen, login screen and desktop looking unified. User decisions:
 | Login sync install (KUM-33) | User's sudo; path unit enabled; code copies identical to the repository; greetd `config.toml` and PAM untouched |
 | Login sync live | Light→Dark switch: automatic runs 13:42:20/13:42:24. Wallpaper change: `kumios-wallpaper.png` updated 13:46:14 and the accent followed (`#815eaf`). No sudo |
 | **User login screen check** | **Passed** 2026-11-04: "The login screen works with the new look" |
-
 | **User password login, key unplugged** (KUM-32) | **Passed** 2026-11-04: "Password login works" |
 | **User lock screen look** (KUM-30) | **Passed** 2026-11-04: "the lock screen looks right" |
 

@@ -25,6 +25,11 @@ maintained KDE components before building custom backends.
   get Plasma-native sources: kitty follows Light/Dark (KUM-27), the ReGreet login theme
   takes KDE colors and wallpaper (KUM-28), and the login greeter runs on KWin instead
   of Hyprland (KUM-29, user decision).
+- **v0.5.0 — unified lock screen and login with security key (accepted 2026-11-04, not yet merged or tagged):** the
+  lock screen shows the desktop wallpaper and follows Light/Dark and the accent
+  (KUM-30); a security key touch unlocks it with the password as fallback (KUM-31);
+  the login screen mirrors the lock screen (KUM-32) and follows the desktop through a
+  sandboxed root sync service (KUM-33). Evidence: [verification](plasma/verification-0.5.0.md).
 
 No GitHub release, new version tag or deployment is authorized. Ordinary validated
 development-branch synchronization is authorized; follow AGENTS.md and report the

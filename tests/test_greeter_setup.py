@@ -1,6 +1,9 @@
 """ReGreet login theme: KDE colors/wallpaper, snapshot portability and rollback
 boundaries (KUM-28). Nothing here touches /etc/greetd or runs sudo."""
 import importlib.util
+import re
+import xml.etree.ElementTree as ET
+import sys
 from pathlib import Path
 import tempfile
 import tomllib
@@ -121,7 +124,7 @@ class WallpaperTests(unittest.TestCase):
     def test_missing_image_is_none(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            with patch.object(greeter, 'package_image', return_value=None):
+            with patch.object(sys.modules['desktop_appearance'], 'package_image', return_value=None):
                 self.assertIsNone(greeter.plasma_wallpaper(self.appletsrc(root, root / 'gone.png'), True))
 
 
@@ -166,6 +169,29 @@ class SnapshotTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 greeter.prepare(root, root / 'missing', root / 'colors')
             self.assertFalse((root / 'regreet.toml').exists())
+
+
+class ClockTests(unittest.TestCase):
+    """ReGreet's clock formats with chrono: an unknown `%` code panics the clock
+    (seen when Pango markup used size='300%'), so the installed format is checked."""
+    CHRONO = set('aAbBcCdDeFgGhHIjklmMnpPrRsStTuUVwWxXyYzZ%')
+
+    def test_every_percent_is_a_known_chrono_code(self):
+        fmt = greeter.CLOCK_FORMAT.replace('\\n', '\n')
+        for match in re.finditer(r'%(-?)(.)', fmt):
+            self.assertIn(match[2], self.CHRONO, f'unknown clock code %{match[1]}{match[2]}')
+        self.assertNotIn("%'", fmt)
+
+    def test_markup_is_well_formed_and_installed(self):
+        fmt = greeter.CLOCK_FORMAT.replace('\\n', '\n')
+        ET.fromstring('<root>' + fmt.replace('&', '&amp;') + '</root>')
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            wallpaper = write(root / 'w.png', 'x')
+            greeter.prepare(root, wallpaper, root / 'none', greetd_config=write(root / 'g.toml', GREETD))
+            config = tomllib.loads((root / 'regreet.toml').read_text())
+        self.assertEqual(config['widget']['clock']['format'], fmt)
+        self.assertIn('%H:%M', config['widget']['clock']['format'])
 
 
 class GreetdCommandTests(unittest.TestCase):

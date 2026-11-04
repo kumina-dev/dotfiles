@@ -16,13 +16,37 @@ package installed into `/etc/greetd` with sudo, **not** a dotfile link.
   the greeter user, TTY and any other section stay as they are. greetd and PAM
   authentication are not changed.
 
-The theme is a snapshot. After changing the wallpaper or Light/Dark, run preview
-and install again to update the login screen. The snapshot makes the wallpaper
-readable by the greeter account even when your home directory is not.
+The installed theme is a snapshot that is readable by the greeter account even
+when your home directory is not. Keep it in sync with the desktop automatically
+(recommended), or rerun install after changing the wallpaper or Light/Dark.
 
-User/session selection, password visibility, authentication prompts, cancellation
-and power controls remain ReGreet's own UI. The font is Noto Sans with the normal
-system fallback; the clock and greeting are fixed.
+## Look: mirrors the lock screen
+
+`style.css` styles ReGreet like KDE's lock screen, so the login screen, lock
+screen and desktop look like one system: the desktop wallpaper blurred and
+dimmed, a large Noto Sans clock with the date below, the controls floating on the
+wallpaper instead of a card, Breeze-like fields with the KDE accent as focus
+ring, the accent Login button, and flat Reboot/Power Off buttons.
+`tests/probes/run_lock_login_look_probe.py` renders both screens offscreen for
+a side-by-side comparison.
+
+ReGreet's layout itself cannot be changed: it shows a greeting and user/session
+selectors instead of the lock screen's avatar. User/session selection, password
+visibility, authentication prompts, cancellation and power controls remain
+ReGreet's own UI. The clock format (`CLOCK_FORMAT` in `setup.py`) uses Pango
+markup; any `%` in it is a clock code, and an unknown one crashes ReGreet's clock,
+which the tests guard against.
+
+## Security key
+
+greetd's PAM stack (`/etc/pam.d/greetd`, not managed by this repository) has
+`pam_u2f` (touch only) as `sufficient` before the password. At the login screen,
+pick the user and session, choose Login, and ReGreet shows the key's touch
+prompt; a touch logs in. With the key unplugged, or if it is not touched, the
+password prompt follows. Touch only means possession of the key logs in. A
+key-only login does not unlock password-based keyrings (gnome-keyring/KWallet),
+which may then ask for the password once. The lock screen's key unlock is
+configured separately: see `../security_key.py` and the runbook.
 
 ## Preview
 
@@ -64,6 +88,35 @@ verifies that the greeter account can read them, in this order:
 If any step fails, the backup is restored automatically. Nothing is restarted: the
 new greeter starts at the next normal logout or reboot. Earlier Hyprland greeter
 files (`/etc/greetd/hyprland.lua`) are left in place but no longer used.
+
+## Automatic sync with the desktop
+
+```sh
+python3 plasma/greeter/setup.py install-sync   # after install; uses your sudo
+python3 plasma/greeter/setup.py remove-sync    # stop syncing; the current theme stays
+```
+
+`install-sync` copies `desktop_appearance.py`, `setup.py`, `style.css` and `sync.py`
+to root-owned `/usr/local/lib/kumios/` and adds the system units
+`kumios-greeter-sync.path` and `.service`. The path unit watches only your
+`plasma-org.kde.plasma.desktop-appletsrc` (wallpaper) and `kdeglobals` (colors,
+accent, Light/Dark). On a change the service:
+
+1. stages as **you** (it drops from root before opening anything in your home):
+   your colors, Light/Dark and a copy of the wallpaper go into a fresh directory
+   under `/run/kumios-greeter-sync`. A wallpaper path you cannot read fails here,
+   so root never copies a file on your behalf;
+2. as root, opens only those staged files without following symlinks, and accepts
+   a regular single-link file owned by you, at most 64 MiB, with a PNG, JPEG or
+   WebP signature, and exact `#rrggbb` colors;
+3. renders `regreet.toml` and `regreet.css` itself from the root-owned copy and
+   atomically replaces only files that changed.
+
+It never runs code from your home, never changes greetd's `config.toml` or PAM, and
+is sandboxed (`ProtectSystem=strict`, writes only to `/etc/greetd`, no network,
+minimal capabilities; `systemd-analyze security` rates it 1.8). After changing
+`style.css` or `sync.py` in the repository, run `install-sync` again to update the
+root-owned copy. Check runs with `journalctl -u kumios-greeter-sync`.
 
 ## Restore and recovery
 

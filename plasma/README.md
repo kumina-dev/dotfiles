@@ -127,12 +127,60 @@ that cache colors may need reopening. The Plasma style and themes apply to the
 running shell immediately; the accent updates the next time KDE evaluates the
 wallpaper (for example after a wallpaper change).
 
+### Lock screen
+
+The lock screen is KDE's own (kscreenlocker); its UI comes from Plasma's shell and
+is not replaced. It follows Light/Dark and the wallpaper accent through the KumiOS
+Plasma style and color scheme. Its wallpaper is set to the desktop's and kept in sync:
+
+```sh
+python3 plasma/lockscreen.py                # read-only status
+python3 plasma/lockscreen.py install-sync   # back up kscreenlockerrc, sync, keep in sync
+python3 plasma/lockscreen.py remove-sync    # stop syncing (current wallpaper stays)
+```
+
+`install-sync` adds the user units `kumios-lockscreen-sync.path` and `.service`,
+which re-run `lockscreen.py sync` when `plasma-org.kde.plasma.desktop-appletsrc`
+(wallpaper) or `kdeglobals` (Light/Dark, which selects a wallpaper package's dark
+image) changes. Syncing only writes when the wallpaper differs. The backup is in
+`~/.config/kumios/lockscreen-backup-*`. It never locks the session; check the
+result by locking (Meta+L).
+
+### Security key unlock
+
+A touch of the registered security key unlocks the lock screen; the password
+always works too. kscreenlocker 6.8 starts one method at a time (password,
+smartcard, face, or its own `kde-u2f` security-key method, each replacing the
+password box), and runs only the fingerprint service `kde-fingerprint` in
+parallel with the password service `kde`. This PC has no fingerprint reader, so
+KumiOS overrides that service with `plasma/pam/kde-fingerprint` (touch-only
+`pam_u2f`, the same options as sudo and greetd use here). Its methods are
+`[Authenticators]` switches in `kscreenlockerrc` (Fingerprint is on by default),
+and the last chosen method is remembered in `~/.local/state/kscreenlockerrc`
+`[Greeter] Authenticator`; neither needs changing.
+
+```sh
+python3 plasma/security_key.py           # read-only status and readiness
+python3 plasma/security_key.py install   # back up and install (your sudo)
+python3 plasma/security_key.py remove    # KDE's vendor kde-fingerprint applies again
+```
+
+The stack accepts only a key touch (no password module), keeps `faillock preauth`
+so a password-locked account stays locked, and has no `authfail`, so a missing or
+untouched key never counts towards a lockout. While the key is plugged in, the
+lock screen's own hint reads "(or scan your fingerprint on the reader)": that is
+the key (KDE's text cannot be changed). Touch only means possession of the key
+unlocks. `install` also removes the unused `/etc/pam.d/kde-smartcard` override an
+earlier 0.5.0-dev build installed.
+`tests/probes/run_lockscreen_unlock_probe.py` checks a key touch in kscreenlocker's
+testing greeter under a virtual KWin, without locking the session.
+
 ### Login greeter
 
 The login screen is greetd + ReGreet, started on KWin and themed from KDE (colors,
 wallpaper accent, current wallpaper, Light/Dark). Preview, install, restore and TTY
-recovery: [greeter/README.md](greeter/README.md). The theme is a snapshot; reinstall
-it after changing the wallpaper or Light/Dark. The install uses the user's sudo and
+recovery: [greeter/README.md](greeter/README.md). `install-sync` keeps the theme in sync with the
+desktop through a sandboxed root service that reads your files only as you. The install uses the user's sudo and
 takes effect at the next logout or reboot.
 
 ### kitty terminal

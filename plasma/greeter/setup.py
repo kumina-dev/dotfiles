@@ -11,17 +11,20 @@ by changing only the `command` in `[default_session]` of greetd's config.toml.
 greetd and PAM authentication are not changed.
 """
 import argparse
-import configparser
 import json
 import os
 from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
-from urllib.parse import unquote, urlparse
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent))
+from desktop_appearance import (  # noqa: E402  (shared with the lock screen and sync)
+    CONFIG, DEFAULTS, KDE_COLORS, IMAGE_SUFFIXES, hex_color, is_dark, kde_colors,
+    package_image, plasma_wallpaper, read_kde)
 DEST = Path('/etc/greetd')
 FILES = ('regreet.toml', 'regreet.css', 'kumios-wallpaper.png', 'config.toml')
 # Installed in this order: resources first, greetd's launch command last.
@@ -30,100 +33,16 @@ INSTALL_ORDER = ('kumios-wallpaper.png', 'regreet.css', 'regreet.toml', 'config.
 GREETER_COMMAND = ('dbus-run-session -- kwin_wayland --drm --no-lockscreen --no-global-shortcuts'
                    ' --locale1 --exit-with-session /usr/bin/regreet')
 COMMAND_TOOLS = ('dbus-run-session', 'kwin_wayland', 'regreet')
-CONFIG = Path(os.environ.get('XDG_CONFIG_HOME') or Path.home() / '.config')
-# Breeze Dark, used for any color the KDE configuration does not provide.
-DEFAULTS = {
-    'accent_color': '#3daee9', 'accent_bg_color': '#3daee9',
-    'accent_fg_color': '#fcfcfc', 'window_bg_color': '#202326',
-    'window_fg_color': '#fcfcfc', 'view_bg_color': '#141618',
-    'destructive_bg_color': '#da4453', 'destructive_fg_color': '#fcfcfc',
-}
-# Theme color -> KDE (group, key). The accent comes from General/AccentColor
-# (KDE's wallpaper accent) when set, otherwise from the selection color.
-KDE_COLORS = {
-    'accent_bg_color': ('Colors:Selection', 'BackgroundNormal'),
-    'accent_fg_color': ('Colors:Selection', 'ForegroundNormal'),
-    'window_bg_color': ('Colors:Window', 'BackgroundNormal'),
-    'window_fg_color': ('Colors:Window', 'ForegroundNormal'),
-    'view_bg_color': ('Colors:View', 'BackgroundNormal'),
-    'destructive_bg_color': ('Colors:View', 'ForegroundNegative'),
-    'destructive_fg_color': ('Colors:Selection', 'ForegroundNormal'),
-}
-IMAGE_SUFFIXES = ('.png', '.jpg', '.jpeg', '.webp')
-
+# Large time over the date, like KDE's lock screen. Any `%` here is a chrono
+# format code; a stray one panics ReGreet's clock (see tests).
+CLOCK_FORMAT = "<span font='Noto Sans 54'>%H:%M</span>\\n%A, %-d %B %Y"
 
 def run(*args):
     return subprocess.run([str(a) for a in args], check=True)
 
 
-def read_kde(*paths):
-    """KDE ini files, later paths filling only keys earlier ones lack."""
-    merged = {}
-    for path in paths:
-        parser = configparser.RawConfigParser(strict=False, interpolation=None)
-        parser.optionxform = str
-        try:
-            parser.read(path, encoding='utf-8')
-        except (configparser.Error, UnicodeDecodeError):
-            continue
-        for section in parser.sections():
-            for key, value in parser[section].items():
-                merged.setdefault((section, key), value)
-    return merged
-
-
-def hex_color(value):
-    parts = value.split(',') if value else []
-    if len(parts) < 3 or not all(p.strip().isdigit() for p in parts[:3]):
-        return None
-    return '#' + ''.join(f'{min(int(p), 255):02x}' for p in parts[:3])
-
-
-def kde_colors(path):
-    """Theme colors from a kdeglobals (or *.colors scheme) file; Breeze Dark fallback."""
-    kde = read_kde(path, path.parent / 'kdedefaults' / path.name)
-    colors = DEFAULTS.copy()
-    for name, key in KDE_COLORS.items():
-        colors[name] = hex_color(kde.get(key)) or colors[name]
-    colors['accent_bg_color'] = hex_color(kde.get(('General', 'AccentColor'))) or colors['accent_bg_color']
-    colors['accent_color'] = colors['accent_bg_color']
-    return colors
-
-
-def is_dark(colors):
-    red, green, blue = (int(colors['window_bg_color'][i:i + 2], 16) for i in (1, 3, 5))
-    return 0.2126 * red + 0.7152 * green + 0.0722 * blue < 128
-
-
 def palette(colors):
     return '\n'.join(f'@define-color {k} {v};' for k, v in colors.items()) + '\n'
-
-
-def package_image(directory, dark):
-    """Largest image of a KDE wallpaper package, preferring images_dark when dark."""
-    folders = (['images_dark'] if dark else []) + ['images']
-    for folder in folders:
-        candidates = [p for p in (directory / 'contents' / folder).glob('*') if p.suffix.lower() in IMAGE_SUFFIXES]
-        def pixels(p):
-            size = re.match(r'(\d+)x(\d+)', p.stem)
-            return int(size[1]) * int(size[2]) if size else 0
-        if candidates:
-            return max(candidates, key=pixels)
-    return None
-
-
-def plasma_wallpaper(appletsrc, dark):
-    """The image Plasma's desktop shows, from its containment config."""
-    kde = read_kde(appletsrc)
-    images = [value for (section, key), value in sorted(kde.items())
-              if key == 'Image' and section.endswith('][Wallpaper][org.kde.image][General')]
-    for value in images or ['/usr/share/wallpapers/Next']:
-        path = Path(unquote(urlparse(value).path)) if value.startswith('file:') else Path(value).expanduser()
-        if path.is_dir():
-            path = package_image(path, dark)
-        if path and path.is_file():
-            return path
-    return None
 
 
 def with_greeter_command(text, command=GREETER_COMMAND):
@@ -144,19 +63,8 @@ def with_greeter_command(text, command=GREETER_COMMAND):
     return ''.join(lines)
 
 
-def prepare(stage, wallpaper, colors, installed=False, greetd_config=None):
-    """Stage the theme. `colors` is a kdeglobals or *.colors file; `wallpaper` an image
-    or None to use Plasma's current desktop wallpaper."""
-    theme = kde_colors(colors)
-    dark = is_dark(theme)
-    if wallpaper is None:
-        wallpaper = plasma_wallpaper(CONFIG / 'plasma-org.kde.plasma.desktop-appletsrc', dark)
-        if wallpaper is None:
-            raise ValueError("Plasma's wallpaper could not be found. Use --wallpaper PATH.")
-    if not wallpaper.is_file():
-        raise ValueError(f'Wallpaper not found: {wallpaper}. Use --wallpaper PATH.')
-    shutil.copyfile(wallpaper, stage / FILES[2])
-    background = (DEST if installed else stage) / FILES[2]
+def render(theme, dark, background, style=None):
+    """(regreet.toml, regreet.css) text for validated theme colors and a wallpaper path."""
     config = f'''skip_selection = false
 
 [background]
@@ -174,18 +82,32 @@ cursor_theme_name = "Adwaita"
 greeting_msg = "Welcome to KumiOS"
 
 [widget.clock]
-format = "%a %d %b  •  %H:%M"
+format = "{CLOCK_FORMAT}"
 resolution = "1s"
 
 [commands]
 reboot = ["systemctl", "reboot"]
 poweroff = ["systemctl", "poweroff"]
 '''
+    css = palette(theme) + (style or (HERE / 'style.css').read_text(encoding='utf-8'))
+    return config, css
+
+
+def prepare(stage, wallpaper, colors, installed=False, greetd_config=None):
+    """Stage the theme. `colors` is a kdeglobals or *.colors file; `wallpaper` an image
+    or None to use Plasma's current desktop wallpaper."""
+    theme = kde_colors(colors)
+    dark = is_dark(theme)
+    if wallpaper is None:
+        wallpaper = plasma_wallpaper(CONFIG / 'plasma-org.kde.plasma.desktop-appletsrc', dark)
+        if wallpaper is None:
+            raise ValueError("Plasma's wallpaper could not be found. Use --wallpaper PATH.")
+    if not wallpaper.is_file():
+        raise ValueError(f'Wallpaper not found: {wallpaper}. Use --wallpaper PATH.')
+    shutil.copyfile(wallpaper, stage / FILES[2])
+    config, css = render(theme, dark, (DEST if installed else stage) / FILES[2])
     (stage / FILES[0]).write_text(config, encoding='utf-8')
-    (stage / FILES[1]).write_text(
-        palette(theme) + (HERE / 'style.css').read_text(encoding='utf-8'),
-        encoding='utf-8',
-    )
+    (stage / FILES[1]).write_text(css, encoding='utf-8')
     source = greetd_config or DEST / FILES[3]
     (stage / FILES[3]).write_text(with_greeter_command(source.read_text(encoding='utf-8')), encoding='utf-8')
     return theme, wallpaper
@@ -248,9 +170,93 @@ def install(stage):
     print('  sudo systemctl restart greetd')
 
 
+LIB_ROOT = Path('/usr/local/lib/kumios')
+SYNC_UNIT = 'kumios-greeter-sync'
+UNIT_DIR = Path('/etc/systemd/system')
+# Root-owned copies the sync service runs: never code from the user's home.
+LIB_FILES = {HERE.parent / 'desktop_appearance.py': LIB_ROOT / 'desktop_appearance.py',
+             HERE / 'setup.py': LIB_ROOT / 'greeter' / 'setup.py',
+             HERE / 'style.css': LIB_ROOT / 'greeter' / 'style.css',
+             HERE / 'sync.py': LIB_ROOT / 'greeter' / 'sync.py'}
+
+
+def sync_units(user, home):
+    """System units that keep /etc/greetd in sync with `user`'s desktop appearance."""
+    config = Path(home) / '.config'
+    path_unit = f"""[Unit]
+Description=Watch {user}'s desktop appearance for the KumiOS login screen
+
+[Path]
+PathChanged={config / 'plasma-org.kde.plasma.desktop-appletsrc'}
+PathChanged={config / 'kdeglobals'}
+
+[Install]
+WantedBy=multi-user.target
+"""
+    service_unit = f"""[Unit]
+Description=Sync the KumiOS login screen with {user}'s desktop appearance
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -I {LIB_FILES[HERE / 'sync.py']} run --user {user}
+RuntimeDirectory={SYNC_UNIT}
+RuntimeDirectoryMode=0711
+ProtectSystem=strict
+ReadWritePaths=/etc/greetd
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateNetwork=yes
+NoNewPrivileges=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=CAP_SETUID CAP_SETGID CAP_CHOWN CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
+PrivateDevices=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictAddressFamilies=AF_UNIX
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+MemoryDenyWriteExecute=yes
+UMask=0022
+"""
+    return {f'{SYNC_UNIT}.path': path_unit, f'{SYNC_UNIT}.service': service_unit}
+
+
+def install_sync(user, home):
+    """Install the root-owned sync code and units (uses sudo), enable and run once."""
+    if not (DEST / FILES[3]).is_file():
+        raise ValueError('Install the greeter first: python3 plasma/greeter/setup.py install')
+    sudo('install', '-d', '-o', 'root', '-g', 'root', '-m', '755', LIB_ROOT, LIB_ROOT / 'greeter')
+    for source, target in LIB_FILES.items():
+        sudo('install', '-o', 'root', '-g', 'root', '-m', '644', source, target)
+    with tempfile.TemporaryDirectory(prefix='kumios-units-') as directory:
+        for name, text in sync_units(user, home).items():
+            (Path(directory) / name).write_text(text)
+            sudo('install', '-o', 'root', '-g', 'root', '-m', '644', Path(directory) / name, UNIT_DIR / name)
+    sudo('systemctl', 'daemon-reload')
+    sudo('systemctl', 'enable', '--now', f'{SYNC_UNIT}.path')
+    sudo('systemctl', 'start', f'{SYNC_UNIT}.service')
+
+
+def remove_sync():
+    subprocess.run(['sudo', 'systemctl', 'disable', '--now', f'{SYNC_UNIT}.path'], check=False)
+    for name in sync_units('user', '/home/user'):
+        sudo('rm', '-f', UNIT_DIR / name)
+    sudo('rm', '-f', *LIB_FILES.values())
+    subprocess.run(['sudo', 'rmdir', LIB_ROOT / 'greeter', LIB_ROOT], check=False)
+    sudo('systemctl', 'daemon-reload')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('preview', 'install', 'restore'))
+    parser.add_argument('action', choices=('preview', 'install', 'restore', 'install-sync', 'remove-sync'))
     parser.add_argument('backup', nargs='?', type=Path)
     parser.add_argument('--wallpaper', type=Path, default=None,
                         help="image to show (default: Plasma's current desktop wallpaper)")
@@ -260,6 +266,15 @@ def main():
     if os.geteuid() == 0:
         parser.error('Run as your normal desktop user; install/restore request sudo when needed.')
     try:
+        if args.action == 'install-sync':
+            install_sync(os.environ.get('USER') or Path.home().name, str(Path.home()))
+            print(f'Login screen sync enabled ({SYNC_UNIT}.path): changes to your wallpaper, colors or '
+                  'Light/Dark update /etc/greetd automatically. Code runs from root-owned ' + str(LIB_ROOT) + '.')
+            return
+        if args.action == 'remove-sync':
+            remove_sync()
+            print('Login screen sync removed; the current login screen theme stays.')
+            return
         if args.action == 'restore':
             if args.backup is None:
                 parser.error('restore needs the backup directory printed during installation')

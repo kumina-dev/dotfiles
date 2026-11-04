@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased — 0.5.0-dev
+
+- The lock screen shows the desktop's wallpaper and keeps it in sync
+  (`plasma/lockscreen.py`, user path unit). It follows Light/Dark and the accent
+  through the KumiOS style. Wallpaper and color resolution is shared with the
+  login greeter (`plasma/desktop_appearance.py`).
+- A security key touch unlocks the lock screen; the password still works
+  (`plasma/security_key.py`, overriding only the `kde-fingerprint` PAM service,
+  the one kscreenlocker 6.8 runs beside the password; this PC has no reader).
+- The login screen mirrors the lock screen: blurred desktop wallpaper, a large
+  clock with the date, controls floating on the wallpaper, Breeze-like fields
+  with the accent, and flat power buttons. The security-key login (already in
+  greetd's PAM) is documented.
+- The login screen follows desktop wallpaper, color and Light/Dark changes
+  automatically (`setup.py install-sync`). A sandboxed root service reads the
+  user's files only as the user, validates what it installs, and runs only
+  root-owned code.
+
 ## 0.4.0 — 2026-11-03
 
 - `main` is Plasma-only. The Hyprland-era code (Hyprland, Waybar, SwayNC, fuzzel,

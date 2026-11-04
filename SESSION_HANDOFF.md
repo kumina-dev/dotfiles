@@ -1,14 +1,16 @@
 # KumiOS session handoff
 
-Snapshot: 2026-11-03 (v0.4.0 released as a tag). Read this index, then reconstruct live state from Git and
+Snapshot: 2026-11-04 (v0.5.0 in progress on `kumios/lock-and-login`; v0.4.0 is the latest tag). Read this index, then reconstruct live state from Git and
 Linear; do not treat a previous conversation or this snapshot as a live database.
 
 ## Git checkpoint
 
 - Project: KumiOS (`kumina-dev/dotfiles`), workspace/team Kumina / KUM.
-- Milestone: **v0.4.0 — Plasma-only main, Hyprland preserved on a branch**, accepted
-  by the user, merged and tagged on 2026-11-03. No next milestone is authorized.
-- Active branch: `main`. `kumios/plasma-only` was merged (`f9ff574`) and deleted.
+- Milestone: **v0.5.0 — Unified lock screen and login with security key** (KUM-30–33),
+  started and accepted by the user 2026-11-04; awaiting merge/bump/tag instruction. v0.4.0 was
+  accepted, merged and tagged on 2026-11-03.
+- Active branch: `kumios/lock-and-login` (pushed, tracks `origin`), from `main` at
+  v0.4.0. Version `0.5.0-dev`. `kumios/plasma-only` was merged (`f9ff574`) and deleted.
   `legacy/hyprland` preserves the Hyprland-era tree (keep it; not maintained).
 - v0.4.0 commits: `86b2e9c` (KUM-26), `dbcbea4` (KUM-27), `5d1c958`/`dd3f4a4`
   (KUM-28, KUM-29). v0.3.0: `aed52c5`, `bc0b565`, `04b66fa`, `bd0b97d`, `ba53a02`,
@@ -23,7 +25,7 @@ Linear; do not treat a previous conversation or this snapshot as a live database
   2026-11-03), all published on GitHub. Source version is `0.4.0` (root `VERSION`). No GitHub releases exist; creating
   one or a new version tag requires explicit release authorization.
 - Remote target: `origin` = `https://github.com/kumina-dev/dotfiles.git`, branch
-  `main`. Verify synchronization after pushing: `git fetch --no-tags origin`, then
+  `main`, and `kumios/lock-and-login` for v0.5.0 work. Verify synchronization after pushing: `git fetch --no-tags origin`, then
   `git rev-list --left-right --count HEAD...@{upstream}` must be `0 0`.
   A clean worktree is insufficient; rerun these commands rather than trusting a
   stale snapshot.
@@ -107,12 +109,27 @@ complete Hyprland-era tree at v0.3.0 with history.
 v0.3.0 is tagged and accepted; its open items (V030-AUTO transition, real KDE audio
 API change) remain as recorded in `plasma/verification-0.3.0.md`.
 
+## v0.5.0 state
+
+Branch `kumios/lock-and-login`; evidence in `plasma/verification-0.5.0.md`.
+
+| Issue | State | Notes |
+| --- | --- | --- |
+| KUM-30 | Done | Lock screen wallpaper sync live (user path unit); user confirmed the real lock screen's look |
+| KUM-31 | Done | Key touch via `/etc/pam.d/kde-fingerprint` (kscreenlocker 6.8 runs only that beside the password); user passed touch and unplugged-password unlock |
+| KUM-32 | Done | User passed the new login look and a password login with the key unplugged |
+| KUM-33 | Done | Root sync service live; Light/Dark and wallpaper changes update `/etc/greetd` without sudo |
+
+Live system changes made with the user's sudo: `/etc/pam.d/kde-fingerprint` (undo:
+`python3 plasma/security_key.py remove`), `kumios-greeter-sync.path/.service` and
+`/usr/local/lib/kumios` (undo: `python3 plasma/greeter/setup.py remove-sync`).
+
 ## Next authorized action
 
-v0.4.0 is released as a tag (no GitHub release). No next feature milestone is
-authorized; KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
+v0.5.0 is accepted (KUM-30–33 Done). Merge to `main`, bump to 0.5.0 and tag only on
+the user's instruction. KUM-25 (multi-monitor layout) is optional Backlog. Open items to record
 when observed: the V030-AUTO dusk/dawn switch, and the audio API check after a KDE
-upgrade (`python3 plasma/audio_api.py`). After wallpaper or Light/Dark changes, the
-login theme updates only when `python3 plasma/greeter/setup.py install` is rerun.
-Never change greetd/PAM authentication. No GitHub release, version tag or Plasma
-restart without the user's instruction.
+upgrade (`python3 plasma/audio_api.py`). The login theme now follows wallpaper and
+Light/Dark automatically (KUM-33). Change greetd/PAM only with backup, the user's
+sudo and a planned test. No GitHub release, version tag or Plasma restart without
+the user's instruction.

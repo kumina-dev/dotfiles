@@ -1,28 +1,52 @@
-/* ReGreet 0.5: theme its existing controls, including authentication prompts. */
-window { background-color: @window_bg_color; color: @window_fg_color; }
-frame.background {
-    background-color: alpha(@window_bg_color, 0.96);
-    color: @window_fg_color;
-    border: 1px solid alpha(@window_fg_color, 0.14);
-    border-radius: 20px;
-    padding: 18px;
-    box-shadow: 0 12px 36px alpha(black, 0.35);
+/* KumiOS login screen for ReGreet 0.5, styled to mirror KDE's lock screen:
+   blurred desktop wallpaper, a large centered clock, controls floating on the
+   wallpaper instead of a card, Breeze-like fields with an accent focus ring, and
+   flat power buttons. ReGreet's widget layout itself cannot change (no avatar). */
+
+window { background-color: @window_bg_color; color: @window_fg_color; font-family: "Noto Sans"; }
+
+/* The wallpaper, blurred and slightly dimmed like the lock screen's. */
+/* Scaled slightly so the blur's darkened edges fall outside the screen. */
+picture { filter: blur(16px) brightness(0.85); transform: scale(1.06); }
+
+/* Clock: the lock screen's large time, with the date below. */
+frame.background > label,
+frame.background > box > label {
+    background: none;
+    box-shadow: none;
+    color: white;
+    font-size: 24px;
+    text-shadow: 0 1px 6px alpha(black, 0.45);
+    margin-top: 48px;
 }
-frame.background > grid > label:first-child { font-size: 20px; }
-button, entry, passwordentry {
+
+/* No card: the login controls float on the wallpaper. */
+frame.background {
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: white;
+    padding: 18px;
+}
+frame.background label { color: white; text-shadow: 0 1px 4px alpha(black, 0.5); }
+frame.background > grid > label:first-child { font-size: 22px; font-weight: 400; margin-bottom: 8px; }
+
+/* Breeze-like fields: translucent dark fill, thin border, accent ring on focus. */
+button, entry, passwordentry, dropdown > button, combobox > box > button {
     background-image: none;
-    background-color: @view_bg_color;
+    background-color: alpha(@view_bg_color, 0.62);
     color: @window_fg_color;
-    border: 1px solid alpha(@window_fg_color, 0.16);
-    border-radius: 10px;
-    padding: 10px 14px;
+    border: 1px solid alpha(@window_fg_color, 0.20);
+    border-radius: 6px;
+    padding: 8px 12px;
     box-shadow: none;
     text-shadow: none;
 }
-button:hover { background-color: mix(@view_bg_color, @window_fg_color, 0.10); }
+button:hover { background-color: alpha(mix(@view_bg_color, @window_fg_color, 0.12), 0.75); }
 button:focus-visible, entry:focus-within, passwordentry:focus-within {
-    outline: 2px solid @accent_color;
-    outline-offset: 2px;
+    border-color: @accent_color;
+    outline: 1px solid @accent_color;
+    outline-offset: 0;
 }
 button.suggested-action {
     background-color: @accent_bg_color;
@@ -31,18 +55,23 @@ button.suggested-action {
     font-weight: bold;
 }
 button.suggested-action:hover { background-color: shade(@accent_bg_color, 1.10); }
+
+/* Power buttons: flat with a label, like the lock screen's Sleep/Switch User. */
 button.destructive-action {
-    background-color: @window_bg_color;
-    color: @window_fg_color;
+    background: none;
+    border: none;
+    color: white;
+    text-shadow: 0 1px 4px alpha(black, 0.5);
 }
 button.destructive-action:hover {
-    background-color: @destructive_bg_color;
+    background-color: alpha(@destructive_bg_color, 0.85);
     color: @destructive_fg_color;
 }
+
 button:disabled { opacity: 0.5; }
 popover > contents {
     background-color: @window_bg_color;
     color: @window_fg_color;
-    border-radius: 12px;
+    border-radius: 8px;
 }
 selection { background-color: @accent_bg_color; color: @accent_fg_color; }

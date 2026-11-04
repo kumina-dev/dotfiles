@@ -51,7 +51,8 @@ def main():
         env = {'PATH': os.environ['PATH'], 'HOME': str(home), 'USER': os.environ.get('USER', ''),
                'XDG_CONFIG_HOME': str(config), 'XDG_DATA_HOME': str(Path.home() / '.local/share'),
                'XDG_DATA_DIRS': '/usr/local/share:/usr/share', 'XDG_CACHE_HOME': str(home / 'cache'),
-               'XDG_RUNTIME_DIR': str(home), 'QT_FORCE_STDERR_LOGGING': '1', 'XDG_STATE_HOME': str(home / 'state')}
+               'XDG_RUNTIME_DIR': str(home), 'QT_FORCE_STDERR_LOGGING': '1', 'XDG_STATE_HOME': str(home / 'state'),
+               'QT_LOGGING_RULES': 'kscreenlocker*.debug=true'}
         print(f'Touch your security key when asked (within {WAIT} s).', flush=True)
         process = subprocess.Popen(
             ['dbus-run-session', '--', 'kwin_wayland', '--virtual', '--width', '1600', '--height', '900',
@@ -70,7 +71,12 @@ def main():
             except ProcessLookupError:
                 pass
     text = ''.join(lines)
-    unlocked = 'KUMIOS_EXIT 0' in text
+    log = (out / 'greet.log').read_text(errors='replace') if (out / 'greet.log').is_file() else ''
+    # Exit 0 alone is not enough: the success must come from the key's service.
+    unlocked = 'KUMIOS_EXIT 0' in text and 'Success from non-interactive authenticator' in log
+    for line in log.splitlines():
+        if 'Starting PAM worker' in line or 'Success from' in line:
+            print('  ' + line.split(': ', 1)[-1])
     print(('PASS' if unlocked else 'FAIL') + ': key touch unlocked the testing lock screen'
           + ('' if unlocked else (' (timed out)' if 'KUMIOS_TIMEOUT' in text else ' (greeter exited non-zero)')))
     print(f'Screenshot: {out / "lockscreen.png"}; greeter log: {out / "greet.log"}')

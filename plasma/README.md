@@ -149,21 +149,29 @@ result by locking (Meta+L).
 ### Security key unlock
 
 A touch of the registered security key unlocks the lock screen; the password
-always works too. kscreenlocker runs the PAM service `kde-smartcard` in parallel
-with the password service `kde`. KumiOS overrides only that service with
-`plasma/pam/kde-smartcard` (touch-only `pam_u2f`, the same options as sudo and
-greetd use here):
+always works too. kscreenlocker 6.8 starts one method at a time (password,
+smartcard, face, or its own `kde-u2f` security-key method, each replacing the
+password box), and runs only the fingerprint service `kde-fingerprint` in
+parallel with the password service `kde`. This PC has no fingerprint reader, so
+KumiOS overrides that service with `plasma/pam/kde-fingerprint` (touch-only
+`pam_u2f`, the same options as sudo and greetd use here). Its methods are
+`[Authenticators]` switches in `kscreenlockerrc` (Fingerprint is on by default),
+and the last chosen method is remembered in `~/.local/state/kscreenlockerrc`
+`[Greeter] Authenticator`; neither needs changing.
 
 ```sh
 python3 plasma/security_key.py           # read-only status and readiness
 python3 plasma/security_key.py install   # back up and install (your sudo)
-python3 plasma/security_key.py remove    # KDE's vendor kde-smartcard applies again
+python3 plasma/security_key.py remove    # KDE's vendor kde-fingerprint applies again
 ```
 
 The stack accepts only a key touch (no password module), keeps `faillock preauth`
 so a password-locked account stays locked, and has no `authfail`, so a missing or
-untouched key never counts towards a lockout. The lock screen's own hint reads
-"(or scan your smartcard)". Touch only means possession of the key unlocks.
+untouched key never counts towards a lockout. While the key is plugged in, the
+lock screen's own hint reads "(or scan your fingerprint on the reader)": that is
+the key (KDE's text cannot be changed). Touch only means possession of the key
+unlocks. `install` also removes the unused `/etc/pam.d/kde-smartcard` override an
+earlier 0.5.0-dev build installed.
 `tests/probes/run_lockscreen_unlock_probe.py` checks a key touch in kscreenlocker's
 testing greeter under a virtual KWin, without locking the session.
 

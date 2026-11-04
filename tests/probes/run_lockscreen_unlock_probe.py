@@ -3,9 +3,10 @@
 
 Runs kscreenlocker_greet in --testing mode inside a virtual KWin in a private
 D-Bus session, so the real session is never locked. The greeter authenticates
-through the real PAM services as the current user. A screenshot shows whether
-the smartcard (security key) authenticator is offered; then the user touches
-the key. The greeter exits 0 when authentication succeeds. Typing the password
+through the real PAM services as the current user, in its default password
+method, which runs kde-fingerprint (the security key, plasma/security_key.py) in
+parallel. Its state directory is private, so no remembered method applies. A
+screenshot shows the screen with the key offered; then the user touches the key. The greeter exits 0 when authentication succeeds. Typing the password
 into the virtual output is not possible here; check the password on a real lock.
 """
 from pathlib import Path
@@ -50,7 +51,7 @@ def main():
         env = {'PATH': os.environ['PATH'], 'HOME': str(home), 'USER': os.environ.get('USER', ''),
                'XDG_CONFIG_HOME': str(config), 'XDG_DATA_HOME': str(Path.home() / '.local/share'),
                'XDG_DATA_DIRS': '/usr/local/share:/usr/share', 'XDG_CACHE_HOME': str(home / 'cache'),
-               'XDG_RUNTIME_DIR': str(home), 'QT_FORCE_STDERR_LOGGING': '1'}
+               'XDG_RUNTIME_DIR': str(home), 'QT_FORCE_STDERR_LOGGING': '1', 'XDG_STATE_HOME': str(home / 'state')}
         print(f'Touch your security key when asked (within {WAIT} s).', flush=True)
         process = subprocess.Popen(
             ['dbus-run-session', '--', 'kwin_wayland', '--virtual', '--width', '1600', '--height', '900',

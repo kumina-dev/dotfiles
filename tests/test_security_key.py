@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('kumios_security_key', ROOT / 'plasma/security_key.py')
 security_key = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(security_key)
-TEMPLATE = (ROOT / 'plasma/pam/kde-smartcard').read_text()
+TEMPLATE = (ROOT / 'plasma/pam/kde-fingerprint').read_text()
 
 
 def rules(text, facility):
@@ -68,13 +68,49 @@ class ToolTests(unittest.TestCase):
             temp = Path(temp)
             mapping = temp / 'keys'
             mapping.write_text('alice:c,k,es256,+presence\n')
-            template = temp / 'kde-smartcard'
+            template = temp / 'kde-fingerprint'
             template.write_text(f'auth required pam_u2f.so cue authfile={mapping}\n')
             module = temp / 'pam_u2f.so'
-            self.assertIn('pam_u2f is not installed', security_key.problems('alice', template, module)[0])
+            rc = temp / 'kscreenlockerrc'
+            self.assertIn('pam_u2f is not installed', security_key.problems('alice', template, module, rc)[0])
             module.write_text('')
-            self.assertEqual(security_key.problems('alice', template, module), [])
-            self.assertIn('no security key is registered for carol', security_key.problems('carol', template, module)[0])
+            self.assertEqual(security_key.problems('alice', template, module, rc), [])
+            self.assertIn('no security key is registered for carol', security_key.problems('carol', template, module, rc)[0])
+            rc.write_text('[Authenticators]\nFingerprint=false\n')
+            self.assertIn('fingerprint method is turned off', security_key.problems('alice', template, module, rc)[0])
+
+    def test_fingerprint_switch_defaults_on(self):
+        with tempfile.TemporaryDirectory() as temp:
+            rc = Path(temp, 'kscreenlockerrc')
+            self.assertTrue(security_key.fingerprint_enabled(rc))
+            rc.write_text('[Greeter]\nWallpaperPlugin=org.kde.image\n\n[Authenticators]\nUniversal2Factor=true\n')
+            self.assertTrue(security_key.fingerprint_enabled(rc))
+            rc.write_text('[Authenticators]\nFingerprint=False\n')
+            self.assertFalse(security_key.fingerprint_enabled(rc))
+
+    def test_obsolete_smartcard_override_removed_only_when_ours(self):
+        with tempfile.TemporaryDirectory() as temp:
+            old = Path(temp, 'kde-smartcard')
+            self.assertFalse(security_key.obsolete_ours(old))
+            old.write_text('auth required pam_sss.so\n')
+            self.assertFalse(security_key.obsolete_ours(old))
+            old.write_text(security_key.OBSOLETE_MARK + ' (KUM-31).\nauth required pam_u2f.so\n')
+            self.assertTrue(security_key.obsolete_ours(old))
+            link = Path(temp, 'link')
+            link.symlink_to(old)
+            self.assertFalse(security_key.obsolete_ours(link))
+        calls = []
+        with patch.object(security_key, 'problems', return_value=[]), \
+             patch.object(security_key, 'sudo', side_effect=lambda *a: calls.append(a)), \
+             patch.object(security_key, 'obsolete_ours', return_value=True), \
+             patch.object(Path, 'is_symlink', return_value=False), patch.object(Path, 'exists', return_value=False):
+            security_key.install('alice')
+        self.assertEqual(calls[-1], ('rm', '-f', security_key.OBSOLETE))
+        self.assertEqual(calls[0][-1], security_key.TARGET)
+
+    def test_targets_the_service_run_beside_the_password(self):
+        self.assertEqual(security_key.TARGET, Path('/etc/pam.d/kde-fingerprint'))
+        self.assertTrue(security_key.TEMPLATE.is_file())
 
     def test_install_refuses_when_not_ready_without_sudo(self):
         with patch.object(security_key, 'problems', return_value=['pam_u2f is not installed']), \
@@ -87,10 +123,11 @@ class ToolTests(unittest.TestCase):
         calls = []
         with patch.object(security_key, 'problems', return_value=[]), \
              patch.object(security_key, 'sudo', side_effect=lambda *a: calls.append(a)), \
-             patch.object(security_key.subprocess, 'check_output', return_value='/etc/pam.d/kde-smartcard.kumios-backup.x1\n'), \
+             patch.object(security_key.subprocess, 'check_output', return_value='/etc/pam.d/kde-fingerprint.kumios-backup.x1\n'), \
+             patch.object(security_key, 'obsolete_ours', return_value=False), \
              patch.object(Path, 'is_symlink', return_value=False), patch.object(Path, 'exists', return_value=True):
             backup = security_key.install('alice')
-        self.assertEqual(backup, '/etc/pam.d/kde-smartcard.kumios-backup.x1')
+        self.assertEqual(backup, '/etc/pam.d/kde-fingerprint.kumios-backup.x1')
         self.assertEqual(calls[0][0], 'cp')
         self.assertEqual(calls[-1], ('install', '-o', 'root', '-g', 'root', '-m', '644',
                                      security_key.TEMPLATE, security_key.TARGET))
@@ -98,7 +135,7 @@ class ToolTests(unittest.TestCase):
     def test_remove_validates_restore_source(self):
         with patch.object(security_key, 'sudo') as sudo:
             with self.assertRaises(ValueError):
-                security_key.remove('/tmp/kde-smartcard.kumios-backup.x')
+                security_key.remove('/tmp/kde-fingerprint.kumios-backup.x')
             sudo.assert_not_called()
             self.assertEqual(security_key.remove(), 'removed')
             sudo.assert_called_once_with('rm', '-f', security_key.TARGET)

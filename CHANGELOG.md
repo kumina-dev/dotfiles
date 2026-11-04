@@ -7,7 +7,8 @@
   through the KumiOS style. Wallpaper and color resolution is shared with the
   login greeter (`plasma/desktop_appearance.py`).
 - A security key touch unlocks the lock screen; the password still works
-  (`plasma/security_key.py`, overriding only the `kde-smartcard` PAM service).
+  (`plasma/security_key.py`, overriding only the `kde-fingerprint` PAM service,
+  the one kscreenlocker 6.8 runs beside the password; this PC has no reader).
 - The login screen mirrors the lock screen: blurred desktop wallpaper, a large
   clock with the date, controls floating on the wallpaper, Breeze-like fields
   with the accent, and flat power buttons. The security-key login (already in

@@ -2,15 +2,19 @@
 """Security-key unlock for the KDE lock screen (KUM-31).
 
   security_key.py            read-only status
-  security_key.py install    back up and install plasma/pam/kde-smartcard as
-                             /etc/pam.d/kde-smartcard (uses your sudo)
+  security_key.py install    back up and install plasma/pam/kde-fingerprint as
+                             /etc/pam.d/kde-fingerprint (uses your sudo)
   security_key.py remove     remove that override; KDE's vendor file applies again
 
-kscreenlocker runs the `kde-smartcard` PAM service in parallel with the password
-service `kde`. The override makes a touch of the security key unlock the lock
-screen; the password keeps working. No other PAM file is changed.
+kscreenlocker 6.8 runs the `kde-fingerprint` PAM service in parallel with the
+password service `kde` (its other methods, including kde-u2f, replace the
+password box instead). The override makes a touch of the security key unlock the
+lock screen while the password keeps working. No other PAM file is changed.
+install also removes the unused /etc/pam.d/kde-smartcard override that earlier
+0.5.0-dev builds installed, when it is unmodified KumiOS content.
 """
 import argparse
+import configparser
 import os
 from pathlib import Path
 import re
@@ -19,12 +23,15 @@ import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
-TEMPLATE = HERE / 'pam' / 'kde-smartcard'
-TARGET = Path('/etc/pam.d/kde-smartcard')
-VENDOR = Path('/usr/lib/pam.d/kde-smartcard')
+TEMPLATE = HERE / 'pam' / 'kde-fingerprint'
+TARGET = Path('/etc/pam.d/kde-fingerprint')
+VENDOR = Path('/usr/lib/pam.d/kde-fingerprint')
+OBSOLETE = Path('/etc/pam.d/kde-smartcard')
+OBSOLETE_MARK = '# KumiOS: unlock the KDE lock screen by touching the security key'
+LOCKER_RC = Path(os.environ.get('XDG_CONFIG_HOME') or Path.home() / '.config') / 'kscreenlockerrc'
 MODULE = Path('/usr/lib/security/pam_u2f.so')
 BACKUP_DIR = Path('/etc/pam.d')
-BACKUP_PREFIX = 'kde-smartcard.kumios-backup.'
+BACKUP_PREFIX = 'kde-fingerprint.kumios-backup.'
 
 
 def authfile(text):
@@ -44,9 +51,30 @@ def mapped(mapping, user):
     return 0
 
 
-def problems(user, template=TEMPLATE, module=MODULE):
+def fingerprint_enabled(rc=LOCKER_RC):
+    """kscreenlocker's [Authenticators] Fingerprint switch (default on)."""
+    parser = configparser.ConfigParser(interpolation=None, strict=False)
+    parser.optionxform = str
+    try:
+        parser.read_string(rc.read_text())
+    except (OSError, configparser.Error):
+        return True
+    return parser.get('Authenticators', 'Fingerprint', fallback='true').strip().lower() != 'false'
+
+
+def obsolete_ours(path=OBSOLETE):
+    """True when `path` is the unmodified kde-smartcard override an earlier build installed."""
+    try:
+        return not path.is_symlink() and OBSOLETE_MARK in path.read_text()
+    except OSError:
+        return False
+
+
+def problems(user, template=TEMPLATE, module=MODULE, rc=LOCKER_RC):
     """Why installing would not give a working key unlock (empty when ready)."""
     found = []
+    if not fingerprint_enabled(rc):
+        found.append(f'the lock screen fingerprint method is turned off ([Authenticators] Fingerprint=false in {rc})')
     if not module.is_file():
         found.append(f'pam_u2f is not installed ({module})')
     mapping = authfile(template.read_text())
@@ -59,7 +87,7 @@ def problems(user, template=TEMPLATE, module=MODULE):
 
 def state(target=TARGET, template=TEMPLATE):
     if not target.exists():
-        return 'not installed (KDE vendor kde-smartcard applies)'
+        return 'not installed (KDE vendor kde-fingerprint applies)'
     try:
         same = target.read_text() == template.read_text()
     except OSError:
@@ -83,6 +111,8 @@ def install(user):
                                          text=True).strip()
         sudo('cp', '-a', TARGET, backup)
     sudo('install', '-o', 'root', '-g', 'root', '-m', '644', TEMPLATE, TARGET)
+    if obsolete_ours():
+        sudo('rm', '-f', OBSOLETE)
     return backup
 
 
@@ -112,16 +142,20 @@ def main():
             print('Not ready: ' + '; '.join(found))
         elif not TARGET.exists():
             print('Ready to install.')
-        print(f'Password unlock (PAM service kde) is not changed by this tool. Vendor file: {VENDOR}')
+        if obsolete_ours():
+            print(f'Unused earlier override {OBSOLETE} is present; install removes it.')
+        print(f'Password unlock (PAM service kde) is not changed by this tool. Vendor file overridden: {VENDOR}')
         print('Read-only check: nothing changed.')
     elif args.action == 'install':
         backup = install(user)
         print(f'Installed {TARGET}.' + (f' Previous override backed up to {backup}.' if backup else ''))
+        if not OBSOLETE.exists():
+            print(f'{OBSOLETE} is not present (KDE vendor file applies).')
         print('A key touch now unlocks the lock screen; the password still works.')
         print('Undo: python3 plasma/security_key.py remove' + (f' --restore {backup}' if backup else ''))
     else:
         print(f'{TARGET} {remove(args.restore)}; '
-              + ('the earlier override is back.' if args.restore else "KDE's vendor kde-smartcard applies again."))
+              + ('the earlier override is back.' if args.restore else "KDE's vendor kde-fingerprint applies again."))
 
 
 if __name__ == '__main__':

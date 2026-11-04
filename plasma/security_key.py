@@ -108,7 +108,10 @@ def main():
     if args.action is None:
         found = problems(user)
         print('Lock screen key unlock: ' + state())
-        print('Ready to install.' if not found else 'Not ready: ' + '; '.join(found))
+        if found:
+            print('Not ready: ' + '; '.join(found))
+        elif not TARGET.exists():
+            print('Ready to install.')
         print(f'Password unlock (PAM service kde) is not changed by this tool. Vendor file: {VENDOR}')
         print('Read-only check: nothing changed.')
     elif args.action == 'install':
